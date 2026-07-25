@@ -207,7 +207,7 @@ const (
 	LenT
 	// List from tuple (dst mem)
 	List
-	// Literal of value (dst mem num tok)
+	// Literal of value (dst mem mem num tok)
 	Litx
 	// Length of snippet (dst mem)
 	LnSn

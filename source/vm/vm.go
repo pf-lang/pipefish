@@ -1273,12 +1273,24 @@ loop:
 					list = list.Conj(vm.Mem[args[1]])
 				}
 				vm.Mem[args[0]] = values.Value{values.LIST, list}
-			case Litx: // Literal of value (dst mem num tok)
+			case Litx: // Literal of value (dst mem mem num tok)
 				// Operands :
 				//     v#1 is the value.
 				//     n#2 is the number of the compiler to generate the literal.
 				//     n#3 is the number of a token for error-generation if the value has no literal representation.
-				vm.Mem[args[0]] = values.Value{values.STRING, vm.Literal(vm.Mem[args[1]], args[2])}
+				if vm.Mem[args[2]].V.(bool) { // We are necessarily passed the value in args[1] as a tuple. args[2] tells us whether it started out as one.
+					vm.Mem[args[0]] = values.Value{values.STRING, vm.Literal(vm.Mem[args[1]], args[3])}
+				} else {
+					buf := strings.Builder{}
+					sep := ""
+					for _, v := range vm.Mem[args[1]].V.([]values.Value) {
+						buf.WriteString(sep)
+						buf.WriteString(vm.Literal(v, args[3]))
+						sep = ", "
+					}
+					vm.Mem[args[0]] = values.Value{values.STRING, buf.String()}
+				}
+				// TODO --- why are we not consuming n#4 then?
 			case LnSn: // Length of snippet (dst mem)
 				vm.Mem[args[0]] = values.Value{values.INT, len(vm.Mem[args[1]].V.(values.Snippet).Data)}
 			case Logn: // Turn logging off ()

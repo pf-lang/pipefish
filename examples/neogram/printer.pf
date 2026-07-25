@@ -1,14 +1,13 @@
 import 
 
 pho::"phonemes.pf"
-"lists"
 "strings"
 
 ~~ Prints things out for the user or for debugging.
 
 const private
 
-COLUMNS = 3
+COLUMNS = 1
 WIDTH = 30
 
 def
@@ -27,8 +26,8 @@ display(M map) :
             str = pad("▪ " + k + " - " + M[k])
 
 ppRules(rules list) :
-    from a = "" for i::sn = range rules :
-        a + pad(string(i)+".", 5) + makeString(sn) + "\n"
+    from a = "" for i::rule = range rules :
+        a + pad(string(i)+".", 5) + rule[flavor] + " -- " + makeString(rule[body]) + "\n"
 
 makeString(sn snippet) :
     from a = "" for _::el = range sn :

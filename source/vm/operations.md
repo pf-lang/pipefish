@@ -477,7 +477,7 @@ Length of tuple
 list : dst mem
 List from tuple
 
-litx : dst mem num tok
+litx : dst mem mem num tok
 Literal of value
 Operands :
     v#1 is the value.

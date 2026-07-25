@@ -1,6 +1,7 @@
 import 
 
 pho::"phonemes.pf"
+"lists"
 NULL::"files"
 
 include
@@ -10,16 +11,32 @@ include
 "evaluator.pf"
 "parser.pf"
 
+newtype
+
+Rule = struct(flavor string, body snippet)
+
 var
 
 words = map()
 rules = []
+currentFile string? = NULL
 
 cmd
 
 ~~ Adds a list of words to the vocab list.
 add(sn snippet) :
     retcon len(rules), sn
+
+~~ Borrows words into the language, conforming them to the phoneme inventory.
+borrow(sn snippet) :
+    words = (combine words, (sn -> tokenize -> parseWordList -> assimilate(that, inv)))
+given :
+    inv = getPhonemesFrom words
+
+~~ Creates a permanent law of the phonology.
+fix(sn snippet) :
+    rules = rules & Rule("fix", sn)
+    words = fixAll(words, (rules ?> that[flavor] == "fix"))
 
 ~~ Shows the history of the sound changes.
 history :
@@ -28,10 +45,18 @@ history :
     else :
         post ppRules rules
 
+~~ Lists the phonemes currrently in the language.
+inventory :
+    post getPhonemesFrom words
+
 ~~ Merges a file containing a list of words into the vocab.
 merge(filename string) :
     get text from File(filename)
     add snippet(text)
+
+~~ Adds a note to the history.
+note(sn snippet) :
+   rules = rules & Rule("note", sn)
 
 ~~ Deletes the entire vocab and history.
 nuke :
@@ -42,9 +67,12 @@ nuke :
 retcon(sn snippet) :
     retcon 0, sn
 
-~~ Retcons a list of words into the vocab list at a point just prior to rule `i`.
+~~ Retcons a list of words into the vocab list at a point just prior to event `i`.
 retcon(i int, sn snippet) :
-    words = (combine words, (sn -> tokenize -> parseWordList -> apply that, rules[i::len rules]))
+    words = (combine words, 
+                  .. (sn -> tokenize -> parseWordList ..
+                      .. -> apply that, (rules[i::len rules] ?> that[flavor] == "shift"))) ..
+         .. -> fixAll(that, (rules ?> that[flavor] == "fix"))
 
 ~~ Retcons a file containing a list of words into the vocab at the start.
 retcon merge(filename string) :
@@ -56,10 +84,20 @@ retcon merge(i int, filename string) :
     get text from File(filename)
     retcon i, snippet(text)
 
+~~ Saves the project to the given file.
+save as (filename string) :
+    put (literal words, rules) into File(filename)
+
+save :
+    currentFile in string :
+        save as currentFile
+    else :
+        error "you can't use `save` before you've used `save as` to select a filename"
+
 ~~ Applies a sound change.
 shift(sn snippet) :
-    words = changeAll(words, sn)
-    rules = rules & sn
+    words = changeAll(words, sn) -> fixAll(that, (rules ?> that[flavor] == "fix"))
+    rules = rules & Rule("shift", sn)
 
 ~~ Displays the vocab list.
 vocab :
@@ -67,16 +105,30 @@ vocab :
     
 def       
 
+phonemes(sn snippet) :
+    sn -> parse -> evaluateSet
+
+private
+
+fixAll(words map, rules list) :
+    from M = words for :
+        M == newWords :
+            break M 
+        else :
+            newWords
+    given : newWords = apply(M, rules)
+
+getPhonemesFrom(words map) :
+    from S = set() for k::_ = range words :
+        S + set(pho.split(k) ...)
+
 apply(words map, rules list) :
     from M = words for _::rule = range rules :
-        changeAll(M, rule)
+        changeAll(M, rule[body])
 
 changeAll(words map, sn snippet) :
     from M = map() for k::v = range words :
         M with (replaceAll k, sn)::v
-
-phonemes(sn snippet) :
-    sn -> parse -> evaluateSet
 
 combine(M, N map) :
     from m = M for k::v = range N :
@@ -105,6 +157,16 @@ given :
     lhs, rhs = decompose pattern 
     start = matchIn(word, 0::(1 + len(phos) - len(lhs)), lhs)
     stop = start + len lhs
+
+// Assimilates a map of words to a phoneme set.
+assimilate(words map, target set) :
+    from M = map() for k::v = range words :
+        M with (assimilate k, target)::v
+
+// Assimilates a word to a phoneme set.
+assimilate(word string, target set) :
+    from a = "" for i::ph = range pho.split word :
+        a + pho.closest(ph, target)
 
 // Replaces a substring of a word with its nearest match to the pattern in the rhs.
 replaceSubstring(phos list, rhs list) :

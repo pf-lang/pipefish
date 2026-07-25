@@ -81,8 +81,9 @@ len(x clones{snippet}) -> int : builtin "len_snippet"
 len(x clones{string}) -> int : builtin "len_string"
 len(x tuple) -> int : builtin "len_tuple"
 list(x clones{list}) -> list : builtin "cast_to_list"
-literal(x any?) -> string : builtin "literal"
-literal(x tuple) -> string : builtin "literal"
+literal(x tuple) -> string : makeLiteral true, x
+literal(x ... any?) -> string : makeLiteral false, x
+makeLiteral(b bool, x tuple) : builtin "literal"
 map(x clones{map}) -> map : builtin "cast_to_map"
 map(x ... pair) -> map : makeMap(x)
 makeMap(x tuple) -> map : builtin "make_map"
