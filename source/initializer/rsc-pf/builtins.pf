@@ -50,7 +50,7 @@ def
 (x set) - (y set) -> set : builtin "subtract_sets"
 (x type) / (y type) -> any : builtin "type_union"
 
-// Ordinary functions are in order of their function name.
+// Functions with alphabetic names are in order of their function name.
 
 cast(t type, x any?) -> any : builtin "cast"
 codepoint(x clones{rune}) -> int : builtin "codepoint"  
@@ -109,7 +109,7 @@ unsafe(t type, x any?) -> any : builtin "unsafe"
 (x type) with (y ... pair) -> struct : builtin "type_with"        
 (x map) without (y ... any?) -> map : builtin "map_without"
 
-// This supplies us with a any code address to call which will dispatch on the
+// This supplies us with a code address to call which will dispatch on the
 // type of x to the relevant instance of the 'string' function.
 stringify(x any?) -> string :
     string x

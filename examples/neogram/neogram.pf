@@ -63,6 +63,10 @@ nuke :
     words = map()
     rules = []
 
+// open (filename string):
+//     get data from File(filename)
+//     words, rules = eval data
+
 ~~ Retcons a list of words into the vocab list at the start.
 retcon(sn snippet) :
     retcon 0, sn
@@ -87,6 +91,7 @@ retcon merge(i int, filename string) :
 ~~ Saves the project to the given file.
 save as (filename string) :
     put (literal words, rules) into File(filename)
+    currentFile = filename
 
 save :
     currentFile in string :

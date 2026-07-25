@@ -36,7 +36,7 @@ var BUILTINS = map[string]functionAndReturnType{
 	"divide_integers":           {(*Compiler).btDivideIntegers, AltType(values.ERROR, values.INT)},
 	"divide_integer_by_float":   {(*Compiler).btDivideIntegerByFloat, AltType(values.ERROR, values.FLOAT)},
 	"divide_integers_to_float":  {(*Compiler).btDivideIntegersToFloat, AltType(values.ERROR, values.FLOAT)},
-	"eval":                      {(*Compiler).btEval, AltType()},
+	"eval":                      {(*Compiler).btEval, AltType()},         // Result type added in SeekFunctionCall
 	"first_in_tuple":            {(*Compiler).btFirstInTuple, AltType()}, // Types need to be added by the caller.
 	"float_of_int":              {(*Compiler).btFloatOfInt, AltType(values.FLOAT)},
 	"float_of_string":           {(*Compiler).btFloatOfString, AltType(values.ERROR, values.FLOAT)},
