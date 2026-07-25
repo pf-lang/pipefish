@@ -129,10 +129,14 @@ const (
 	Gtef
 	// Int comparison with >= (dst mem mem)
 	Gtei
+	// String comparison with >= (dst mem mem)
+	Gtes
 	// Float comparison with > (dst mem mem)
 	Gthf
 	// Int comparison with > (dst mem mem)
 	Gthi
+	// String comparison with > (dst mem mem)
+	Gths
 	// Intersection of sets (dst mem mem)
 	IctS
 	// Index list  (dst mem mem tok)

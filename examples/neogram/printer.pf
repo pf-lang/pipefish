@@ -1,9 +1,15 @@
+import 
+
+pho::"phonemes.pf"
+"lists"
+"strings"
+
 ~~ Prints things out for the user or for debugging.
 
 const private
 
 COLUMNS = 3
-WIDTH = 25
+WIDTH = 30
 
 def
 
@@ -12,20 +18,34 @@ display(M map) :
     len(M) == 0 :
         "Vocab list is empty."
     else :
-        first from result, c = "", 1 for k::v = range M :
+        first from result, c = "", 1 for _::k = range lists.sort keys M  :
             c mod COLUMNS == 0 :
                 result + str + "\n", c + 1
             else :
                 result + str, c + 1
         given :
-            str = pad("▪ " + k + " - " + v)
+            str = pad("▪ " + k + " - " + M[k])
+
+ppRules(rules list) :
+    from a = "" for i::sn = range rules :
+        a + pad(string(i)+".", 5) + makeString(sn) + "\n"
+
+makeString(sn snippet) :
+    from a = "" for _::el = range sn :
+        a + string(el)
+
+mapToOrderedList(M map) -> list :
+    lists.sort from L = [] for k::v = range M :
+        L & (k::v) 
 
 pad(s string) :
-    len(s) > WIDTH :
+    pad s, WIDTH
+
+pad(s string, w int) :
+    len(s) > w :
         error "string too wide to pad"
     else :
-        from result = s for _::i = range 0::(WIDTH - len s) :
-            result + " "
+        s + strings.repeat(" ", w-len s)
 
 ~~ Prettyprints an AST.
 pp(node Node) :

@@ -1153,7 +1153,7 @@ NodeTypeSwitch:
 			rhs := uint32(DUMMY)
 			switch chunk := chunk.(type) {
 			case *parser.InfixExpression:
-				if dtypes.SetOf(vm.Gthf, vm.Gtef, vm.Gthi, vm.Gtei).Contains(penultimateCode.Opcode) && oldTop+2 == cp.CodeTop() {
+				if dtypes.SetOf(vm.Gthf, vm.Gtef, vm.Gthi, vm.Gtei, vm.Gths, vm.Gtes).Contains(penultimateCode.Opcode) && oldTop+2 == cp.CodeTop() {
 					switch chunk.Operator {
 					case ">", ">=":
 						lhs = penultimateCode.Args[1]

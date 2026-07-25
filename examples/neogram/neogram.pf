@@ -1,6 +1,7 @@
 import 
 
 pho::"phonemes.pf"
+NULL::"files"
 
 include
 
@@ -9,19 +10,70 @@ include
 "evaluator.pf"
 "parser.pf"
 
-var 
+var
 
 words = map()
+rules = []
 
 cmd
 
+~~ Adds a list of words to the vocab list.
 add(sn snippet) :
-    words = combine words, (sn -> tokenize -> parseWordList)
+    retcon len(rules), sn
 
+~~ Shows the history of the sound changes.
+history :
+    rules == [] :
+        post "No history has happened yet."
+    else :
+        post ppRules rules
+
+~~ Merges a file containing a list of words into the vocab.
+merge(filename string) :
+    get text from File(filename)
+    add snippet(text)
+
+~~ Deletes the entire vocab and history.
+nuke :
+    words = map()
+    rules = []
+
+~~ Retcons a list of words into the vocab list at the start.
+retcon(sn snippet) :
+    retcon 0, sn
+
+~~ Retcons a list of words into the vocab list at a point just prior to rule `i`.
+retcon(i int, sn snippet) :
+    words = (combine words, (sn -> tokenize -> parseWordList -> apply that, rules[i::len rules]))
+
+~~ Retcons a file containing a list of words into the vocab at the start.
+retcon merge(filename string) :
+    get text from File(filename)
+    retcon 0, snippet(text)
+
+~~ Retcons a file containing a list of words into the vocab at the start.
+retcon merge(i int, filename string) :
+    get text from File(filename)
+    retcon i, snippet(text)
+
+~~ Applies a sound change.
+shift(sn snippet) :
+    words = changeAll(words, sn)
+    rules = rules & sn
+
+~~ Displays the vocab list.
 vocab :
     post display words
+    
+def       
 
-def 
+apply(words map, rules list) :
+    from M = words for _::rule = range rules :
+        changeAll(M, rule)
+
+changeAll(words map, sn snippet) :
+    from M = map() for k::v = range words :
+        M with (replaceAll k, sn)::v
 
 phonemes(sn snippet) :
     sn -> parse -> evaluateSet
@@ -31,7 +83,70 @@ combine(M, N map) :
         m with k::v
 
 match(word string, pattern snippet) :
-    pattern -> parse -> listify
+    (pattern -> parse -> listify), (word -> pho.split)
+
+replaceAll(word string, pattern snippet) : 
+    from a = word for :
+        newWord == a :
+            break
+        else :
+            newWord
+    given :
+        newWord = replaceOnce a, pattern
+
+replaceOnce(word string, pattern snippet) :
+    start in null :
+        word 
+    else :
+        (lists.sum phos[0::start] & "") + replaceSubstring(phos[start::stop], rhs) ..
+                                .. + (lists.sum phos[stop::len phos] & "")
+given :
+    phos = pho.split word
+    lhs, rhs = decompose pattern 
+    start = matchIn(word, 0::(1 + len(phos) - len(lhs)), lhs)
+    stop = start + len lhs
+
+// Replaces a substring of a word with its nearest match to the pattern in the rhs.
+replaceSubstring(phos list, rhs list) :
+    from a = "" for i::ph = range phos :
+        a + pho.closest(ph, rhs[i])
+
+// Expects a pattern of the form `lhs > rhs` and turns it into two lists of sets
+// of phonemes.
+decompose(pattern snippet) :
+    ast in BinaryNode and ast[operator] == ">" :
+        makeSets(ast[left]), makeSets(ast[right])
+    else :
+        error "expected `>`"
+given :
+    ast = parse pattern 
+
+// Turns a comma-separated node into a pattern given as a list of sets.
+makeSets(n Node) :
+    n -> listify >> evaluateSet
+
+// Returns the position of the first substring of the word to match the pattern
+// given in `sets`, or `NULL` if there is no match.
+matchIn(word string, bounds pair, sets list) -> int? :
+    len sets == 0 :
+        NULL 
+    else :
+        from a = NULL for _::i = range bounds :
+            matchAt word, i, sets :
+                break i
+            else :
+                continue
+
+// Returns true if the pattern matches the word at the given position.
+matchAt(word string, pos int, sets list) -> bool :
+    from a = true for i::j = range pos::pos+len(sets) :
+        phos[j] in sets[i] :
+            continue 
+        else :
+            break false
+given :
+    phos = pho.split(word)
+    
 
 // This splits the node into pieces at the commas.
 listify(n Node) :

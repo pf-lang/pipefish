@@ -898,10 +898,14 @@ loop:
 				vm.Mem[args[0]] = values.Value{values.BOOL, vm.Mem[args[1]].V.(float64) >= vm.Mem[args[2]].V.(float64)}
 			case Gtei: // Int comparison with >= (dst mem mem)
 				vm.Mem[args[0]] = values.Value{values.BOOL, vm.Mem[args[1]].V.(int) >= vm.Mem[args[2]].V.(int)}
+			case Gtes: // String comparison with >= (dst mem mem)
+				vm.Mem[args[0]] = values.Value{values.BOOL, vm.Mem[args[1]].V.(string) >= vm.Mem[args[2]].V.(string)}
 			case Gthf: // Float comparison with > (dst mem mem)
 				vm.Mem[args[0]] = values.Value{values.BOOL, vm.Mem[args[1]].V.(float64) > vm.Mem[args[2]].V.(float64)}
 			case Gthi: // Int comparison with > (dst mem mem)
 				vm.Mem[args[0]] = values.Value{values.BOOL, vm.Mem[args[1]].V.(int) > vm.Mem[args[2]].V.(int)}
+			case Gths: // String comparison with > (dst mem mem)
+				vm.Mem[args[0]] = values.Value{values.BOOL, vm.Mem[args[1]].V.(string) > vm.Mem[args[2]].V.(string)}
 			case IctS: // Intersection of sets (dst mem mem)
 				leftSet := vm.Mem[args[1]].V.(values.Set)
 				result := leftSet.Intersect(vm.Mem[args[2]].V.(values.Set))

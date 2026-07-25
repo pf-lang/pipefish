@@ -323,11 +323,17 @@ Float comparison with >=
 gtei : dst mem mem
 Int comparison with >=
 
+gtes : dst mem mem
+String comparison with >=
+
 gthf : dst mem mem
 Float comparison with >
 
 gthi : dst mem mem
 Int comparison with >
+
+gths : dst mem mem
+String comparison with >
 
 ictS : dst mem mem
 Intersection of sets

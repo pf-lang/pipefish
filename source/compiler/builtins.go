@@ -52,6 +52,8 @@ var BUILTINS = map[string]functionAndReturnType{
 	"gte_floats":                {(*Compiler).btGteFloats, AltType(values.BOOL)},
 	"gt_ints":                   {(*Compiler).btGtInts, AltType(values.BOOL)},
 	"gte_ints":                  {(*Compiler).btGteInts, AltType(values.BOOL)},
+	"gt_strings":                {(*Compiler).btGtStrings, AltType(values.BOOL)},
+	"gte_strings":               {(*Compiler).btGteStrings, AltType(values.BOOL)},
 	"intersect_sets":            {(*Compiler).btIntersectSets, AltType(values.SET)},
 	"int_of_enum":               {(*Compiler).btIntOfEnum, AltType(values.INT)},
 	"int_of_float":              {(*Compiler).btIntOfFloat, AltType(values.INT)},
@@ -71,6 +73,8 @@ var BUILTINS = map[string]functionAndReturnType{
 	"lte_floats":                {(*Compiler).btLteFloats, AltType(values.BOOL)},
 	"lt_ints":                   {(*Compiler).btLtInts, AltType(values.BOOL)},
 	"lte_ints":                  {(*Compiler).btLteInts, AltType(values.BOOL)},
+	"lt_strings":                {(*Compiler).btLtStrings, AltType(values.BOOL)},
+	"lte_strings":               {(*Compiler).btLteStrings, AltType(values.BOOL)},
 	"make_error":                {(*Compiler).btMakeError, AltType(values.ERROR)},
 	"make_map":                  {(*Compiler).btMakeMap, AltType(values.MAP)},
 	"make_pair":                 {(*Compiler).btMakePair, AltType(values.PAIR)},
@@ -271,6 +275,14 @@ func (cp *Compiler) btGteInts(tok *token.Token, dest uint32, args []uint32) {
 	cp.Emit(vm.Gtei, dest, args[0], args[2])
 }
 
+func (cp *Compiler) btGtStrings(tok *token.Token, dest uint32, args []uint32) {
+	cp.Emit(vm.Gths, dest, args[0], args[2])
+}
+
+func (cp *Compiler) btGteStrings(tok *token.Token, dest uint32, args []uint32) {
+	cp.Emit(vm.Gtes, dest, args[0], args[2])
+}
+
 func (cp *Compiler) btIntersectSets(tok *token.Token, dest uint32, args []uint32) {
 	cp.Emit(vm.IctS, dest, args[0], args[2])
 }
@@ -346,6 +358,14 @@ func (cp *Compiler) btLtInts(tok *token.Token, dest uint32, args []uint32) {
 
 func (cp *Compiler) btLteInts(tok *token.Token, dest uint32, args []uint32) {
 	cp.Emit(vm.Gtei, dest, args[2], args[0])
+}
+
+func (cp *Compiler) btLtStrings(tok *token.Token, dest uint32, args []uint32) {
+	cp.Emit(vm.Gths, dest, args[2], args[0])
+}
+
+func (cp *Compiler) btLteStrings(tok *token.Token, dest uint32, args []uint32) {
+	cp.Emit(vm.Gtes, dest, args[2], args[0])
 }
 
 func (cp *Compiler) btMakeError(tok *token.Token, dest uint32, args []uint32) {

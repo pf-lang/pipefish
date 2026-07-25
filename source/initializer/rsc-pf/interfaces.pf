@@ -10,10 +10,10 @@ Lteable = interface :
     (x self) <= (y self) -> bool
 
 Gtable = interface :
-    (x self) < (y self) -> bool
+    (x self) > (y self) -> bool
 
 Gteable = interface :
-    (x self) <= (y self) -> bool
+    (x self) >= (y self) -> bool
 
 Comparable = interface :
     (x self) < (y self) -> bool

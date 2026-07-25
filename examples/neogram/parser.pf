@@ -86,7 +86,7 @@ given :
     newTail = rparenAndNewTail[1::len rparenAndNewTail]
 
 parseImplicitAnd(tokens list, leftNode Node) -> list, Node : 
-    parseRest(newTail, BinaryNode(AND_TOKEN, "&", leftNode, rightNode), LOWEST_PRECEDENCE)
+    parseRest(newTail, BinaryNode(AND_TOKEN, "&", leftNode, rightNode), INFIXES["&"])
 given :
     newTail, rightNode = parseExpression(tokens, INFIXES["&"])
 
