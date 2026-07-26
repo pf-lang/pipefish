@@ -20,6 +20,7 @@ var
 words = map()
 rules = []
 currentFile string? = NULL
+recentChanges map? = NULL
 
 cmd
 
@@ -29,18 +30,28 @@ add(sn snippet) :
 
 ~~ Borrows words into the language, conforming them to the phoneme inventory.
 borrow(sn snippet) :
-    words = (combine words, (sn -> tokenize -> parseWordList -> assimilate(that, inv)))
+    setWords ((combine words, (sn -> tokenize -> parseWordList -> assimilate(that, inv))) ..
+              .. -> fixAll(that, (rules ?> that[flavor] == "fix")))
 given :
     inv = getPhonemesFrom words
 
 ~~ Deletes words from the vocab list.
-delete(sn snippet) :
+// We don't use `setWords` 'cos there wouldn't be anything to show, maybe have it construct its
+// own diff?
+delete(sn snippet) : 
     words = words without ((sn -> makeString -> strings.split that, "\n") ...)
+
+~~ Shows which entries in the word list have been changed by the most recent command.
+diff :
+    recentChanges in null :
+        post "There are no recent changes."
+    else :
+        post display recentChanges
 
 ~~ Creates a permanent law of the phonology.
 fix(sn snippet) :
     rules = rules & Rule("fix", sn)
-    words = fixAll(words, (rules ?> that[flavor] == "fix"))
+    setWords fixAll(words, (rules ?> that[flavor] == "fix"))
 
 ~~ Shows the history of the sound changes.
 history :
@@ -62,10 +73,12 @@ merge(filename string) :
 note(sn snippet) :
    rules = rules & Rule("note", sn)
 
-~~ Deletes the entire vocab and history.
+~~ Deletes the project in-memory, though not on disk if you've saved it.
 nuke :
     words = map()
     rules = []
+    currentFile = NULL 
+    recentChanges = NULL
 
 ~~ Opens a saved project.
 open (filename string):
@@ -81,10 +94,10 @@ retcon(sn snippet) :
 
 ~~ Retcons a list of words into the vocab list at a point just prior to event `i`.
 retcon(i int, sn snippet) :
-    words = (combine words, 
+    setWords ((combine words, 
                   .. (sn -> tokenize -> parseWordList ..
                       .. -> apply that, (rules[i::len rules] ?> that[flavor] == "shift"))) ..
-         .. -> fixAll(that, (rules ?> that[flavor] == "fix"))
+         .. -> fixAll(that, (rules ?> that[flavor] == "fix")))
 
 ~~ Retcons a file containing a list of words into the vocab at the start.
 retcon merge(filename string) :
@@ -109,20 +122,51 @@ save :
 
 ~~ Applies a sound change.
 shift(sn snippet) :
-    words = changeAll(words, sn) -> fixAll(that, (rules ?> that[flavor] == "fix"))
+    setWords (changeAll(words, sn) -> fixAll(that, (rules ?> that[flavor] == "fix")))
     rules = rules & Rule("shift", sn)
 
 ~~ Displays the vocab list.
 vocab :
     post display words
-    
+   
+private
+
+// Makes sure we set the diff when we set the words.
+setWords(newWords map) :
+    recentChanges = getDiff(words, newWords)
+    words = newWords
+
 def       
+
+~~ Describes the phonological properties of a phoneme.
+describe(sn snippet) -> string :
+    ph -> getSets ?> not (that in ["C", "V", "consonant", "vowel"] ..
+                       .. or len(that) > 4 and that[0::4] == "non-") ..
+     .. -> strings.join(that, " ") + cOrV 
+given :
+    ph = makeString sn 
+    cOrV = (ph in pho.CONSONANT : " consonant" ; else : " vowel")
+
 
 ~~ Returns the phonemes matching a given pattern.
 phonemes(sn snippet) :
     sn -> parse -> evaluateSet
 
-private
+// private
+
+getDiff(M, N map) -> map :
+    from A = map() for k::v = range N :
+        not k in keys M or M[k] != v :
+            A with k::v 
+        else :
+            continue
+
+getSets(ph string) :
+    from L = [] for name::class = range pho.MAP :
+        ph in class :
+            L & name
+        else :
+            continue
 
 fixAll(words map, rules list) :
     from M = words for :
@@ -149,13 +193,10 @@ combine(M, N map) :
         m plus (k::v)
 
 (M map) plus (P pair) -> map :
-    P[0] in keys M :
+    P[0] in keys M and P[1] != M[P[0]] :
         M with P[0]::M[P[0]]+", "+P[1]
     else :
         M with P
-
-match(word string, pattern snippet) :
-    (pattern -> parse -> listify), (word -> pho.split)
 
 replaceAll(word string, pattern snippet) : 
     from a = word for :
@@ -170,12 +211,16 @@ replaceOnce(word string, pattern snippet) :
     start in null :
         word 
     else :
-        (lists.sum phos[0::start] & "") + replaceSubstring(phos[start::stop], rhs) ..
+        (lists.sum phos[0::start] & "") + replaceSubstring(phos[start::stop], rhs, numbering) ..
                                 .. + (lists.sum phos[stop::len phos] & "")
 given :
     phos = pho.split word
     lhs, rhs = decompose pattern 
-    start = matchIn(word, 0::(1 + len(phos) - len(lhs)), lhs)
+    searchFrom = (isFinal : len(phos)-len(lhs) ; else : 0)
+    searchTo = (isInitial : 1 ; else : 1 + len(phos)-len(lhs))
+    isInitial, isFinal = isInitialOrFinal pattern
+    numbering = pattern -> parse -> that[right] -> listify -> getNumbers(that)
+    start = matchIn(word, searchFrom::searchTo, lhs)
     stop = start + len lhs
 
 // Assimilates a map of words to a phoneme set.
@@ -189,23 +234,51 @@ assimilate(word string, target set) :
         a + pho.closest(ph, target)
 
 // Replaces a substring of a word with its nearest match to the pattern in the rhs.
-replaceSubstring(phos list, rhs list) :
-    from a = "" for i::ph = range phos :
-        a + pho.closest(ph, rhs[i])
+replaceSubstring(phos list, rhs list, numbering list) : 
+    from a = "" for i::target = range rhs : 
+        ph == "" and len(rhs[i]) != 1 :
+            error "not enough phonemes on left-hand side of pattern"
+        else :
+            a + pho.closest(ph, rhs[i])
+    given :
+        ph = (numbering[i] >= len(phos) : "" ; else : phos[numbering[i]])
+
 
 // Expects a pattern of the form `lhs > rhs` and turns it into two lists of sets
 // of phonemes.
 decompose(pattern snippet) :
     ast in BinaryNode and ast[operator] == ">" :
-        makeSets(ast[left]), makeSets(ast[right])
+        (leftList >> evaluateSet), (rightList >> evaluateSet)
     else :
         error "expected `>`"
 given :
     ast = parse pattern 
+    leftList = listify ast[left]
+    rightList = listify ast[right]
 
-// Turns a comma-separated node into a pattern given as a list of sets.
-makeSets(n Node) :
-    n -> listify >> evaluateSet
+isInitialOrFinal(pattern snippet) :
+    (lhs[0] in PrefixNode and lhs[0][prefix] == "initial") ,
+ .. (lhs[len(lhs)-1] in PrefixNode and lhs[len(lhs)-1][prefix] == "final")
+given :
+    lhs = pattern -> parse -> that[left] -> listify
+     
+// We want a list of numbers for the RHS of the list corresponding to the numbers of the phonemes
+// on the RHS that we want to consume.
+// As we construct the list, we'll zero-index everything.    
+getNumbers(nodes list) -> list :
+    from L = [] for i::node = range nodes :
+        node in NumberNode :
+            L & node[value] - 1
+        node in BinaryNode and node[operator] == "." :
+            node[right] in NumberNode :
+                L & node[right][value] - 1
+            else : 
+                error "expected number on right-hand side of `.`"
+        L == [] :
+            [0]
+        else :
+            L & L[i-1]+1
+
 
 // Returns the position of the first substring of the word to match the pattern
 // given in `sets`, or `NULL` if there is no match.

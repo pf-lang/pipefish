@@ -5,11 +5,6 @@ pho::"phonemes.pf"
 
 ~~ Prints things out for the user or for debugging.
 
-const private
-
-COLUMNS = 1
-WIDTH = 30
-
 def
 
 ~~ Displays word lists.
@@ -17,13 +12,9 @@ display(M map) :
     len(M) == 0 :
         "Vocab list is empty."
     else :
-        first from result, c = "", 1 for _::k = range lists.sort keys M  :
-            c mod COLUMNS == 0 :
-                result + str + "\n", c + 1
-            else :
-                result + str, c + 1
-        given :
-            str = pad("▪ " + k + " - " + M[k])
+        from a = "" for _::k = range lists.sort keys M  :
+            a + "▪ " + k + " - " + M[k] + "\n"
+
 
 ppRules(rules list) :
     from a = "" for i::rule = range rules :
@@ -36,9 +27,6 @@ makeString(sn snippet) :
 mapToOrderedList(M map) -> list :
     lists.sort from L = [] for k::v = range M :
         L & (k::v) 
-
-pad(s string) :
-    pad s, WIDTH
 
 pad(s string, w int) :
     len(s) > w :

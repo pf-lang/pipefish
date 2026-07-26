@@ -37,7 +37,7 @@ MAP = map(   "front"::FRONT,
           .. "approximant"::APPROXIMANT,
           .. "tap"::TAP,
           .. "trill"::TRILL,
-          .. "consonsant"::CONSONANT,
+          .. "consonant"::CONSONANT,
           .. "C"::CONSONANT,
           .. "voiced"::VOICED,
           .. "unvoiced"::UNVOICED,
@@ -112,7 +112,7 @@ closeness(s, t string) :
 ~~ Finds the closest phoneme to `pho` in `S`.
 closest(pho string, S set) :
     first from result, max = "", 0 for _::el = range S :
-        c > max :
+        c >= max :
             el, c 
         else :
             continue

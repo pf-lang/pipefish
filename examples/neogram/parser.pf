@@ -24,12 +24,7 @@ INFIXES = map(">"::1,
            .. "&"::6,
            .. "/"::7)
 PREFIX_PRECEDENCE = 4
-PREFIXES = map("any"::ANY,
-            .. "initial"::INITIAL, 
-            .. "medial"::MEDIAL,
-            .. "final"::FINAL,
-            .. "non-initial"::NON_INITIAL, 
-            .. "non-final"::NON_FINAL)
+PREFIXES = set("any", "initial", "final")
 
 def
 
@@ -52,7 +47,7 @@ parseExpression(tokens list, prec int) -> list, Node :
     parseStart(tokens) -> parseRest(that[0], that[1], prec)
 
 parseStart(tokens list) -> list, Node :
-    head[value] in keys PREFIXES :       
+    head[value] in PREFIXES :       
         parsePrefixExpression(tokens)    
     head[tokenType] == L_PAREN :         
         parseGroupedExpression(tail)     
