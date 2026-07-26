@@ -33,6 +33,10 @@ borrow(sn snippet) :
 given :
     inv = getPhonemesFrom words
 
+~~ Deletes words from the vocab list.
+delete(sn snippet) :
+    words = words without ((sn -> makeString -> strings.split that, "\n") ...)
+
 ~~ Creates a permanent law of the phonology.
 fix(sn snippet) :
     rules = rules & Rule("fix", sn)
@@ -63,9 +67,13 @@ nuke :
     words = map()
     rules = []
 
-// open (filename string):
-//     get data from File(filename)
-//     words, rules = eval data
+~~ Opens a saved project.
+open (filename string):
+    get text from File(filename)
+    data = [(eval text)] // TODO --- this is a hack because `eval` is behaving weirdly when returning tuples.
+    currentFile = filename
+    words = data[0]
+    rules = data[1]
 
 ~~ Retcons a list of words into the vocab list at the start.
 retcon(sn snippet) :
@@ -110,6 +118,7 @@ vocab :
     
 def       
 
+~~ Returns the phonemes matching a given pattern.
 phonemes(sn snippet) :
     sn -> parse -> evaluateSet
 
@@ -133,11 +142,17 @@ apply(words map, rules list) :
 
 changeAll(words map, sn snippet) :
     from M = map() for k::v = range words :
-        M with (replaceAll k, sn)::v
+        M plus ((replaceAll k, sn)::v)
 
 combine(M, N map) :
-    from m = M for k::v = range N :
-        m with k::v
+    from m = M for k::v = range N :   
+        m plus (k::v)
+
+(M map) plus (P pair) -> map :
+    P[0] in keys M :
+        M with P[0]::M[P[0]]+", "+P[1]
+    else :
+        M with P
 
 match(word string, pattern snippet) :
     (pattern -> parse -> listify), (word -> pho.split)
