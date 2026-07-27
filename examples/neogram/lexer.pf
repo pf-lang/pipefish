@@ -9,6 +9,8 @@ def
 tokenize(sn snippet) :
     sn -> glue -> lex
 
+private
+
 glue(sn snippet) :
     from str = "" for _::el = range sn :
         str + string(el)

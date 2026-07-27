@@ -28,7 +28,7 @@ Pipefish is a delightful general-purpose language particularly suitable for rapi
 
 The core language is 97% feature-complete; it currently has [39 standard libraries](https://github.com/tim-hardcastle/pipefish/wiki/Imports-and-libraries#libraries); there is [tooling](https://github.com/tim-hardcastle/pipefish/wiki/Developing-in-Pipefish); there is [a wiki](https://github.com/tim-hardcastle/pipefish/wiki); there are plenty of features including some you've never heard or thought of.
 
-It benchmarks very competitively on [independent benchmarks](https://github.com/lac-dcc/BenchGen/wiki/Pipefish:-A-functional-and-indentation-sensitive-programming-language-on-BenchGen), despite having little in the way of optimization (scheduled for the next and final phase of the project).
+It benchmarks very competitively on [independent benchmarks](https://github.com/lac-dcc/BenchGen/wiki/Pipefish:-A-functional-and-indentation-sensitive-programming-language-on-BenchGen), despite having little in the way of optimization (scheduled for the next phase of the project).
 
 It still requires work on optimzation, tooling, concurrency, and security before it should be used in production for its main purpose, but it can be used for personal projects. You can download it [here](https://github.com/tim-hardcastle/pipefish/wiki/Installing-and-using-Pipefish).
 

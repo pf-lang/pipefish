@@ -119,10 +119,9 @@ closest(pho string, S set) :
     given :
         c = closeness(pho, el)
 
-
-// This splits a word into phonemes greedily, i.e. since two or even three runes in a row
-// can be one IPA phoneme, we try to do that and so for example represent `pf` as `pf` and 
-// not as `p`, `f`.
+~~ This splits a word into phonemes greedily, i.e. since two or even three runes in a row
+~~ can be one IPA phoneme, we try to do that and so for example represent `pf` as `pf` and 
+~~ not as `p`, `f`.
 split(word string) -> list :
     word =="" :
         []

@@ -1,15 +1,13 @@
-import 
+import private
 
-pho::"phonemes.pf"
 "lists"
+
 NULL::"files"
-
-include
-
-"lexer.pf"
-"printer.pf"
-"evaluator.pf"
-"parser.pf"
+NULL::"lexer.pf"
+NULL::"printer.pf"
+NULL::"evaluator.pf"
+NULL::"parser.pf"
+pho::"phonemes.pf"
 
 newtype
 
@@ -19,6 +17,9 @@ var
 
 words = map()
 rules = []
+
+private
+
 currentFile string? = NULL
 recentChanges map? = NULL
 
@@ -152,7 +153,7 @@ given :
 phonemes(sn snippet) :
     sn -> parse -> evaluateSet
 
-// private
+private
 
 getDiff(M, N map) -> map :
     from A = map() for k::v = range N :

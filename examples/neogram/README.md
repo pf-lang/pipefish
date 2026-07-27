@@ -282,4 +282,91 @@ neogram → diff
 
 neogram →   
 
-And of course there are various commands to save and open projects, delete words from the vocab, and other mundane housekeeping tasks.
+And of course there are various commands to save and open projects, delete words from the vocab, and other mundane housekeeping tasks. The full list of public commands and functions follows.
+
+## Commands
+
+### `add(sn snippet)`
+
+Adds a list of words to the vocab list.  
+
+### `borrow(sn snippet)`
+
+Borrows words into the language, conforming them to the phoneme inventory.  
+
+### `delete(sn snippet)`
+
+Deletes words from the vocab list.  
+
+### `diff`
+
+Shows which entries in the word list have been changed by the most recent command.  
+
+### `fix(sn snippet)`
+
+Creates a permanent law of the phonology.  
+
+### `history`
+
+Shows the history of the sound changes.  
+
+### `inventory`
+
+Lists the phonemes currrently in the language.  
+
+### `merge(filename string)`
+
+Merges a file containing a list of words into the vocab.  
+
+### `note(sn snippet)`
+
+Adds a note to the history.  
+
+### `nuke`
+
+Deletes the project in-memory, though not on disk if you've saved it.  
+
+### `open(filename string)`
+
+Opens a saved project.  
+
+### `retcon(sn snippet)`
+
+Retcons a list of words into the vocab list at the start.  
+
+### `retcon(i int, sn snippet)`
+
+Retcons a list of words into the vocab list at a point just prior to event `i`.  
+
+### `retcon merge (filename string)`
+
+Retcons a file containing a list of words into the vocab at the start.  
+
+### `retcon merge (i int, filename string)`
+
+Retcons a file containing a list of words into the vocab at the start.  
+
+### `save as (filename string)`
+
+Saves the project to the given file.  
+
+### `save`
+
+### `shift(sn snippet)`
+
+Applies a sound change.  
+
+### `vocab`
+
+Displays the vocab list.
+
+## Functions 
+
+### `describe(sn snippet) -> string`
+
+Describes the phonological properties of a phoneme.  
+
+### `phonemes(sn snippet)`
+
+Returns the phonemes matching a given pattern. 
+

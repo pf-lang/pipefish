@@ -1,9 +1,9 @@
-import 
+~~ Prints things out for the user or for debugging.
+
+import private
 
 pho::"phonemes.pf"
 "strings"
-
-~~ Prints things out for the user or for debugging.
 
 def
 
@@ -12,9 +12,8 @@ display(M map) :
     len(M) == 0 :
         "Vocab list is empty."
     else :
-        from a = "" for _::k = range lists.sort keys M  :
+        from a = "" for _::k = range lists.sort keys M :
             a + "▪ " + k + " - " + M[k] + "\n"
-
 
 ppRules(rules list) :
     from a = "" for i::rule = range rules :
@@ -23,6 +22,8 @@ ppRules(rules list) :
 makeString(sn snippet) :
     from a = "" for _::el = range sn :
         a + string(el)
+
+private
 
 mapToOrderedList(M map) -> list :
     lists.sort from L = [] for k::v = range M :
@@ -34,20 +35,3 @@ pad(s string, w int) :
     else :
         s + strings.repeat(" ", w-len s)
 
-~~ Prettyprints an AST.
-pp(node Node) :
-    type node == NumberNode :
-        string(node[value])
-    type node == PhonemeNode :
-        node[phoneme]
-    type node == ClassNode :
-        node[class]
-    type node == BinaryNode :
-        "(" + pp(node[left]) + ") " + node[operator] ..
-        .. + " (" + pp(node[right]) + ")"
-    type node == PrefixNode :
-        node[prefix] + " (" + pp(node[argument]) + ")"
-    type node == EmptyNode :
-        "<EMPTY NODE>"
-    else :
-        error "unknown node type"

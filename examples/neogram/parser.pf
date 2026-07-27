@@ -42,6 +42,25 @@ given :
                         .. parseExpression(that, LOWEST_PRECEDENCE)
     head = leftovers[0]
 
+~~ Prettyprints an AST.
+prettyprint(node Node) :
+    type node == NumberNode :
+        string(node[value])
+    type node == PhonemeNode :
+        node[phoneme]
+    type node == ClassNode :
+        node[class]
+    type node == BinaryNode :
+        "(" + prettyprint(node[left]) + ") " + node[operator] ..
+        .. + " (" + prettyprint(node[right]) + ")"
+    type node == PrefixNode :
+        node[prefix] + " (" + prettyprint(node[argument]) + ")"
+    type node == EmptyNode :
+        "<EMPTY NODE>"
+    else :
+        error "unknown node type"
+
+private
 
 parseExpression(tokens list, prec int) -> list, Node :   
     parseStart(tokens) -> parseRest(that[0], that[1], prec)
