@@ -19,12 +19,14 @@ type lexer struct {
 	reader           strings.Reader
 	tstart           int // the value of char at the start of a token
 	lineNo           int
-	afterWhitespace  bool // whether we are just after the (possible empty) whitespace, so .. is forbidden if not a continuation
-	continuation     bool
 	whitespaceStack  dtypes.Stack[string] // levels of whitespace to unindent to
 	Ers              err.Errors
 	source           string
 	currentNamespace string
+	// TODO -- there should be a cleaner way of doing this now I know what I'm doing.
+	continuation     bool
+	mayContinue      bool // Set to true when we encounter a comma or `..`, set to false if we encounter anything but a comment, when it stays the same.
+	wasContinue      bool // Keeps track of what `mayContinue` was last time round so as to implement this.
 }
 
 func NewLexer(source, input string) *lexer {
@@ -42,8 +44,9 @@ func NewLexer(source, input string) *lexer {
 }
 
 func (l *lexer) getTokens() []token.Token {
+	l.wasContinue = l.mayContinue
+	l.mayContinue = false
 	if l.lineNo < l.runes.lineNo && !l.continuation {
-		l.afterWhitespace = true
 		l.lineNo = l.runes.lineNo
 		return l.interpretWhitespace()
 	}
@@ -62,6 +65,11 @@ func (l *lexer) getTokens() []token.Token {
 			return []token.Token{l.NewToken(token.EOF, "EOF")}
 		}
 	case '\n':
+		l.mayContinue = l.wasContinue
+		if l.mayContinue {
+			l.runes.Next()
+			return []token.Token{}
+		}
 		return []token.Token{l.NewToken(token.NEWLINE, ";")}
 	case '\\':
 		if l.runes.PeekRune() == '\\' {
@@ -69,6 +77,7 @@ func (l *lexer) getTokens() []token.Token {
 			return []token.Token{l.NewToken(token.LOG, strings.TrimSpace(l.runes.ReadComment()))}
 		}
 	case ';':
+		l.mayContinue = l.wasContinue
 		return []token.Token{l.NewToken(token.SEMICOLON, ";")}
 	case ':':
 		if l.runes.PeekRune() == ':' {
@@ -90,6 +99,7 @@ func (l *lexer) getTokens() []token.Token {
 			return []token.Token{l.NewToken(token.FILTER, "?>")} // We return []token.Token{this as a regular identifier so we can define the '::' operator as a builtin.
 		}
 	case ',':
+		l.mayContinue = true
 		if l.skipWhitespaceAfterPotentialContinuation() {
 			return []token.Token{l.NewToken(token.COMMA, ",")}
 		} else {
@@ -143,6 +153,7 @@ func (l *lexer) getTokens() []token.Token {
 				l.runes.Next()
 				return []token.Token{l.NewToken(token.DOTDOTDOT, "...")}
 			}
+			l.mayContinue = true
 			if l.skipWhitespaceAfterPotentialContinuation() {
 				l.runes.Next()
 				return []token.Token{}
@@ -158,6 +169,7 @@ func (l *lexer) getTokens() []token.Token {
 	// We may have a comment.
 	if l.runes.CurrentRune() == '/' && l.runes.PeekRune() == '/' {
 		l.runes.Next()
+		l.mayContinue = l.wasContinue
 		return []token.Token{l.NewToken(token.COMMENT, l.runes.ReadComment())}
 	}
 
@@ -265,6 +277,10 @@ func (l *lexer) interpretWhitespace() []token.Token {
 	if l.runes.CurrentRune() == '.' && l.runes.PeekRune() == '.' {
 		l.runes.Next()
 		l.runes.Next()
+		if l.wasContinue {
+			l.mayContinue = l.wasContinue
+			return []token.Token{}
+		}
 		return []token.Token{l.Throw("lex/cont/b")}
 	}
 	previousWhitespace, _ := l.whitespaceStack.HeadValue()
@@ -656,7 +672,6 @@ func (runes *RuneSupplier) atBoundary() bool {
 
 func (l *lexer) NewToken(tokenType token.TokenType, st string) token.Token {
 	l.runes.Next()
-	l.afterWhitespace = false
 	return l.MakeToken(tokenType, st)
 }
 
