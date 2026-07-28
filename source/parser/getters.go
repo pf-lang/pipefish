@@ -165,13 +165,10 @@ func (p *Parser) isPositionallyFunctional() bool {
 	if p.PeekTokenIs(token.IDENT) && p.Common.BlingManager.canBling(p.PeekToken.Literal, ANY_BLING...) {
 		return false
 	}
-	if p.PeekToken.Type == token.RPAREN || p.PeekToken.Type == token.PIPE ||
-		p.PeekToken.Type == token.MAPPING || p.PeekToken.Type == token.FILTER ||
-		p.PeekToken.Type == token.COLON || p.PeekToken.Type == token.MAGIC_COLON ||
-		p.PeekToken.Type == token.COMMA || p.PeekToken.Type == token.RBRACK ||
-		p.PeekToken.Type == token.RBRACE || p.PeekToken.Type == token.AND ||
-		p.PeekToken.Type == token.OR {
-		return false
+	if p.PeekTokenIs(token.RPAREN, token.PIPE, token.MAPPING, token.FILTER, token.COLON, 
+		token.MAGIC_COLON, token.COMMA, token.RBRACK, token.RBRACE, token.AND, token.OR, 
+		token.SEMICOLON, token.NEWLINE) {
+			return false
 	}
 	if p.CurToken.Literal == "type" && p.IsTypePrefix(p.PeekToken.Literal) {
 		return true
@@ -212,15 +209,12 @@ func (p *Parser) typeIsFunctional() bool {
 	if p.PeekTokenIs(token.IDENT) && p.Common.BlingManager.canBling(p.PeekToken.Literal, ANY_BLING...) {
 		return false
 	}
-	if p.PeekToken.Type == token.RPAREN || p.PeekToken.Type == token.PIPE ||
-		p.PeekToken.Type == token.MAPPING || p.PeekToken.Type == token.FILTER ||
-		p.PeekToken.Type == token.COLON || p.PeekToken.Type == token.MAGIC_COLON ||
-		p.PeekToken.Type == token.COMMA || p.PeekToken.Type == token.RBRACK ||
-		p.PeekToken.Type == token.RBRACE || p.PeekToken.Literal == "?" ||
-		p.PeekToken.Type == token.AND || p.PeekToken.Type == token.OR {
+	if p.PeekTokenIs(token.RPAREN, token.PIPE, token.MAPPING, token.FILTER, token.COLON, 
+		token.MAGIC_COLON, token.COMMA, token.RBRACK, token.RBRACE, token.AND, token.OR) || 
+		p.PeekToken.Literal == "?" {
 		return false
 	}
-	if p.PeekToken.Type == token.EMDASH || p.PeekToken.Type == token.LBRACK {
+	if p.PeekTokenIs(token.EMDASH, token.LBRACK) {
 		return true
 	}
 	if literalsAndLParen.Contains(p.PeekToken.Type) {

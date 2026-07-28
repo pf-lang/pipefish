@@ -856,9 +856,8 @@ func (p *Parser) parseStreamingExpression(left Node) Node {
 		Operator: p.CurToken.Literal,
 		Left:     left,
 	}
-	precedence := p.curPrecedence()
 	p.NextToken()
-	expression.Right = p.ParseExpression(precedence)
+	expression.Right = p.ParseExpression(PIPING)
 	expression.Right = p.recursivelyDesugarAst(expression.Right)
 	return expression
 }
@@ -1072,8 +1071,13 @@ func (p *Parser) CurTokenMatches(t token.TokenType, s string) bool {
 	return p.CurToken.Type == t && p.CurToken.Literal == s
 }
 
-func (p *Parser) PeekTokenIs(t token.TokenType) bool {
-	return p.PeekToken.Type == t
+func (p *Parser) PeekTokenIs(t ... token.TokenType) bool {
+	for _, el := range t {
+		if p.PeekToken.Type == el {
+			return true
+		}
+	}
+	return false
 }
 
 func (p *Parser) PeekTokenMatches(t token.TokenType, s string) bool {
