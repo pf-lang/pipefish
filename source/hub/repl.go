@@ -13,11 +13,8 @@ import (
 func (h *Hub) Repl() {
 	colonOrEmdash, _ := regexp.Compile(`.*[\w\s]*(:|--)[\s]*$`)
 	rline := readline.NewInstance()
-	rline.SyntaxHighlighter = func(code []rune) string {
-		return h.Services["hub"].Highlight(code, h.getFonts())
-	}
+	inSnippet := false
 	for {
-
 		ws := ""
 		input := ""
 		c := 0
@@ -80,6 +77,15 @@ func (h *Hub) Repl() {
 		}
 		for {
 			rline.SetPrompt(makePrompt(h, ws != ""))
+			if inSnippet {
+				rline.SyntaxHighlighter = func(code []rune) string {
+					return string(code)
+				}
+			} else {
+				rline.SyntaxHighlighter = func(code []rune) string {
+					return h.Services["hub"].Highlight(code, h.getFonts())
+				}	
+			}
 			line, err := rline.ReadlineWithDefault(ws)
 			if err == readline.ErrCtrlC {
 				print("\nQuit Pipefish? [Y/n] ")
@@ -102,10 +108,13 @@ func (h *Hub) Repl() {
 					break
 				}
 			}
-			if colonOrEmdash.Match([]byte(line)) {
+			matches := colonOrEmdash.FindSubmatch([]byte(line))
+			if len(matches) > 1 {
 				ws = ws + "  "
+				inSnippet = true
 			}
 			if ws == "" {
+				inSnippet = false
 				break
 			}
 		}

@@ -418,7 +418,7 @@ func (runes *RuneSupplier) ReadComment() string {
 
 func (l *lexer) readSnippet() (string, int) {
 	// Note --- what we return from this is followed by makeToken, which doesn't read a character, rather than NewToken, which does.
-	// This is because we may end up in a position where we've just realized that we've unindented. (See other use of MakeChar.)
+	// This is because we may end up in a position where we've just realized that we've unindented. (See other use of makeToken.)
 	result := ""
 	for l.runes.PeekRune() == ' ' || l.runes.PeekRune() == '\t' { // We consume the whitespace between the emdash and either a non-whitespace character or a newline.
 		l.runes.Next()

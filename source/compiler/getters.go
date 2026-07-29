@@ -250,6 +250,15 @@ func (cp *Compiler) Highlight(code []rune, fonts values.Map) string {
 		case runes.CurrentRune() == '/' && runes.PeekRune() == '/':
 			result := "/" + runes.ReadComment()
 			out.WriteString(wrapFont(result, "comment", fonts))
+		// Or a snippet.
+		case runes.CurrentRune() == '-' && runes.PeekRune() == '-':
+			out.WriteString(wrapFont("--", "reserved", fonts))
+			runes.Next()
+			runes.Next()
+			for runes.CurrentRune() != '\n' && runes.CurrentRune() != 0 {
+				out.WriteRune(runes.CurrentRune())
+				runes.Next()
+			}
 		// A nondecimal integer literal.
 		case runes.CurrentRune() == '0' && nondecimalIndicators.Contains(runes.PeekRune()):
 			result := ""
@@ -288,7 +297,6 @@ func (cp *Compiler) Highlight(code []rune, fonts values.Map) string {
 			default:
 				out.WriteString(result)
 			}
-		// Or, by default (e.g. if it's whitespace)
 		default:
 			out.WriteRune(runes.CurrentRune())
 		}
