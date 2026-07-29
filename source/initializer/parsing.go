@@ -254,8 +254,12 @@ func (iz *Initializer) addToNamespace(thingsToImport []tokenizedCode) {
 		path := pathTok.Literal
 		source := pathTok.Source
 		_, path = TweakNameAndPath("", path, source)
-		file, _ := os.Stat(MakeFilepath(path))
-		if file != nil { // Exempts things like the builins.
+		file, err := os.Stat(MakeFilepath(path))
+		if err != nil && !settings.ThingsToIgnore.Contains(pathTok.Literal) {
+			iz.throw("init/null/path", &pathTok, pathTok.Literal, err.Error())
+			continue
+		}
+		if !settings.ThingsToIgnore.Contains(pathTok.Literal) {
 			iz.cp.Sources[path] = file.ModTime().UnixMilli()
 		}
 		if dec.getDeclarationType() == includeDeclaration {

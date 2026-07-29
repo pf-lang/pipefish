@@ -60,6 +60,7 @@ func TestChunkingItes(t *testing.T) {
 		{`impex/expect`, `OK`},
 		{`impex/pair`, `OK`},
 		{`impex/string`, `OK`},
+		{`null/path`, `OK`},
 		{`interface/colon`, `OK`},
 		{`interface/self`, `OK`},
 		{`param/exists`, `OK`},

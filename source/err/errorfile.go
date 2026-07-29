@@ -1206,6 +1206,17 @@ var errorCreatorMap = map[string]ErrorCreator{
 		},
 	},
 
+	"init/null/path": {
+		Message: func(tok *token.Token, args ...any) string {
+			return "can't open file " + emph(args[0]) + " with error " + emph(args[1])
+		},
+		Explanation: func(tok *token.Token, args ...any) string {
+			return "Very much what it says. Pipefish has been unable to open the file you " +
+				"were trying to import or include, for reasons that hopefully are clarified by the " +
+				"error message returned by the OS."
+		},
+	},
+
 	"init/import/file": {
 		Message: func(tok *token.Token, args ...any) string {
 			return "couldn't open file " + emph(args[0]) + " with OS error " + emph(args[1])

@@ -1,0 +1,82 @@
+~~ This illustrates the family of constructions proposed by Paul Erdős as the asymptotic solution to 
+~~ the unit distance problem in a now-disproved conjecture.
+
+import
+
+NULL::"image/bmp"
+
+const
+
+IMAGE_SIZE = 500
+I = newImage(IMAGE_SIZE, IMAGE_SIZE, Rgb(0, 0, 0))
+
+cmd
+
+draw(filename string, w, h int, pairs ... pair) :
+    not isErdős(pairs) :
+        post "Pairs don't have the same sum of squares."
+    post drawing(w, h, pairs) to BmpFile(filename)
+
+def private
+
+drawing(w, h int, pairs ... pair) :
+    newImage(imageWidth, imageHeight, Rgb(0, 0, 0)) -> drawLines(that, w, h, pairs)
+given :
+    imageWidth = (w >= h : IMAGE_SIZE ; else : IMAGE_SIZE * w div h)
+    imageHeight = (w <= h : IMAGE_SIZE ; else : IMAGE_SIZE * h div w)
+
+drawLines(I Image, w, h int, pairs ... pair) :
+    from imX = I for _::gx = range w :
+        from imY = imX for _::gy = range h :
+            linesFromPoint(imY, gx, gy, w, h, pairs)
+
+linesFromPoint(I Image, gx, gy, w, h int, pairs ... pair) :
+    from resultQ = I for _::q = range pairs :
+        from resultP = resultQ for _::p = range [q[0]::q[1], q[1]::q[0], q[0]::-q[1], q[1]::-q[0], -q[0]::q[1], -q[1]::q[0], -q[0]::-q[1], -q[1]::-q[0]] :
+            0 <= gx + p[0] and gx + p[0] < w and 0 <= gy + p[1] and gy + p[1] < h :
+                gridLine(resultP, gx, gy, gx+p[0], gy+p[1], w, h)
+            else :
+                continue
+
+gridPoint(x, y, w, h) :
+    [borderWidth + gridSize * x, borderWidth + gridSize * y]
+given :
+    gridSize = IMAGE_SIZE div max(w, h)
+    borderWidth = gridSize div 2
+
+gridLine(I Image, ax, ay, bx, by, w, h int) :
+    line(I,  gridPoint(ax, ay, w, h)... , gridPoint(bx, by, w, h)... , Rgb(255, 255, 255))
+
+line(I Image, ax, ay, bx, by int, c Color) :
+    from result = I for _::i = range length+1 :
+        result with [cx, cy]::c
+    given :
+        t = i/length
+        cx = ax + int(t*dx) 
+        cy = ay + int(t*dy)
+given :
+    dx = bx - ax
+    dy = by - ay
+    length = max(abs(dx), abs(dy))
+
+max(a, b int) :
+    a > b :
+        a 
+    else :
+        b
+
+abs(x int) :
+    x >= 0 :
+        x 
+    else : 
+        -x
+
+isErdős(pairs ... pair) :
+    from A = true for _::p = range pairs[1::len pairs] :
+        sumOfSquares p == sumOfSquares pairs[0] :
+            continue
+        else :
+            break false
+
+sumOfSquares(p pair) :
+    p[0]*p[0] + p[1]*p[1]
