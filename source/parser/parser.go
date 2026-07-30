@@ -626,6 +626,7 @@ func (p *Parser) parseIfLogExpression(left Node) Node {
 		Token: p.CurToken,
 		Left:  left,
 		Value: p.CurToken.Literal,
+		LogNodes: p.extractNodesFromTextWithBars(p.CurToken),
 	}
 	precedence := p.curPrecedence()
 	p.NextToken()
@@ -775,6 +776,7 @@ func (p *Parser) parseLogExpression(left Node) Node {
 		Token: p.CurToken,
 		Left:  left,
 		Value: p.CurToken.Literal,
+		LogNodes: p.extractNodesFromTextWithBars(p.CurToken),
 	}
 	return expression
 }
@@ -833,10 +835,10 @@ func (p *Parser) parsePeekExpression() Node {
 }
 
 func (p *Parser) parsePrelogExpression() Node {
-
 	expression := &LogExpression{
 		Token: p.CurToken,
 		Value: p.CurToken.Literal,
+		LogNodes: p.extractNodesFromTextWithBars(p.CurToken),
 	}
 	precedence := p.curPrecedence()
 	p.NextToken()
@@ -886,6 +888,10 @@ func (p *Parser) recursivelyDesugarAst(exp Node) Node {
 }
 
 func (p *Parser) parseSnippetExpression(tok token.Token) Node {
+	return &SnippetLiteral{Token: tok, Value: tok.Literal, Values: p.extractNodesFromTextWithBars(tok)}
+}
+
+func (p *Parser) extractNodesFromTextWithBars(tok token.Token) []Node {
 	codeTokens := p.TokenizedCode
 	cT := p.CurToken
 	pT := p.PeekToken
@@ -909,7 +915,7 @@ func (p *Parser) parseSnippetExpression(tok token.Token) Node {
 	p.TokenizedCode = codeTokens
 	p.CurToken = cT
 	p.PeekToken = pT
-	return &SnippetLiteral{Token: tok, Value: tok.Literal, Values: nodes}
+	return nodes
 }
 
 func GetTextWithBarsAsList(text string) ([]string, bool) {

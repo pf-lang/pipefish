@@ -230,7 +230,7 @@ func TestCorners(t *testing.T) {
 	test_helper.RunTest(t, "corners_test.pf", tests, test_helper.TestValues)
 }
 
-func TestDump(t *testing.T) { 
+func TestDump(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
 		{`hub run "../hub/test-files/dump.pf"`, `Starting script [36m"dump.pf"[39m as service [36m"dump"[39m.`},
@@ -749,7 +749,7 @@ func TestLogging(t *testing.T) {
 
 func TestLoggingCtes(t *testing.T) {
 	tests := []test_helper.TestItem{
-		{`42 \\ | forty-two`, `comp/log/close`},
+		{`42 \\ | forty-two`, `parse/snippet/form`},
 		{`42 \\ | 1 + |`, `parse/prefix`},
 		{`42 \\ | 42 == true |`, `comp/eq/types`},
 	}

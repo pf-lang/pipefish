@@ -444,7 +444,7 @@ func TestLambdaRTEs(t *testing.T) {
 
 func TestLoggingCtes(t *testing.T) {
 	tests := []test_helper.TestItem{
-		{`42 \\ | forty-two`, `comp/log/close`},
+		{`42 \\ | forty-two`, `parse/snippet/form`},
 	}
 	test_helper.RunTest(t, "", tests, test_helper.TestCompilerErrors)
 }

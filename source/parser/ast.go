@@ -126,11 +126,13 @@ type ForExpression struct {
 	Given            Node
 	Logging          ForLog
 	LogString        string
+	LogNodes         []Node
 }
 
 func (fe *ForExpression) Children() []Node {
-	return []Node{fe.BoundVariables, fe.Initializer, fe.ConditionOrRange, fe.Update, fe.Body, fe.Given}
+	return append(fe.LogNodes, fe.BoundVariables, fe.Initializer, fe.ConditionOrRange, fe.Update, fe.Body, fe.Given)
 }
+
 func (fe *ForExpression) GetToken() *token.Token { return &fe.Token }
 
 func (fe *ForExpression) String() string {
@@ -313,9 +315,10 @@ type LogExpression struct {
 	Value string
 	Left  Node
 	Right Node
+	LogNodes []Node
 }
 
-func (le *LogExpression) Children() []Node       { return []Node{le.Left, le.Right} }
+func (le *LogExpression) Children() []Node       { return append(le.LogNodes, le.Left, le.Right) }
 func (le *LogExpression) GetToken() *token.Token { return &le.Token }
 func (le *LogExpression) String() string {
 	var out bytes.Buffer
