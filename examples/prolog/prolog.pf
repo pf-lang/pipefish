@@ -3,7 +3,6 @@ import
 golang "github.com/ichiban/prolog"
 golang "github.com/ichiban/prolog/engine"
 "strings"
-NULL::"files"
 
 var pDb = Prolog()
 
