@@ -41,11 +41,6 @@ add(P Prolog, s string) :
 add(P Prolog, S snippet) :
     add P, toString(S) 
 
-~~ Initializes the interpreter from a file.
-load(P ref) from (f PrologFile) :
-    get code from File("./test.plg")
-    P = Prolog(code)
-
 def 
 
 ~~ Returns the result of a query.
