@@ -4,8 +4,6 @@ golang "github.com/ichiban/prolog"
 golang "github.com/ichiban/prolog/engine"
 "strings"
 
-var pDb = Prolog()
-
 newtype 
 
 Prolog = wrapper *prolog.Interpreter
