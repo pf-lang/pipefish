@@ -2456,10 +2456,15 @@ func (cp *Compiler) compileLog(node *parser.LogExpression, ctxt Context) (uint32
 			continue
 		}
 		if str[0] == '|' { // Then we must parse and compile.
-			// This is a disgusting kludge to find out if if parses correctly.
+			// TODO: this is a disgusting kludge to find out if if parses correctly.
 			errCount := len(cp.P.Common.Errors)
-			parsedAst := cp.P.ParseLine("code snippet in log expression", str[1:len(str)-1])
+			parsedAst := cp.P.ParseLine(node.Token.Source, str[1:len(str)-1])
 			if errCount < len(cp.P.Common.Errors) {
+				lastError := cp.P.Common.Errors[len(cp.P.Common.Errors)-1]
+				snipTok := lastError.Token
+				lastError.Message = lastError.Message + " at line " + text.Yellow(strconv.Itoa(snipTok.Line) +
+				":" + strconv.Itoa(snipTok.ChStart) + "-" + strconv.Itoa(snipTok.ChEnd)) + "of embedded code"
+				lastError.Token = &node.Token
 				return uint32(DUMMY), false, false
 			}
 			sResult := cp.CompileNode(parsedAst, ctxt.x())
