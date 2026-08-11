@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1">
+
+<title>{{title}}</title>
+
+<meta name="description"
+      content="{{description}}">
+
+<link rel="stylesheet"
+      href="/assets/css/style.css">
+
+<link rel="icon"
+      href="/assets/images/icon.ico">
+
+ <script>
+      const theme =
+            localStorage.getItem("pipefish-theme") ||
+            (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+
+      document.documentElement.dataset.theme = theme;
+</script>
+
+
+</head>
+
+<body>
+
+{{header}}
+
+<main class="site-main">
+
+{{content}}
+
+</main>
+
+{{footer}}
+
+<script src="/assets/js/site.js"></script>
+
+</body>
+</html>

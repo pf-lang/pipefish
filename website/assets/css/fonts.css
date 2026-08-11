@@ -1,0 +1,26 @@
+@font-face {
+    font-family: "Josefin Slab";
+    src: url("../fonts/JosefinSlab-VariableFont_wght.woff2")
+         format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Yrsa";
+    src: url("../fonts/Yrsa-VariableFont_wght.woff2")
+         format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Google Sans Code";
+    src: url("../fonts/GoogleSansCode-VariableFont_MONO,wght.woff2")
+         format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
