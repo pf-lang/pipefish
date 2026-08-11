@@ -62,10 +62,11 @@ prettyprint(node Node) :
 
 private
 
-parseExpression(tokens list, prec int) -> list, Node :   \\
-    parseStart(tokens) -> parseRest(that[0], that[1], prec)
+parseExpression(tokens list, prec int) -> list, Node : 
+    peek c :  
+        parseStart(tokens) -> parseRest(that[0], that[1], prec)
 
-parseStart(tokens list) -> list, Node : \\
+parseStart(tokens list) -> list, Node : 
     head[value] in PREFIXES :       
         parsePrefixExpression(tokens)    
     head[tokenType] == L_PAREN :         
@@ -105,7 +106,7 @@ given :
     newTail, rightNode = parseExpression(tokens, INFIXES["&"])
 
 // Makes a literal node from a token.
-parseLiteral(aToken Token) -> Node : \\
+parseLiteral(aToken Token) -> Node : 
     aToken[tokenType] == NUMBER : 
         NumberNode(aToken, val)  
     val in pho.PHONEME :  
@@ -117,7 +118,7 @@ parseLiteral(aToken Token) -> Node : \\
 given :
     val = aToken[value]
 
-parseRest(tokens list, leftNode Node, prec int) -> list, Node : \\
+parseRest(tokens list, leftNode Node, prec int) -> list, Node : 
     valid headPrec and headPrec >= prec :  
         parseRest(newTail, BinaryNode(head, head[value], leftNode, rightNode), prec) 
     else :               

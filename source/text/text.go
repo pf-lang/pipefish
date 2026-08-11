@@ -93,3 +93,9 @@ func Logo() string {
 		leftMargin + "╚" + bar + "╝\n\n"
 	return logoString
 }
+
+func Hyphenate(s string) string {
+	hyphenatedName := strings.ReplaceAll(s, "/", "-")
+	hyphenatedName = strings.ReplaceAll(hyphenatedName, " ", "-")
+	return hyphenatedName
+}

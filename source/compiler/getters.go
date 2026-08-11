@@ -190,8 +190,8 @@ var (
 	rightBrackets = dtypes.SetOf(')', ']', '}')
 )
 
-// We can't just lex it beause we need the whitespace intact. But we can
-// use the lexer logic.
+// We can't just lex our code, beause we need the whitespace intact. But we can
+// re-use the lexer logic, so we will.
 func (cp *Compiler) Highlight(code []rune, fonts values.Map) string {
 	var out bytes.Buffer
 	brackets := []rune{}
