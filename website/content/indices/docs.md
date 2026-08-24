@@ -6,7 +6,7 @@
 ## Language basics
 - Functions and commands
 - Constants and variables
-- Comments, continuation, and headwords
+- Comments, continuations, and headwords
 ## The type system and built-in functions
 - Operations applicable to most types
 - Simple types

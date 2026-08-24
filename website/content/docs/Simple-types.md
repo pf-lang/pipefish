@@ -1,6 +1,6 @@
 In this page we will introduce some basic data types: `int`, `float`, `bool`, `rune`, `string`, and `null`.
 
-## `int`
+## int
 
 The `int` type contains whole numbers which may be either positive or negative.
 
@@ -20,7 +20,7 @@ There are also the comparison operators `<`, `>`, `<=` and `>=`, which work as y
 
 And of course there are the `==` and `!=` operators, as discussed [here](https://github.com/tim-hardcastle/Pipefish/wiki/The-type-system#note-on-equality-and-comparison), but as these are defined for nearly every type we will take their existence for granted from now on.
 
-## `float`
+## float
 
 The `float` type contains decimal numbers: `6.5`, `-9.33`, `3.141592`, etc.
 
@@ -28,37 +28,38 @@ Its operations are `+`, `-`, `*`, `/`, `%`, `<`, `>`, `<=` and `>=`, the `%` ope
 
 Mixing the arithmetic of integers and floating-point numbers usually results in an error, with the exception of multiplication and division operations, which will yield floats as results.
 
-## `bool`
+## bool
 
 The `bool` type consists of the boolean constants `true` and `false`. Its operations are `and`, `or`, and `not`:
 
 `and` and `or` are lazily evaluated, as in most languages.
 
-There is also a conditional operator. Let's demonstrate it in the REPL:
+There is also a conditional operator, the colon (`:`), which combines with the newline/`;` operator so we can write conditionals:
 
-<img width="710" height="157" alt="image" src="https://github.com/user-attachments/assets/3ae10b2e-fb4a-4d0d-b5d7-d93f80ca018e" />
+```
+def
 
-We will have a lot more to say about this in later pages.
+classify(i) :
+    i < 0 :
+        "negative"
+    i == 0 :
+        "positive"
+    else :
+        "zero"
+```
+We will go into this in more detail later.
 
-## `rune`
+## rune
 
 A rune is a single Unicode codepoint. Rune literals are enclosed in single quotes, e.g. `'f'`, `'魚'`.
 
 Besides the usual operations of equality and inequality, runes can be prepended or appended to strings using the `&` operator.
 
-## `string`
+Rune literal have the usual escape codes: `'\\'`, `'\t'`, `'\n'`, `'\r'` and `'\"'`.
 
-There are two kinds of string literals. Double quotes, `"like this"`, represent escaped strings with the following escape codes:
+## string
 
-| Sequence | Description |
-| --- | --- |
-| `\\` | Backslash |
-| `\t` | Horizontal tab |
-| `\n` | Line feed or newline |
-| `\r` | Carriage return |
-| `\"` | Double quote |
-
-But if we use `` `strings with backticks` `` then these sequences are unescaped.
+There are two kinds of string literals. Double quotes, `"like this"`, represent escaped strings with the usual escape codes: `\\`, `\t`, `\n`, `\r` and `\"`. But if we enclose our strings with backticks then these sequences are unescaped.
 
 Strings can be added together with the `+` operator: `"mac" + "hine"` evaluates to `"machine"`.
 
@@ -70,6 +71,6 @@ A "slice" can be taken out of a string, returning another string: `"Pipefish"[1:
 
 Note that the slice is from-including up-to-and-excluding, as is everything else in Pipefish.
 
-## `null`
+## null
 
-The `null` type contains one element, `NULL`, and has no operations defined on it except the default operations `==` and `!=`. (Which are not particular useful, because `NULL` is always equal to itself.) We'll see what it's good for later: in the meantime it definitely belongs on this page because it is indeed a simple type.
+The `null` type contains one element, `NULL`, and has no operations defined on it except the default operations `type`, `in`, `literal`, etc.

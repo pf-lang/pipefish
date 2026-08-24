@@ -1,0 +1,3 @@
+## And a work in progress
+
+Pipefish is usable, but not usable in production unless you want to end your tech career with a real bang. (Make sure you buy the chicken farm *first*.) What remains to be done is laid out in the roadmap; this website and release are by way of an advertisement to attract contributors, early adopters/guinea-pigs, constructive criticism, and some much-needed financial support.

@@ -1,3 +1,3 @@
-## Cras eu lacinia ex
+## Ergonomic
 
-Sed eu tempor libero. Praesent aliquet interdum mauris, sodales suscipit libero laoreet at. Vivamus vehicula mi ligula, ut placerat augue vehicula non. Fusce vehicula iaculis sem id cursus. Phasellus feugiat lacus et dolor feugiat pellentesque. Aliquam erat volutpat. Phasellus cursus eros erat, ut tincidunt lectus rutrum ullamcorper. Aenean facilisis, urna nec luctus tincidunt, nunc massa interdum ligula, vitae rutrum lectus diam ut tortor. 
+Accommodating semantics and lightweight syntax make Pipefish easy to write and read; a compact, consistent, TOOWTDI design makes it easy to learn; a powerful REPL, livecoding, and first-class tools for debugging and testing make it easy to develop in; and the language paradigm makes Pipefish easy to reason about.

@@ -1,0 +1,17 @@
+## Overview 
+
+The `html` library provides functions for escaping and unescaping HTML text.  
+
+## Modules 
+
+### ` ("html")`
+## Functions 
+
+### `escapeString(s string) -> string`
+
+`escapeString` escapes special characters like '<' to become "&lt;". It escapes only five such characters: <, >, &, ' and ". `unescapeString(escapeString(s)) == s` always holds, but the converse isn't always true.  
+
+### `unescapeString(s string) -> string`
+
+`unescapeString` unescapes entities like "&lt;" to become '<'. It unescapes a larger range of entities than `escapeString` escapes. For example, "&aacute;" unescapes to 'á', as does "&#225;" and "&#xE1;". `unescapeString(escapeString(s)) == s` always holds, but the converse isn't always true.  
+

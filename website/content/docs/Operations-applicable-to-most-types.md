@@ -8,8 +8,26 @@ The following operators and functions all come as standard for all types except 
 
 Let's demonstrate them in the TUI:
 
-<img width="710" height="262" alt="image" src="https://github.com/user-attachments/assets/eb070835-e903-497d-8af2-f229e2dfc647" />
+```tui
+→ 2 + 2 == 4
+true
+→ "foo" != "bar"
+true
+→ type true
+bool
+→ type bool
+type
+→ 99 in bool
+false
+→ string 5
+5
+→ string "foo"
+foo
+→ literal "foo"
+"foo"
+→
+```
 
-The `in` operator also works for membership of lists, sets, and tuples, as we will discuss when we introduce those types. It is an error to compare elements of different types. `"walrus" == 42` gives an error and not `false`.
+The `in` operator also works for membership of lists, sets, and tuples, as we will discuss when we introduce those types. It is an error to compare elements of different types. `"walrus" == 42` produces a compile-time error and not `false`.
 
 All comparison in Pipefish is by-value: structs with identical fields are equal, lists with the same elements in the same order are equal, etc.

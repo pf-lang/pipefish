@@ -17,7 +17,7 @@ mul3(x, y, z int) :
 And this will accept a float and a bool:
 
 ```
-conditionallyInvert(x float64, c bool):
+conditionallyInvert(x float, c bool):
     c : - x
     else : x
 ```
@@ -54,7 +54,7 @@ twice(t tuple) :
 
 Functions with more specific type signatures (lower down in the [type system diagram](https://github.com/tim-hardcastle/Pipefish/wiki/Type-system-diagram)) take precedence over less specific signatures. So if we pass a `bool`, we expect this to be handled by the third of the functions above, not the fourth or the fifth. We can demonstrate this, as usual, in the REPL:
 
-```
+```tui
 → hub run "examples/overloading.pf" as "OverL"
 Starting script 'examples/overloading.pf' as service 'OverL'.
 OverL → twice "hello"

@@ -1,6 +1,21 @@
 Let's look again at our first example script.
 
-<img width="710" height="309" alt="image" src="https://github.com/user-attachments/assets/af865a1f-8335-4099-a598-3033ba1eb3bd" />
+```
+cmd
+
+greet :
+    post "Hello world!"
+
+def
+
+(n)! :
+    n == 0 : 
+        1
+    n > 0 :
+        n * (n - 1)!
+    else :
+        error "can't take the factorial of a negative number"
+```
 
 It has a command, introduced by the heading `cmd`, and a function, introduced by the heading `def`. These are two very different things.
 

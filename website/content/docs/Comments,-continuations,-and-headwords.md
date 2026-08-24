@@ -2,9 +2,23 @@
 
 Comments and continuations are illustrated by the example file `examples/wiki/comncon.pf`:
 
-<img width="710" height="290" alt="image" src="https://github.com/user-attachments/assets/855da524-9dc3-4e0a-9387-f5f0a095ccc6" />
+```
+~~ This is a docstring.
 
-As you can see, we distinguish between docstrins and comments. Docstrings are considered part of the API; comments are not. Docstrings can appear at the head of a code file, as here, or before a definition. The `hub api` command, which we met eariler, will render docstrings in markdown.
+// This is a comment.
+
+// And below, the two types of continuation.
+
+const
+
+HELLO = "hello " + ..
+     .. "world"
+
+LIST = [1, 2, 3, 
+     .. 4, 5, 6]
+```
+
+As you can see, we distinguish between docstrins and comments. Comments work just as you'd expect. Docstrings are like comments, but are considered part of the API and are used to generate documentation, which will render markdown if you use it. Docstrings and comments can be interleaved if you wish. 
 
 Continuations must be marked by a `..` at the end of the continued line and a corresponding `..` at the beginning of the continuing line, as in the definitions of `X`, above.
 
@@ -13,3 +27,13 @@ The allowed exception is that the continued line may end in a comma *where this 
 ## Headwords
 
 We have met four "headwords" so far: `def`, `cmd`, `const`, and `var`. The meaning of a headword is "everything after this until the next headword or the end of file is a `def`/`cmd`/whatever declaration". So after `cmd`, Pipefish expects you to be declaring commands; after `def` you can define functions, after `const` you can define constants, and after `var` you can define variables. Besides these, there are `newtype`, `import`, and `external`, which will be discussed later.
+
+Headwords can be used inline.
+
+```
+const MONTHS_IN_A_YEAR = 12
+
+def square(i) :
+    i * i
+```
+This is not idiomatic, but it's useful if you want to do code generation.
