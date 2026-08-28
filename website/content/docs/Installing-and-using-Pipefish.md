@@ -31,7 +31,7 @@ You can stop the TUI with `hub quit`, or with Ctrl+C. We'll talk about what the 
 
 ## How best to use Pipefish
 
-We have supplied Pipefish with a VSCode extension which highlights Pipefish code and takes care of indentation for you. You can add this to VSCode with `cp -r <Main folder of the Pipefish distribution>/pipefish-highlighter ~/.vscode/extensions`. If VSCode is already running, it may be necessary to restart it.
+We have supplied Pipefish with a VSCode extension which highlights Pipefish code and takes care of indentation for you. You can add this to VSCode with `cp -r &ltMain folder of the Pipefish distribution>/pipefish-highlighter ~/.vscode/extensions`. If VSCode is already running, it may be necessary to restart it.
 
 We intend to add support for other editors, but until then, the best way to code in Pipefish is probably to edit your scripts in VSCode while running the Pipefish TUI in a terminal; the one at the bottom of the VSCode window if you have a small screen.
 

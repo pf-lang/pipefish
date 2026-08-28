@@ -31,7 +31,6 @@ func highlightGivenWrapper(code []rune, wrapper highlightWrapper) string {
 		case leftBrackets.Contains(runes.CurrentRune()):
 			out.WriteString(wrapper.brackets(len(brackets), runes.CurrentRune()))
 			brackets = append(brackets, runes.CurrentRune())
-			
 		case rightBrackets.Contains(runes.CurrentRune()):
 			if len(brackets) > 0 && bracketMatch[brackets[len(brackets)-1]] == runes.CurrentRune() {
 				brackets = brackets[:len(brackets)-1]
@@ -139,8 +138,8 @@ var htmlWrapper = highlightWrapper {
 
 	brackets: func(depth int, r rune) string {
 		depth = depth % 3 
-		return "<brackets-" + strconv.Itoa(depth) + ">" + string(r) + 
-		       "</brackets-" + strconv.Itoa(depth) + ">"
+		return "<span class=\"bracket-" + strconv.Itoa(depth) + "\">" + string(r) + 
+		       "</span>"
 	},
 
 	space: "<span class=\"ws\"> </span>",
@@ -148,9 +147,8 @@ var htmlWrapper = highlightWrapper {
 
 var (
 	nondecimalIndicators = dtypes.SetOf('b', 'B', 'o', 'O', 'x', 'X')
-	control              = dtypes.SetOf("break", "continue", "else", "test", "try")
+	control              = dtypes.SetOf("break", "continue", "else", "test", "try", "cmd", "const", "def", "external", "global", "golang", "import", "include", "newtype", "private", "var")
 	reserved             = dtypes.SetOf("and", "false", "given", "not", "or", "true", "->", ">>", "?>", "--")
-	illegalInRepl        = dtypes.SetOf("cmd", "const", "def", "external", "global", "golang", "import", "include", "newtype", "private", "var", "\\\\", "~~")
 	// Used by the syntax highlighter; should not be used by anything else without much forethought.
 	// TODO --- there must be some principled way to generate this from something else.
 	nativeTypes   = dtypes.SetOf("ok", "int", "string", "rune", "bool", "float", "error", "type", "pair", "list", "map", "set", "label", "func", "null", "snippet", "clone", "clones", "enum", "struct", "any", "ref", "tuple")

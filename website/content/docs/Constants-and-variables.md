@@ -2,7 +2,7 @@ Constants can be defined under the heading `const`. The Pipefish style guide rec
 
 Variables can be declared under the heading `var`.
 
-An example is given in `examples/wiki/variables.pf`:
+An example is given in `examples/docs/variables.pf`:
 
 ```
 var

@@ -160,6 +160,12 @@ html[data-theme="dark"] .theme-toggle {
 
     /* The cyan for the service names etc in the CLI. */
     --service: #008080;
+    /* The red for the error messages. */
+    --error-message: #800000;
+    /* And the yellow for the line numbers. */
+    --line-no: #808000;
+    /* And the green for the bullet points. */
+    --bullet: #008800;
 
     /* Typography */
 
@@ -234,8 +240,13 @@ html[data-theme="dark"] .theme-toggle {
 
     /* The cyan for the service names etc in the CLI. */
     --service: #00ffff;
+    /* The red for the error messages. */
+    --error-message: #ff0000;
+    /* And the yellow for the line numbers. */
+    --line-no: #ffff00;
+    /* And the green for the bullet points. */
+    --bullet: #00ff00;
 }
-
 
 /* Global */
 
@@ -931,6 +942,17 @@ hr {
     color: var(--service);
 }
 
+.code-block .error-message {
+    color: var(--error-message);
+}
+
+.code-block .line-no {
+    color: var(--line-no);
+}
+
+.code-block .bullet {
+    color: var(--bullet);
+}
 
 /* Bracket highlighting */
 

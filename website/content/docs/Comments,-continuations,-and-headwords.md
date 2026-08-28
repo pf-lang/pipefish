@@ -1,6 +1,6 @@
 ## Comments and continuations
 
-Comments and continuations are illustrated by the example file `examples/wiki/comncon.pf`:
+Comments and continuations are illustrated by the example file `examples/docs/comncon.pf`:
 
 ```
 ~~ This is a docstring.

@@ -20,7 +20,7 @@ We can parameterize this validation. For example, let's make some math-style vec
 ```
 newtype
     
-Vec = clone{i int} list : 
+Vec{i int} = clone list : 
     len(that) == i
     
 def
@@ -57,7 +57,7 @@ concat (v Vec{i int}, w Vec{j int}) -> Vec{i + j} :
 
 (And indeed in the previous example of vector addition the return type was technically being computed, it's just that the computation was "evaluate `i`".)
 
-The types we can use as parameters are `bool`, `float`, `int`, `string`, `rune`, `type`, and any enum type.
+The types we can use as parameters are `bool`, `float`, `int`, `string`, `rune`, `type`, and any enum type, or to put it another way, the types of which the values have literals rather than needing to be produced by a constructor function.
 
 As mentioned, we can also parameterize struct types. In this particular example, we don't use the parameters for the runtime validation, but just to ensure that it treats different currencies as different types and doesn't try to add them together. An enum type is used as a parameter.
 
@@ -66,7 +66,7 @@ newtype
     
 Currency = enum USD, EURO, GBP 
     
-Money = struct{c Currency}(large, small int):
+Money{c Currency} = struct(large, small int):
     0 <= that[large]
     0 <= that[small]
     that[small] < 100
@@ -82,12 +82,12 @@ def
 
 ## Generics
 
-We can of course implement "generics" merely as a special case where a parameterized type takes a type as a parameter. This has been done for you in the case of the built-in `list`, `set`, `map`, and `pair` types, with `list` and `set` taking one type parameter, and `pair` and `map` taking two. Here for example is the implementation of the generic list type:
+We can of course implement generics merely as a special case where a parameterized type takes a type as a parameter. This has been done for you in the case of the built-in `list`, `set`, `map`, and `pair` types, with `list` and `set` taking one type parameter, and `pair` and `map` taking two. Here for example is the implementation of the generic `list` type:
 
 ```
 newtype 
     
-list = clone{T type} list using +, slice :
+list{T type} = clone list using +, slice :
     from a = true for _::el = range that :
         el in T :
             continue 
@@ -123,4 +123,4 @@ bar(i int) :
 
 ... then the types `Z{3}`, `Z{5}`, `Z{7}`, `Z{9}`, and `Z{12}` will exist at runtime, but nothing else of the form `Z{i}`.
 
-The `make` statement is for when you want to have a type (or as in this case, types) to use at runtime, but there's no other reason to mention it in the script: `make` mentions it, thus summoning it into existence, and has no other effect.
+The `make` statement is for when you want to have a type (or as in this case, types) to use at runtime, but there's no other reason to mention the type in the script: the `make` declaration ckmentions it, thus summoning it into existence, and has no other effect.

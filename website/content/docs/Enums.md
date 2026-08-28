@@ -1,12 +1,31 @@
 ## Enums
 
-A Pipefish enum is a very simple thing. The script `examples/wiki/enums.pf` shows how to declare enums:
+A Pipefish enum is a very simple thing. The script `examples/docs/enums.pf` shows how to declare enums:
 
-<img width="710" height="159" alt="image" src="https://github.com/user-attachments/assets/377535e5-0a24-444e-8576-5e69e8c53a03" />
+```
+newtype
+
+Suit = enum CLUBS, HEARTS, SPADES, DIAMONDS
+
+Value = enum ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, 
+          .. EIGHT, NINE, TEN, JACK, QUEEN, KING
+```
 
 These have only the most basic built-in functions, plus each enum type has a constructor which will make an element of the type out of an integer. We demonstrate this as usual in the TUI:
 
-<img width="710" height="236" alt="image" src="https://github.com/user-attachments/assets/3d40525b-fff8-4f8d-b85c-331606ef5874" />
+```tui
+→ hub run "examples/docs/enums.pf"
+Starting script "enums.pf" as service "enums". 
+enums → HEARTS == DIAMONDS
+false
+enums → CLUBS in Suit
+true
+enums → type JACK
+Value
+enums → Suit(2)
+SPADES
+enums →    
+```
 
 ## General note on type declaration
 

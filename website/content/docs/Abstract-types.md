@@ -1,16 +1,34 @@
-Every specific Pipefish value has a *concrete type*: `int`, `bool`, `string`, a user-defined struct type, etc. We can instantiate any concrete type with literals (`42`, `"foo"`, `false`) or with constructors as with structs, enums, and clone types. Concrete types never have subtypes.
+## Abstract versus concrete types
 
-An *abstract type* is just a union of concrete types, e.g `int/float`. Such types clearly do have subtypes, in this case `int` and `float`, but they can never be instantiated: no value can be of type `int/float`, it has to be one or the other.
+Every specific Pipefish value has a *concrete type*: `int`, `bool`, `string`, a user-defined struct type, etc. We can instantiate any concrete type with literals (`42`, `"foo"`, `false`) or with constructors as with structs, enums, and clone types. Concrete types can never have subtypes.
 
-<img width="710" height="129" alt="image" src="https://github.com/user-attachments/assets/922fbd08-9347-48ca-991b-6407fc68a56f" />
+An *abstract type* is just a union of concrete types, e.g `int/float`. Such types clearly do have subtypes, in this case `int` and `float`, but they can never be instantiated: no value can ever be of type `int/float`, it has to be one or the other.
 
-While we can create and use abstract types "on the fly" by using the `/` operator, we can also give them names in the `newtype` section, which is to be preferred if you're going to use the same abstract type more than once.
+## Declaring abstract types
 
-<img width="710" height="327" alt="image" src="https://github.com/user-attachments/assets/7cd7669b-df70-45f8-9974-e413d419eb74" />
+While we can create and use abstract types  “on the fly” by using the `/` operator, we can also give them names in the `newtype` section, which is to be preferred if you're going to use the same abstract type more than once.
+
+```
+newtype
+
+Number = abstract int/float
+
+// We can then use this to define other types:
+Widget = struct(height, width Number)
+
+var // Or when declaring variables:
+
+myNumber Number = 42
+
+def // Or the parameters of functions:
+
+double(n Number) :
+    2 * n
+```
 
 Note that by default, variables are given the type of the value they're initialized with, so if we just wrote `myNumber = 42`, then myNumber could only ever contain an `int`.
 
-## The `?` operator and `NULL`.
+## The `?` operator and `NULL`
 
 As syntactic sugar, you can write e.g. `int?` for `int/null`, etc.
 
@@ -22,8 +40,8 @@ The abstract type `any` contains all types that aren't `null` or `tuple`. `struc
 
 For any clonable type, e.g. `rune`, the abstract type `clones{rune}` contains the parent type and all its clones.
 
-There are abstract types defined my interfaces, such as `Addable`, which will be discussed in [the next section of this wiki](https://github.com/tim-hardcastle/Pipefish/wiki/Interface-types,-part-1).
+There are abstract types defined my interfaces, such as `Addable`, which will be discussed in the next section of this documentation.
 
-## Note on semantics.
+## Note on semantics
 
 While concrete types are *nominal*, abstract types are *structural*: two abstract types are equal just if they are the union of the same concrete types. So in our example above, `Number` is equal to `int/float` and `float/int`. Or for example if you haven't defined any clones of `rune`, then `clones{rune}` is equal to `rune`.

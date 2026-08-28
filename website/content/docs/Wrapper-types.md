@@ -1,4 +1,4 @@
-You can wrap any Go type in a Pipefish type, declaring it like this, as in the `examples/wiki/wrapper.pf` file.
+You can wrap any Go type in a Pipefish type, declaring it like this, as in the `examples/docs/wrapper.pf` file.
 
 <img width="710" height="97" alt="image" src="https://github.com/user-attachments/assets/094bddc8-47d3-4039-8b2a-57368987998b" />
 

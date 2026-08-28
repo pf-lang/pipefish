@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/tim-hardcastle/pipefish/source/dtypes"
 	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
@@ -36,7 +37,6 @@ func init() {
 }
 
 func main() {
-
 	// We create a temporary output folder, `website-build`, ignored by git.
 
 	os.RemoveAll(filepath.Join(settings.PipefishHomeDirectory, "website-build"))
@@ -68,7 +68,7 @@ func main() {
 		sb.WriteString("\n\n")
 	}
 	landingPage := create("all",
-		sub{"title", "Pipefish."},
+		sub{"title", "Pipefish"},
 		sub{"description", "Landing page for Pipefish."},
 		sub{"content", create("landing", sub{"cards", sb.String()})},
 	)
@@ -100,57 +100,60 @@ func main() {
 	sidebars := make(map[string]string)
 	sidebars["articles"] = string(essaysBytes)
 	sidebars["docs"] = strings.Replace(string(docsBytes), "{{libraries}}", libraries, 1)
+	rawArticleList := strings.Split(string(essaysBytes), "/n")
+	articleSet := make(dtypes.Set[string])
+	for _, raw := range rawArticleList {
+		if raw[:2] == "- " {
+			articleSet = articleSet.Add(raw[2:])
+		}
+	}
 
 	for _, flavor := range []string{"articles", "docs"} {
 		sidebars[flavor] = makeSidebar(flavor, sidebars[flavor])
 	}
 
-	// We convert everything in the docs and articles folder from markdown to HTML and yeet the
+	// We convert everything in the docs folder from markdown to HTML and yeet the
 	// results into the appropriate output folder.
-	for _, dir := range []string{"docs", "articles"} {
-		files, _ = os.ReadDir(filepath.Join(settings.PipefishHomeDirectory, "website/content", dir))
-		for _, file := range files {
-			path := filepath.Join(settings.PipefishHomeDirectory, "website/content", dir, file.Name())
-			text, _ := os.ReadFile(path)
-			name := file.Name()[0 : len(file.Name())-3]
-			title := strings.ReplaceAll(name, "-", " ")
-			if title == "index" {
-				if dir == "docs" {
-					title = "Welcome"
-				} else {
-					title = "Articles"
-				}
-			}
-			ast := mdR.Parse(string(text))
-			headInfo := mdR.ExtractHeadings(ast)
-			tocContent := makeToc(headInfo)
-			toc := create("toc", sub{"toc", tocContent})
-			if tocContent == "" {
-				toc = ""
-			}
-			article := create("article",
-				sub{"title", title},
-				sub{"maybe-toc", toc},
-				sub{"content", mdR.RenderAst(ast)},
-			)
-			articlePlusSidebar := create(dir,
-				sub{"sidebar", sidebars[dir]},
-				sub{"content", article},
-			)
-			var description string
-			if dir == "docs" {
-				description = "Description of " + strings.ToLower(title) + " in Pipefish."
-			} else {
-				description = "Article on '" + title + "'."
-			}
-			target := filepath.Join(settings.PipefishHomeDirectory, "website-build", dir, name+".html")
-			page := create("all",
-				sub{"title", title},
-				sub{"description", description},
-				sub{"content", articlePlusSidebar},
-			)
-			os.WriteFile(target, []byte(page), 0755)
+	docsDir := filepath.Join(settings.PipefishHomeDirectory, "website/content/docs")
+	files, _ = os.ReadDir(docsDir)
+	for _, file := range files {
+		path := filepath.Join(docsDir, file.Name())
+		text, _ := os.ReadFile(path)
+		name := file.Name()[0 : len(file.Name())-3]
+		flavor := "docs"
+		if articleSet.Contains(name) {
+			flavor = "articles"
 		}
+		title := strings.ReplaceAll(name, "-", " ")
+		ast := mdR.Parse(string(text))
+		headInfo := mdR.ExtractHeadings(ast)
+		tocContent := makeToc(headInfo)
+		toc := create("toc", sub{"toc", tocContent})
+		if tocContent == "" {
+			toc = ""
+		}
+		article := create("article",
+			sub{"title", title},
+			sub{"maybe-toc", toc},
+			sub{"content", mdR.RenderAst(ast)},
+		)
+		articlePlusSidebar := create(flavor,
+			sub{"sidebar", sidebars[flavor]},
+			sub{"content", article},
+		)
+		var description string
+		if flavor == "docs" {
+			description = "Description of " + strings.ToLower(title) + " in Pipefish."
+		} else {
+			description = "Article on '" + title + "'."
+		}
+		target := filepath.Join(settings.PipefishHomeDirectory, "website-build/docs", name+".html")
+		page := create("all",
+			sub{"title", title},
+			sub{"description", description},
+			sub{"content", articlePlusSidebar},
+		)
+		os.WriteFile(target, []byte(page), 0755)
 	}
 }
 
