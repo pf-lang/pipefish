@@ -1,4 +1,4 @@
-import
+import private
 
 golang "github.com/ichiban/prolog"
 golang "github.com/ichiban/prolog/engine"
@@ -183,5 +183,3 @@ goQuery(P Prolog, s string) -> list/error : golang {
     }
     return result
 }
-
-
