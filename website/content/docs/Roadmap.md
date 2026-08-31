@@ -1,22 +1,22 @@
 ## Introduction
 
-In the article I will point out the more important things that need doing on the road between a language that works and a language usable in production.
+In the article I will point out the more important things that need doing on the road between a language that works and a language usable in production. They are not in the order in which they should be done, since this is mostly optional, except the first one, which needs doing now, and which I am in fact doing now.
 
-They are not in the order in which they should be done, except the first one, which needs doing now.
+## Attract contributions of time and money
 
-## Attracting contributions of time and money
+The roadmap has many items that could be done better or made easier by contributions of time and/or money. I have a [plausible promise](https://sar.informatik.hu-berlin.de/teaching/neu-etc/oss/The_Cathedral_and_the_Bazaar_.pdf) of success, and the advantages of solo development no longer outweigh its disadvantages.
 
-The roadmap has many items that could be done better or easier by contributions of time and/or money. The language is mature enough, and has already attracted enough outside interest, that I have a [plausible promise](https://sar.informatik.hu-berlin.de/teaching/neu-etc/oss/The_Cathedral_and_the_Bazaar_.pdf) of success, and where the advantages of solo development no longer outweigh its disadvantages.
-
-It is therefore time to go around banging a big drum and trying to get noticed and seek contributions, if not by direct begging, then by a publicity campaign that will lead people to, in fact, this particular page of this website.
+It is therefore time to go around banging a big drum and trying to get noticed and seek contributions, if not by direct begging, then by a publicity campaign that will lead people to, in fact, this particular page of this website, where they can learn how they can help. Here you are. It worked!
 
 ### Contributing time
 
-For people thinking of contributing code to the project, you will not be the first, and I have produced documentation and tooling to help them. The article [State of the project]() explains to potential contributors what they'd be getting themselves into.
+Just using Pipefish and complaining about it would be a very important contribution. I am the worst person in the world to dogfood Pipefish, because I already know how it works. Your experiences of learning Pipefish (thirty minutes well spent) and using it as a lightweight scripting language is essential data that I *cannot* get myself.
+
+For people thinking of contributing code to the project, you will not be the first, and so the documentation and tooling has already been improved to meet the needs of people other than me. The article [For contributors]() explains what sort of shape the project is in considered as a codebase, which bits are gnarly, which bits are good, the tooling for people working on Pipefish, the tests the internal documentation and where to find it, etc.
 
 There are a number of things on the roadmap that others could do better or more quickly than I could, either by just being cleverer than me, or because it involves a skill I have never acquired which is more useful to getting the job done than my better knowledge of the project overall. I will point some of them out as we look over the individual items on the roadmap.
 
-Using Pipefish and complaining about ti would be a very important contribution. I am the worst person in the world to dogfood Pipefish, because I already know how it works. Your experiences of learning Pipefish (thirty minutes well spent) and using it as a lightweight scripting language is essential data that I *cannot* get myself.
+And the project has necessarily had little in the way of code review except me staring in mute horror at the abomination I perpetrated six months earlier. I call this the Aghast Methodology.
 
 ### Contributing money
 
@@ -27,6 +27,10 @@ The purpose of the money is (a) infrastructure spending (b) so that I can afford
 People, businesses, or sinister religious cults who want sponsorship rights in exchange for giving me money can have whatever opportunities to promote themselves that they want. I am not proud.
 
 Any tooling or documentation or instructional videos or whatever that I produce auxiliary to the main Pipefish project will also be released under the MIT license to the greater glory of the project. Conversely it seems fair that I should give a sufficiently munificient sponsor a proportionate amount of assistance if they wanted to do that themselves.
+
+### Please put a star on the repo
+
+Each star you add to [this page]() is a tiny crumb of credibility from which I will build a Plausibility Cake. Thank you.
 
 ## Optimization
 
@@ -90,7 +94,7 @@ Assuming we avoid either a malign or benign technological singularity, we can as
 
 ## An SDK for something that isn't Go
 
-Again, one good one as an example would be fine: something that allows e.g. Rust to embed a Pipefish service with the same function and method signatures as [the `pf` library](*******).
+Again, one good one as an example would be fine: something that allows e.g. Rust to embed a Pipefish service with the same function and method signatures as the `pf` library.
 
 ## The semantics of `private` types
 
@@ -105,6 +109,10 @@ And yet users will want to be able to do it because in many cases is will be qui
 ## A package registry and version control
 
 Natch.
+
+## More comptime
+
+You should be able to manufacture declarations at compile time, not just compute values. This can be done very nicely using snippets plus a `compile <headword> :` control structure . I could do this, but it's sufficiently separable that someone relatively new to the project could also do it and enjoy doing it. The semantics will take some thought on my part.
 
 ## Security auditing
 
