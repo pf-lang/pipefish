@@ -1005,7 +1005,7 @@ func (h *Hub) GetAndReportErrors(sv *pf.Service) {
 
 func (h *Hub) CurrentServiceIsBroken() bool {
 	return h.Services[h.CurrentServiceName()] == nil ||
-	    h.Services[h.CurrentServiceName()].IsBroken()
+		h.Services[h.CurrentServiceName()].IsBroken()
 }
 
 func (h *Hub) saveHubFile() string {
@@ -1344,7 +1344,6 @@ const HELP = "\nUsage: pipefish [-v | --version] [-h | --help]\n" +
 	"  tui           Starts the Pipfish TUI (text user interface).\n" +
 	"  run <file>    Runs a Pipefish script if it has a `main` command.\n" +
 	"  wiki <file>   Returns a description of the file's API in GitHub wiki format.\n\n"
-
 
 func Red(s string) string {
 	return "\033[31m" + s + "\033[0m"

@@ -56,11 +56,15 @@ Pipefish has a latticial type system: that is, it uses union types instead of th
 
 Dealing with data, we would sometimes like to be very hard-line about types and only be able to add apples to apples, and UIDs to nothing. And sometimes we'd like to be able to write a function that treats different data types all the same way and duck-types on them, for example when we want to serialize structs, and we want to write one function for each target format, not one for each struct; or when we want to write a `sum` function for lists that will add up whatever addition is defined on.
 
-I should mention two differences from Julia: the addition of `de facto` interfaces, as a sanity check; and the fact that the labels of fields of structs are first-class values, with structs being indexed with square brackets the same as maps, making it more convenient to abstract over struct types and their fields.
+The type system is also perhaps the *only* sensible basis for dealing pleasantly and idiomatically with pre-existing DSLs: SQL, Prolog, JSON, *******etc*******. A small but very significant set of data points: when implementing those libraries (************ of which are done entirely in userspace; SQL being partly special-cased under the hood for speed) the cause of the friction was never between Pipefish and Go, never between Pipefish and the DSL, but between Go and the DSL (implemented in Go), because the slightly fiddly task of getting static types out of the DSLs is made downright awkward when you need to evaluate an expression in the DSL known only at runtime, and where the return types are therefore unknown.
+
+I should mention two differences from Julia: the addition of [`de facto` interfaces](), as a sanity check; and the fact that the labels of fields of structs are first-class values, with structs being indexed with square brackets the same as maps, making it more convenient to abstract over struct types and their fields.
+
+This is more significant than it sounds at first. Another data point. When I first thought of Pipefish, I considered calling it data-oriented programming. When I looked it up to see if it was taken to mean something else, it turns out that it's been taken *twice*, and [one of those ideas](****) is a subset of the ideas that form Pipefish, *except* for the advice to simply give up on structs and use maps instead. The reasons for doing so vanish if labels are made first-class.
 
 ## `main`-less programming
 
-In Pipefish, since it's a GPL, it is *permitted* to write a program with a `main()` command which does batch processing, prints the result, and stops; or even to write a `main` command with a hand-written REPL inside it.
+In Pipefish, since it's a GPL, it is *permitted* to write a program with a `main` command which does batch processing, prints the result, and stops; or even to write a `main` command with a hand-written REPL inside it, if you are eccentric.
 
 But the more natural way for a human to interact with it is to declare functions and commands which can be used from the TUI, and to talk to Pipefish in Pipefish in the same way that one talks to SQL in SQL. To make it easy to develop this way, the TUI is full of dev tools.
 
@@ -68,7 +72,7 @@ But the more natural way for a human to interact with it is to declare functions
 
 (I am presently unable to think of a less silly name for this concept.) The idea is that the things you can do in the TUI when you run a Pipefish service in your terminal are the things you can do in your code if you import it as a library, and also the things you can do with it in your code if if's someone else's webfacing service and you give your Pipefish compiler your username and password.
 
-We may note, smugly, in passing, that this sort of thing is only really practicable in a language where all values are immutable.
+We may note, smugly, in passing, that this sort of thing is only really practicable in a language where all values are immutable. These are the rewards of virtue you've heard about.
 
 ### DSLs and glue
 

@@ -1,10 +1,3 @@
-## Modules 
-
-### ` ("github.com/ichiban/prolog")`
-
-### ` ("github.com/ichiban/prolog/engine")`
-
-### `strings ("/home/tim/Pipefish/source/initializer/libraries/strings.pf")`
 ## Types 
 
 ### `Prolog = wrapper *Interpreter`
