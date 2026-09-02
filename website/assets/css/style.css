@@ -1,3 +1,5 @@
+@import url("syntax.css");
+
 /* Reset */
 
 *,
@@ -124,6 +126,8 @@ html[data-theme="dark"] .theme-toggle {
     --border: #d8dee8;
     --sidebar-border: #d0d8e4;
 
+    --inline-code-background: #edf1f6;
+
     /* Cards and other raised elements */
 
     --shadow-small:
@@ -131,41 +135,6 @@ html[data-theme="dark"] .theme-toggle {
 
     --shadow-large:
         0 8px 24px rgba(0, 0, 0, .10);
-
-    /* Code */
-
-    --code-background: #f1f4f8;
-    --code-header: #e4e9f1;
-    --code-text: #202124;
-    --code-border: #d6dce5;
-
-    --inline-code-background: #edf1f6;
-
-    /* Syntax highlighting */
-
-    --syntax-reserved: #4b69c6;
-    --syntax-number: #9c5d27;
-    --syntax-string: #448c27;
-    --syntax-constant: #9c5d27;
-    --syntax-type: #7a3e9d;
-    --syntax-control: #4b69c6;
-    --syntax-comment: #aaaaaa;
-    --syntax-docstring: #965d27;
-
-    /* Bracket colours. */
-
-    --bracket-0: #0431fa;
-    --bracket-1: #319331;
-    --bracket-2: #7b3814;
-
-    /* The cyan for the service names etc in the CLI. */
-    --service: #008080;
-    /* The red for the error messages. */
-    --error-message: #800000;
-    /* And the yellow for the line numbers. */
-    --line-no: #808000;
-    /* And the green for the bullet points. */
-    --bullet: #008800;
 
     /* Typography */
 
@@ -213,39 +182,6 @@ html[data-theme="dark"] .theme-toggle {
 
     --shadow-small: none;
     --shadow-large: none;
-
-    /* Code */
-
-    --code-background: #191c21;
-    --code-header: #292d35;
-    --code-text: #dcdcaa;
-    --code-border: #414752;
-
-    --inline-code-background: #30343c;
-
-    /* Syntax highlighting */
-
-    --syntax-reserved: #5c9cd6;
-    --syntax-number: #b5cea8;
-    --syntax-string: #ce9178;
-    --syntax-constant: #4fc1ff;
-    --syntax-type: #4ec9b0;
-    --syntax-control: #c586c0;
-    --syntax-comment: #6a9955;
-    --syntax-docstring: #569cd6;
-
-    --bracket-0: #ffd700;
-    --bracket-1: #da70d6;
-    --bracket-2: #179fff;
-
-    /* The cyan for the service names etc in the CLI. */
-    --service: #00ffff;
-    /* The red for the error messages. */
-    --error-message: #ff0000;
-    /* And the yellow for the line numbers. */
-    --line-no: #ffff00;
-    /* And the green for the bullet points. */
-    --bullet: #00ff00;
 }
 
 /* Global */
@@ -902,72 +838,6 @@ hr {
 
     padding: 0;
 }
-
-
-/* Syntax highlighting */
-
-.code-block .reserved {
-    color: var(--syntax-reserved);
-}
-
-.code-block .number {
-    color: var(--syntax-number);
-}
-
-.code-block .string {
-    color: var(--syntax-string);
-}
-
-.code-block .constant {
-    color: var(--syntax-constant);
-}
-
-.code-block .type {
-    color: var(--syntax-type);
-}
-
-.code-block .control {
-    color: var(--syntax-control);
-}
-
-.code-block .comment {
-    color: var(--syntax-comment);
-}
-
-.code-block .docstring {
-    color: var(--syntax-docstring);
-}
-
-.code-block .service {
-    color: var(--service);
-}
-
-.code-block .error-message {
-    color: var(--error-message);
-}
-
-.code-block .line-no {
-    color: var(--line-no);
-}
-
-.code-block .bullet {
-    color: var(--bullet);
-}
-
-/* Bracket highlighting */
-
-.code-block .bracket-0 {
-    color: var(--bracket-0);
-}
-
-.code-block .bracket-1 {
-    color: var(--bracket-1);
-}
-
-.code-block .bracket-2 {
-    color: var(--bracket-2);
-}
-
 
 /* Blockquotes */
 

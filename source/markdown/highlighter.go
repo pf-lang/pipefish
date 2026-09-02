@@ -10,12 +10,12 @@ import (
 )
 
 type highlightWrapper struct {
-	wrap func(string, string)string
-	brackets func(int, rune)string
-	space string
+	wrap     func(string, string) string
+	brackets func(int, rune) string
+	space    string
 }
 
-func htmlHighlighter(code string) string {
+func HtmlHighlighter(code string) string {
 	return highlightGivenWrapper([]rune(code), htmlWrapper)
 }
 
@@ -131,15 +131,15 @@ func IsProtectedPunctuation(ch rune) bool {
 	return ch == ',' || ch == ':' || ch == ';' || ch == '.' || ch == '='
 }
 
-var htmlWrapper = highlightWrapper {
+var htmlWrapper = highlightWrapper{
 	wrap: func(s, flavor string) string {
-		return "<span class=\""+flavor+"\">"+s+"</span>"
+		return "<span class=\"" + flavor + "\">" + s + "</span>"
 	},
 
 	brackets: func(depth int, r rune) string {
-		depth = depth % 3 
-		return "<span class=\"bracket-" + strconv.Itoa(depth) + "\">" + string(r) + 
-		       "</span>"
+		depth = depth % 3
+		return "<span class=\"bracket-" + strconv.Itoa(depth) + "\">" + string(r) +
+			"</span>"
 	},
 
 	space: "<span class=\"ws\"> </span>",

@@ -16,7 +16,7 @@ func NewAstRenderer() Renderer {
 }
 
 func NewHtmlRenderer() Renderer {
-	return NewRenderer(MakeRenderFunction(html, htmlHighlighter))
+	return NewRenderer(MakeRenderFunction(html, HtmlHighlighter))
 }
 
 func NewTerminalRenderer(highlighter func(string) string) Renderer {
@@ -124,7 +124,7 @@ func MakeRenderFunction(textWrapper map[mdStyle]func(s string) string, codeHighl
 					if ix > 0 {
 						lineOut = "<span class=\"service\">" + (line[:ix-1]) + "</span> "
 					}
-					lineOut = lineOut + "→" + codeHighlighter(line[ix+3:])    // +3 because that's how many bytes there are in the rune.
+					lineOut = lineOut + "→" + codeHighlighter(line[ix+3:]) // +3 because that's how many bytes there are in the rune.
 				} else {
 					lineOut = line
 				}

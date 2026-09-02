@@ -9,59 +9,9 @@ class PipefishService extends HTMLElement {
 
         const shadow = this.attachShadow({ mode: "open" });
 
-        const style = document.createElement("style");
-        style.textContent = `
-            .service {
-                border: 1px solid #888;
-                padding: 1rem;
-                max-width: 600px;
-            }
-
-            textarea {
-                display: block;
-                width: 100%;
-                box-sizing: border-box;
-                min-height: 100px;
-                margin-bottom: 1rem;
-            }
-
-            button {
-                margin-bottom: 1rem;
-            }
-
-            .repl {
-                font-family: monospace;
-                line-height: 1.4;
-            }
-
-            .transcript {
-                margin: 0;
-                white-space: pre-wrap;
-            }
-
-            .input-line {
-                margin: 0;
-                display: flex;
-                font-family: monospace;
-            }
-
-            .transcript,
-            .input-line {
-                line-height: 1.4;
-            }
-
-            .prompt {
-                margin-right: 0.5rem;
-            }
-            
-            .input {
-                flex: 1;
-                font-family: inherit;
-                border: none;
-                outline: none;
-                padding: 0;
-            }
-        `;
+        const style = document.createElement("link");
+        style.rel = "stylesheet";
+        style.href = "pipefish-service.css";
 
         const wrapper = document.createElement("div");
         wrapper.classList.add("service");

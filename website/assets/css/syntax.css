@@ -1,0 +1,125 @@
+:root{
+    --code-background: #f1f4f8;
+    --code-header: #e4e9f1;
+    --code-text: #202124;
+    --code-border: #d6dce5;
+
+    /* Syntax highlighting */
+
+    --syntax-reserved: #4b69c6;
+    --syntax-number: #9c5d27;
+    --syntax-string: #448c27;
+    --syntax-constant: #9c5d27;
+    --syntax-type: #7a3e9d;
+    --syntax-control: #4b69c6;
+    --syntax-comment: #aaaaaa;
+    --syntax-docstring: #965d27;
+
+    /* Bracket colours. */
+
+    --bracket-0: #0431fa;
+    --bracket-1: #319331;
+    --bracket-2: #7b3814;
+
+    /* The cyan for the service names etc in the CLI. */
+    --service: #008080;
+    /* The red for the error messages. */
+    --error-message: #800000;
+    /* And the yellow for the line numbers. */
+    --line-no: #808000;
+    /* And the green for the bullet points. */
+    --bullet: #008800;
+
+    /* Font */
+    --syntax-font: "Google Code Sans", sans-serif;
+}
+
+@font-face {
+    font-family: "Google Sans Code";
+    src: url("../fonts/GoogleSansCode-VariableFont_MONO,wght.woff2")
+         format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Dark theme */
+
+[data-theme="dark"] {
+    /* Code */
+
+    --code-background: #191c21;
+    --code-header: #292d35;
+    --code-text: #dcdcaa;
+    --code-border: #414752;
+
+    --inline-code-background: #30343c;
+
+    /* Syntax highlighting */
+
+    --syntax-reserved: #5c9cd6;
+    --syntax-number: #b5cea8;
+    --syntax-string: #ce9178;
+    --syntax-constant: #4fc1ff;
+    --syntax-type: #4ec9b0;
+    --syntax-control: #c586c0;
+    --syntax-comment: #6a9955;
+    --syntax-docstring: #569cd6;
+
+    --bracket-0: #ffd700;
+    --bracket-1: #da70d6;
+    --bracket-2: #179fff;
+
+    /* The cyan for the service names etc in the CLI. */
+    --service: #00ffff;
+    /* The red for the error messages. */
+    --error-message: #ff0000;
+    /* And the yellow for the line numbers. */
+    --line-no: #ffff00;
+    /* And the green for the bullet points. */
+    --bullet: #00ff00;
+}
+
+.reserved {
+    color: var(--syntax-reserved);
+}
+
+.number {
+    color: var(--syntax-number);
+}
+
+.string {
+    color: var(--syntax-string);
+}
+
+.constant {
+    color: var(--syntax-constant);
+}
+
+.type {
+    color: var(--syntax-type);
+}
+
+.control {
+    color: var(--syntax-control);
+}
+
+.comment {
+    color: var(--syntax-comment);
+}
+
+.docstring {
+    color: var(--syntax-docstring);
+}
+
+.bracket-0 {
+    color: var(--bracket-0);
+}
+
+.bracket-1 {
+    color: var(--bracket-1);
+}
+
+.bracket-2 {
+    color: var(--bracket-2);
+}
