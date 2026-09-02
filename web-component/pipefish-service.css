@@ -1,7 +1,7 @@
-@import url("../website/assets/css/syntax.css");
+@import url("syntax.css");
 
 .service {
-    border: 1px solid #888;
+    border: 1px solid #808080;
     padding: 1rem;
     max-width: 600px;
 }
@@ -21,4 +21,32 @@ button {
 pre {
     margin: 0;
     white-space: pre-wrap;
+}
+
+.prompt {
+    white-space: pre;
+}
+
+.repl,
+.input-line,
+.input,
+.code-editor {
+    font-family: "Google Sans Code", monospace;
+    line-height: 1.4;
+}
+
+.input-line {
+    display: flex;
+    margin: 0;
+}
+
+.input {
+    flex: 1;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
 }

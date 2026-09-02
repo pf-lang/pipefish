@@ -18,7 +18,7 @@ LIST = [1, 2, 3,
      .. 4, 5, 6]
 ```
 
-As you can see, we distinguish between docstrins and comments. Comments work just as you'd expect. Docstrings are like comments, but are considered part of the API and are used to generate documentation, which will render markdown if you use it. Docstrings and comments can be interleaved if you wish. 
+As you can see, we distinguish between docstrings and comments. Comments work just as you'd expect. Docstrings are like comments, but are considered part of the API and are used to generate documentation, which will render markdown if you use it. Docstrings and comments can be interleaved if you wish. 
 
 Continuations must be marked by a `..` at the end of the continued line and a corresponding `..` at the beginning of the continuing line, as in the definitions of `X`, above.
 
@@ -26,7 +26,7 @@ The allowed exception is that the continued line may end in a comma *where this 
 
 ## Headwords
 
-We have met four "headwords" so far: `def`, `cmd`, `const`, and `var`. The meaning of a headword is "everything after this until the next headword or the end of file is a `def`/`cmd`/whatever declaration". So after `cmd`, Pipefish expects you to be declaring commands; after `def` you can define functions, after `const` you can define constants, and after `var` you can define variables. Besides these, there are `newtype`, `import`, and `external`, which will be discussed later.
+We have met four "headwords" so far: `cmd`, `const`, `def`, and `var`. The meaning of a headword is "everything after this until the next headword or the end of file is a `cmd`/`const`/whatever declaration". So after `cmd`, Pipefish expects you to be declaring commands; after `def` you can define functions, after `const` you can define constants, and after `var` you can define variables. Besides these, there are `external`, `import`, `include` and `newtype`, which will be discussed later.
 
 Headwords can be used inline.
 

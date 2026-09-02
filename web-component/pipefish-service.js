@@ -2,7 +2,10 @@ class PipefishService extends HTMLElement {
     constructor() {
         super();
 
-        this.ready = this.loadWasm();
+        this.ready = Promise.all([
+            this.loadWasm(),
+            this.loadFont()
+        ]);
 
         this.history = [];
         this.historyIndex = 0;
@@ -13,6 +16,10 @@ class PipefishService extends HTMLElement {
         style.rel = "stylesheet";
         style.href = "pipefish-service.css";
 
+        const syntax = document.createElement("link");
+        syntax.rel = "stylesheet";
+        syntax.href = "syntax.css";
+
         const wrapper = document.createElement("div");
         wrapper.classList.add("service");
 
@@ -21,6 +28,7 @@ class PipefishService extends HTMLElement {
 
         const code = document.createElement("textarea");
         code.placeholder = "Type Pipefish code here...";
+        code.classList.add("code-editor");
 
         const compileButton = document.createElement("button");
         compileButton.textContent = "Compile";
@@ -37,7 +45,7 @@ class PipefishService extends HTMLElement {
 
         const prompt = document.createElement("span");
         prompt.classList.add("prompt");
-        prompt.textContent = "→";
+        prompt.textContent = "→ ";
 
         const input = document.createElement("input");
         input.classList.add("input");
@@ -55,7 +63,9 @@ class PipefishService extends HTMLElement {
             repl
         );
 
-        shadow.append(style, wrapper);
+        shadow.append(style, syntax, wrapper);
+
+        console.log("shadow styles:", [...shadow.querySelectorAll("link")].map(x => x.href));
 
         compileButton.addEventListener("click", async () => {
             try {
@@ -121,6 +131,25 @@ class PipefishService extends HTMLElement {
         );
 
         this.go.run(result.instance);
+    }
+
+    async loadFont() {
+    const fontURL = new URL(
+        "code-font/GoogleSansCode-VariableFont_MONO,wght.woff2",
+        import.meta.url
+    );
+
+    const font = new FontFace(
+        "Google Sans Code",
+        `url("${fontURL}")`,
+            {
+                weight: "100 900",
+                style: "normal"
+            }
+        );
+
+        await font.load();
+        document.fonts.add(font);
     }
 
     loadScript(url) {

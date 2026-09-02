@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"io/fs"
 	"os"
 	"os/exec"
@@ -37,6 +38,24 @@ func init() {
 }
 
 func main() {
+	// We copy the syntax highlighting rules from the web component.
+	source := filepath.Join(settings.PipefishHomeDirectory, "web-component/syntax.css")
+	destination := filepath.Join(settings.PipefishHomeDirectory, "website/assets/css/syntax.css")
+	sourceFile, err := os.Open(source)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer sourceFile.Close()
+	destFile, err := os.Create(destination)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer destFile.Close()
+	_, err = io.Copy(destFile, sourceFile)
+	if err != nil {
+		panic(err.Error())
+	}
+
 	// We create a temporary output folder, `website-build`, ignored by git.
 
 	os.RemoveAll(filepath.Join(settings.PipefishHomeDirectory, "website-build"))
