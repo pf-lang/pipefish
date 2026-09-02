@@ -1,3 +1,5 @@
+//go:build !js && !wasm
+
 package initializer_test
 
 // This largely repeats the tests in `vm_test.go` and `vm_compiler.go`, but only

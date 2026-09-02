@@ -1,3 +1,5 @@
+//go:build !js && !wasm
+
 package err_test
 
 import (

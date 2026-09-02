@@ -1,3 +1,5 @@
+//go:build !js && !wasm
+
 package hub
 
 // When I do the SQL integration I can just put this stuff in the hub, replacing it with more generic

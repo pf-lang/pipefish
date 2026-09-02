@@ -55,7 +55,7 @@ func (sv *Service) InitializeFromFilepath(scriptFilepath string) error {
 }
 
 // The same as the previous two functions, except that we pass in a map of values to initialize
-// $store.
+// $_env.
 // Initializes the service with the source code supplied in the string.
 func (sv *Service) InitializeFromCodeWithStore(code string, store Map) error {
 	return sv.initialize("InitializeFromCode", code, store)

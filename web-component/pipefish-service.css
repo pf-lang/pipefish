@@ -1,0 +1,22 @@
+.service {
+    border: 1px solid #888;
+    padding: 1rem;
+    max-width: 600px;
+}
+
+textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 100px;
+    margin-bottom: 1rem;
+}
+
+button {
+    margin-bottom: 1rem;
+}
+
+pre {
+    margin: 0;
+    white-space: pre-wrap;
+}
