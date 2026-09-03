@@ -26,9 +26,28 @@ class PipefishService extends HTMLElement {
         const heading = document.createElement("h2");
         heading.textContent = "Pipefish service";
 
+        const editor = document.createElement("div");
+        editor.classList.add("code-editor");
+
+        const highlighted = document.createElement("pre");
+        highlighted.classList.add("highlighted");
+
         const code = document.createElement("textarea");
         code.placeholder = "Type Pipefish code here...";
-        code.classList.add("code-editor");
+        code.classList.add("code-input");
+        code.spellcheck = false;
+
+        editor.append(highlighted, code);
+
+        code.addEventListener("input", () => { this.updateHighlighting(); });
+
+        code.addEventListener("scroll", () => {
+            highlighted.scrollTop = code.scrollTop;
+            highlighted.scrollLeft = code.scrollLeft;
+        });
+
+        this.code = code;
+        this.highlighted = highlighted;
 
         const compileButton = document.createElement("button");
         compileButton.textContent = "Compile";
@@ -58,7 +77,7 @@ class PipefishService extends HTMLElement {
 
         wrapper.append(
             heading,
-            code,
+            editor,
             compileButton,
             repl
         );
@@ -83,6 +102,20 @@ class PipefishService extends HTMLElement {
                 await this.submit(input);
             }
         });
+    }
+
+    syncEditorScroll(input, highlighted) {
+        highlighted.scrollTop = input.scrollTop;
+        highlighted.scrollLeft = input.scrollLeft;
+    }
+
+    async updateHighlighting() {
+        await this.ready;
+
+        this.highlighted.innerHTML =
+            window.pipefishHighlight(this.code.value);
+
+        this.syncEditorScroll(this.code, this.highlighted);
     }
 
     async submit(input) {

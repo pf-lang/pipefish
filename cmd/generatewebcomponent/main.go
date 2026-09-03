@@ -37,7 +37,7 @@ func main() {
         this js.Value,
         args []js.Value,
     ) interface{} {
-        return markdown.HtmlHighlighter(args[0].String())
+        return markdown.BlockHighlighter(args[0].String())
     }))
 
     select {}

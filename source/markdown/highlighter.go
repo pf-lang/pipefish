@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/tim-hardcastle/pipefish/source/dtypes"
 	"github.com/tim-hardcastle/pipefish/source/lexer"
@@ -15,7 +16,18 @@ type highlightWrapper struct {
 	space    string
 }
 
-func HtmlHighlighter(code string) string {
+func BlockHighlighter(code string) string {
+	lines := strings.Split(code, "\n")
+	result := ""
+	sep := ""
+	for _, line := range lines {
+		result = result + sep + htmlHighlighter(line)
+		sep = "\n"
+	}
+	return result
+}
+
+func htmlHighlighter(code string) string {
 	return highlightGivenWrapper([]rune(code), htmlWrapper)
 }
 

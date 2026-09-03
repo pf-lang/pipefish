@@ -16,7 +16,7 @@ func NewAstRenderer() Renderer {
 }
 
 func NewHtmlRenderer() Renderer {
-	return NewRenderer(MakeRenderFunction(html, HtmlHighlighter))
+	return NewRenderer(MakeRenderFunction(html, htmlHighlighter))
 }
 
 func NewTerminalRenderer(highlighter func(string) string) Renderer {
