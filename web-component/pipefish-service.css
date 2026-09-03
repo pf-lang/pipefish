@@ -24,34 +24,77 @@ pre {
 .input,
 .code-editor {
     font-family: "Google Sans Code", monospace;
+    font-size: 14px;
     line-height: 1.4;
 }
 
 .input-line {
     display: flex;
+    align-items: flex-start;
     margin: 0;
 }
 
-.input {
+.prompt {
+    white-space: pre;
+    flex: none;
+}
+
+.input-editor {
+    position: relative;
     flex: 1;
-    font: inherit;
-    color: inherit;
-    background: transparent;
-    border: none;
-    outline: none;
-    padding: 0;
-    margin: 0;
-}
-
-.code-editor .highlighted {
+    min-width: 0;
+    min-height: 1.4em;
+    max-height: calc(1.4em * 12);
     overflow: hidden;
 }
 
-.code-editor .code-input {
-    overflow: auto;
+.input-editor .highlighted-input,
+.input-editor .input {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    min-height: 1.4em;
+    max-height: calc(1.4em * 12);
+
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    font-family: "Google Sans Code", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+
+    white-space: pre-wrap;
+    overflow-wrap: normal;
 }
 
-/* We sync the input and the highlighter. */
+.code-editor .highlighted,
+.code-editor .code-input,
+.input-editor .highlighted-input,
+.input-editor .input {
+    tab-size: 4;
+}
+
+.input-editor .highlighted-input {
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.input-editor .input {
+    resize: none;
+    overflow: auto;
+
+    border: none;
+    outline: none;
+    background: transparent;
+
+    color: transparent;
+    caret-color: var(--code-text);
+}
+
+
+/* Main code editor */
 
 .code-editor {
     position: relative;
@@ -94,6 +137,18 @@ pre {
     border: 0;
     outline: none;
 
+    background: transparent;
+    color: transparent;
+    caret-color: var(--code-text);
+}
+
+.input-editor .highlighted-input {
+    pointer-events: none;
+}
+
+.input-editor .input {
+    border: none;
+    outline: none;
     background: transparent;
     color: transparent;
     caret-color: var(--code-text);
