@@ -56,7 +56,7 @@ class PipefishIde extends HTMLElement {
         code.addEventListener("input", async () => {
             await this.ready;
             highlighted.innerHTML =
-                this.highlighter.Highlight(code.value);
+                this.highlighter.highlight(code.value);
         });
 
         code.addEventListener("scroll", () => {
@@ -163,7 +163,7 @@ class PipefishIde extends HTMLElement {
             await this.ready;
 
             highlightedInput.innerHTML =
-                this.highlighter.Highlight(input.value);
+                this.highlighter.highlight(input.value);
 
             this.resizeReplInput();
         });
@@ -504,7 +504,7 @@ class PipefishIde extends HTMLElement {
 
         entry.innerHTML =
             `<span class="prompt">→ </span>` +
-            this.highlighter.Highlight(command);
+            this.highlighter.highlight(command);
 
         this.transcript.appendChild(entry);
 
@@ -554,7 +554,7 @@ class PipefishIde extends HTMLElement {
         await this.ready;
 
         this.highlighted.innerHTML =
-            this.highlighter.Highlight(this.code.value);
+            this.highlighter.highlight(this.code.value);
 
         this.syncEditorScroll(this.code, this.highlighted);
     }
