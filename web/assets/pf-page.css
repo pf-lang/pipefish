@@ -1,0 +1,155 @@
+@import url("syntax.css");
+
+.service {
+    border: 1px solid #808080;
+    padding: 1rem;
+    max-width: 600px;
+}
+
+button {
+    margin-bottom: 1rem;
+}
+
+pre {
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.prompt {
+    white-space: pre;
+}
+
+.repl,
+.input-line,
+.input,
+.code-editor {
+    font-family: "Google Sans Code", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.input-line {
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+.prompt {
+    white-space: pre;
+    flex: none;
+}
+
+.input-editor {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    min-height: 1.4em;
+    max-height: calc(1.4em * 12);
+    overflow: hidden;
+}
+
+.input-editor .highlighted-input,
+.input-editor .input {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    min-height: 1.4em;
+    max-height: calc(1.4em * 12);
+
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    font-family: "Google Sans Code", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+
+    white-space: pre-wrap;
+    overflow-wrap: normal;
+}
+
+.code-editor .highlighted,
+.code-editor .code-input,
+.input-editor .highlighted-input,
+.input-editor .input {
+    tab-size: 4;
+}
+
+.input-editor .highlighted-input {
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.input-editor .input {
+    resize: none;
+    overflow: auto;
+
+    border: none;
+    outline: none;
+    background: transparent;
+
+    color: transparent;
+    caret-color: var(--code-text);
+}
+
+
+/* Main code editor */
+
+.code-editor {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: var(--code-background);
+    border: 1px solid var(--code-border);
+}
+
+.code-editor .highlighted,
+.code-editor .code-input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 1rem;
+
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+
+    font-family: "Google Sans Code", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+
+    white-space: pre-wrap;
+    overflow: hidden;
+}
+
+.code-editor .highlighted {
+    pointer-events: none;
+    color: var(--code-text);
+}
+
+.code-editor .code-input {
+    overflow: auto;
+    resize: none;
+
+    border: 0;
+    outline: none;
+
+    background: transparent;
+    color: transparent;
+    caret-color: var(--code-text);
+}
+
+.input-editor .highlighted-input {
+    pointer-events: none;
+}
+
+.input-editor .input {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: transparent;
+    caret-color: var(--code-text);
+}
