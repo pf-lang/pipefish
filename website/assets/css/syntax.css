@@ -1,4 +1,4 @@
-/* The source of truth for this file is in `web-component`; if you edit the version in */
+/* The source of truth for this file is in `web`; if you edit the version in */
 /* `website`, this will simply be overwritten when the site builds/                    */ 
 
 :where(:root, :host) {
@@ -39,7 +39,7 @@
 
 @font-face {
     font-family: "Google Sans Code";
-    src: url("code-font/GoogleSansCode-VariableFont_MONO,wght.woff2")
+    src: url("cGoogleSansCode-VariableFont_MONO,wght.woff2")
          format("woff2");
     font-weight: 100 900;
     font-style: normal;

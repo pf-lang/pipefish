@@ -39,7 +39,7 @@ func init() {
 
 func main() {
 	// We copy the syntax highlighting rules from the web component.
-	source := filepath.Join(settings.PipefishHomeDirectory, "web-component/syntax.css")
+	source := filepath.Join(settings.PipefishHomeDirectory, "web/assets/syntax.css")
 	destination := filepath.Join(settings.PipefishHomeDirectory, "website/assets/css/syntax.css")
 	sourceFile, err := os.Open(source)
 	if err != nil {
