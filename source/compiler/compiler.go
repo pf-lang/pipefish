@@ -1716,7 +1716,7 @@ func (cp *Compiler) compileForExpression(node *parser.ForExpression, ctxt Contex
 				rangeOver = rangeExpression.Args[0]
 				rangeCpResult := cp.CompileNode(rangeOver, ctxt.x())
 				if len(rangeCpResult.Types.intersect(cp.Common.IsRangeable)) == 0 && !rangeCpResult.Types.Contains(values.TUPLE) { // Note that 'Contains' special-cases tuples.
-					cp.Throw("comp/for/range/types", node.GetToken())
+					cp.Throw("comp/for/range/types", node.GetToken(), rangeCpResult.Types.describe(cp.Vm))
 					return FAIL
 				}
 				keysInt := uint32(0)

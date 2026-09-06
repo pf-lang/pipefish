@@ -45,8 +45,8 @@ Some examples (in alphabetical order):
 * Go has not unkindly been called "a DSL for writing servers".
 * Lua was designed to solve the needs of scientists in Brazil's nuclear power industry. (It became wedded to the games industry when someone at LucasFilms Games read about it in Dr Dobbs Journal and realized it was better than what they'd done in-house.)
 * PHP, despite being objectively terrible, and coming from (and being aimed at) a dysfunctional "worse is better" culture, managed to spread like wildfire or a plague of poorly-designed locusts because its initials stood for Personal Home Page: it knew exactly what it was for.
-* Python was designed because ********.
-* Rust was famously inspired by a stuck elevator reminding ****** how terribly often things break, a rather more "meta" inspiration than for example C's origin story but still a moment that gave Rust a fixed purpose.
+* Python was created because Guido van Rossum realised that a dynamic language with powers to do OS-level things could make his life much simpler: "I thought, well, oh man, if we just could program ABC instead of C, each of those utilities would be like half a page of code and I could write the entire suite of utilities in a couple of weeks instead of the years that it looked like it was going to take us."
+* Rust was famously inspired by a stuck elevator reminding Graydon Hoare how terribly often things break, a rather more "meta" inspiration than for example C's origin story but still a moment that gave Rust a fixed purpose.
 
 
 (It's worth noting in passing, for the moral of it, that *none* of the "easy" languages on out list were designed in an attempt to dumb programming down for a hypothetical userbase of grateful simple folks, like BASIC was, or Pascal. Rather, they were designed to make things (*specific* things) ergonomic for clever people, which, by a non-coincidence, makes them ergonomic for everyone. SQL is a DSL example of the same thing.)

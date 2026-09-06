@@ -359,7 +359,7 @@ var errorCreatorMap = map[string]ErrorCreator{
 
 	"comp/for/range/types": {
 		Message: func(tok *token.Token, args ...any) string {
-			return "ranging over invalid type"
+			return "ranging over invalid type " + emph(args[0])
 		},
 		Explanation: func(tok *token.Token, args ...any) string {
 			return "The argument of `range` should be a type you can in fact range over, such as a list or a set."
