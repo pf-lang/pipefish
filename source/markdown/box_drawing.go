@@ -43,30 +43,30 @@ type locus struct{center, up, down, left, right rune}
 func getLocus(L locus) rune {
 	switch L.center {
 	case '|':
-		if dtypes.SetOf('|', '^', '-').Contains(L.up) {
-			if dtypes.SetOf('|', 'v', '-').Contains(L.down) {
-				if '-' == L.left {
-					if '-' == L.right {
+		if dtypes.SetOf('|', '^', '-', '+').Contains(L.up) {
+			if dtypes.SetOf('|', 'v', '-', '+').Contains(L.down) {
+				if dtypes.SetOf('-', '+').Contains(L.left) {
+					if dtypes.SetOf('-', '+').Contains(L.right) {
 						return '┼'
 					} else {
 						return '┤'
 					}
 				} else {
-					if '-' == L.right {
+					if dtypes.SetOf('-', '+').Contains(L.right) {
 						return '├'
 					} else {
 						return '│'
 					}
 				}
 			} else {
-				if '-' == L.left {
-					if '-' == L.right {
+				if dtypes.SetOf('-', '+').Contains(L.left) {
+					if dtypes.SetOf('-', '+').Contains(L.right) {
 						return '┴'
 					} else {
 						return '╯'
 					}
 				} else {
-					if '-' == L.right {
+					if dtypes.SetOf('-', '+').Contains(L.right) {
 						return '╰'
 					} else {
 						return '│'
@@ -74,29 +74,29 @@ func getLocus(L locus) rune {
 				}
 			}
 		} else {
-			if dtypes.SetOf('|', 'v', '-').Contains(L.down) {
-				if '-' == L.left {
-					if '-' == L.right {
+			if dtypes.SetOf('|', 'v', '-', '+').Contains(L.down) {
+				if dtypes.SetOf('-', '+').Contains(L.left) {
+					if dtypes.SetOf('-', '+').Contains(L.right) {
 						return '┬'
 					} else {
 						return '╮'
 					}
 				} else {
-					if '-' == L.right {
+					if dtypes.SetOf('-', '+').Contains(L.right) {
 						return '╭'
 					} else {
 						return '|'
 					}
 				}
 			} else {
-				if '-' == L.left {
-					if '-' == L.right {
+				if dtypes.SetOf('-', '+').Contains(L.left) {
+					if dtypes.SetOf('-', '+').Contains(L.right) {
 						return '┼'
 					} else {
 						return '╮'
 					}
 				} else {
-					if '-' == L.right {
+					if dtypes.SetOf('-', '+').Contains(L.right) {
 						return '╭'
 					} else {
 						return '|'
@@ -105,30 +105,30 @@ func getLocus(L locus) rune {
 			}
 		}
 	case '-':
-		if dtypes.SetOf('-', '<', '|').Contains(L.left) {
-			if dtypes.SetOf('-', '>', '|').Contains(L.right) {
-				if '|' == L.up {
-					if '|' == L.down {
+		if dtypes.SetOf('-', '<', '|', '+').Contains(L.left) {
+			if dtypes.SetOf('-', '>', '|', '+').Contains(L.right) {
+				if dtypes.SetOf('|', '+').Contains(L.up) {
+					if dtypes.SetOf('|', '+').Contains(L.down) {
 						return '┼'
 					} else {
 						return '┴'
 					}
 				} else {
-					if '|' == L.down {
+					if dtypes.SetOf('|', '+').Contains(L.down) {
 						return '┬'
 					} else {
 						return '─'
 					}
 				}
 			} else {
-				if '|' == L.up {
+				if dtypes.SetOf('|', '+').Contains(L.up) {
 					if '|' == L.down {
 						return '┤'
 					} else {
 						return '╯'
 					}
 				} else {
-					if '|' == L.down {
+					if dtypes.SetOf('|', '+').Contains(L.down) {
 						return '╮'
 					} else {
 						return '─'
@@ -136,29 +136,29 @@ func getLocus(L locus) rune {
 				}
 			}
 		} else {
-			if dtypes.SetOf('-', '>', '|').Contains(L.right) {
-				if '|' == L.up {
-					if '|' == L.down {
+			if dtypes.SetOf('-', '>', '|', '+').Contains(L.right) {
+				if dtypes.SetOf('|', '+').Contains(L.up) {
+					if dtypes.SetOf('|', '+').Contains(L.down) {
 						return '├'
 					} else {
 						return '╰'
 					}
 				} else {
-					if '|' == L.down {
+					if dtypes.SetOf('|', '+').Contains(L.down) {
 						return '╭'
 					} else {
 						return '─'
 					}
 				}
 			} else {
-				if '|' == L.up {
-					if '|' == L.down {
+				if dtypes.SetOf('|', '+').Contains(L.up) {
+					if dtypes.SetOf('|', '+').Contains(L.down) {
 						return '┼'
 					} else {
 						return '┴'
 					}
 				} else {
-					if '|' == L.down {
+					if dtypes.SetOf('|', '+').Contains(L.down) {
 						return '┬'
 					} else {
 						return '-'
@@ -167,29 +167,40 @@ func getLocus(L locus) rune {
 			}
 		}
 	case '^':
-		if L.down == '|' {
+		if dtypes.SetOf('|', '+').Contains(L.down) {
 			return '🢑'
 		} else {
 			return '^'
 		}
 	case 'v':
-		if L.up == '|' {
+		if dtypes.SetOf('|', '+').Contains(L.up) {
 			return '🢓'
 		} else {
 			return 'v'
 		}
 	case '<':
-		if L.right == '-' {
+		if dtypes.SetOf('-', '+').Contains(L.right) {
 			return '🢐'
 		} else {
 			return '<'
 		}
 	case '>':
-		if L.left == '-' {
+		if dtypes.SetOf('-', '+').Contains(L.left) {
 			return '🢒'
 		} else {
 			return '>'
 		}
+	case '+':
+		if dtypes.SetOf('-', '|', '^', '+').Contains(L.up) ||
+		dtypes.SetOf('-', '|', 'v', '+').Contains(L.down) ||
+		dtypes.SetOf('-', '|', '<', '+').Contains(L.left) ||
+		dtypes.SetOf('-', '|', '>', '+').Contains(L.right) {
+			return '┼'
+		} else {
+			return '+'
+		}
+			
+
 	default:
 		return L.center
 	}
