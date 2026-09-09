@@ -40,6 +40,21 @@ func TestHtml(t *testing.T) {
 	runTests(t, tests, markdown.NewHtmlRenderer())
 }
 
+func TestBoxDrawing(t *testing.T) {
+	tests := []mdTest{
+		{"--", "──"},
+		{"|---|\n| | |\n-----\n| | |\n|---|", "╭─┬─╮\n│ │ │\n├─┼─┤\n│ │ │\n╰─┴─╯"},
+		{"-----\n| | |\n|-|-|\n| | |\n-----", "╭─┬─╮\n│ │ │\n├─┼─┤\n│ │ │\n╰─┴─╯"},
+		{"  ^  \n<-|->\n  v  \n", "  🢑  \n🢐─┼─🢒\n  🢓  \n"},
+	}
+	for _, test := range tests {
+		result := markdown.BoxDrawing(test.input)
+		if result != test.output {
+			t.Fatalf("expected \n%s\n and got \n%s\n", strconv.Quote(test.output), strconv.Quote(result))
+		}
+	}
+}
+
 func runTests(t *testing.T, tests []mdTest, rnd markdown.Renderer) {
 	for _, test := range tests {
 		result := rnd.Render(test.input)

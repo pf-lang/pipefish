@@ -8,7 +8,7 @@ class PipefishHighlighter extends HTMLElement {
 
     async highlight(source) {
         await this.ready;
-        return window.pipefishHighlighter(source);
+        return window.pipefishHighlight(source);
     }
 
 }

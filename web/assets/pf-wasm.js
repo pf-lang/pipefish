@@ -51,7 +51,7 @@ const deadline = Date.now() + 10000;
         if (
             window.pipefishCompile &&
             window.pipefishDo &&
-            window.pipefishHighlighter
+            window.pipefishHighlight
         ) {
             resolve();
             return;

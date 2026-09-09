@@ -4,17 +4,17 @@ This is a historical approach to what "functional programming" actually means. I
 
 ## "If this is such a good idea ... ?"
 
-All my life, I have been subject to occasional glimpses of how there must be something *better* than the sled, or the travois, or the mule, some *exciting new way* of reducing friction while transporting heavy loads.
+All my life, I have been subject to occasional glimpses of how there must be something *better* than the sled, or the travois, or even the mule, some *exciting new way* of reducing friction while transporting heavy loads.
 
 And so I have set about to reinvent the wheel. Sometimes my wheels have been hexagonal, for ease of storage. Sometimes they have been spherical, for greater generality. Sometimes they have been made of styrofoam, to save weight.
 
-And then most usually when I've finally hit on something circular and got my axle working, someone points out that my bright idea was done in the Late Neolithic, or in 1962, and I read about how they did it, and move on to something else. Just wait 'til you see what I'm "cooking up" (that's a little hint!) with two sticks and friction!
+And then most usually when I've finally hit on something circular and got my axle working, someone points out that my bright idea was done in the Late Neolithic, or in 1962, and I read about how they did it ... and I move on to something else. Just wait 'til you see what I'm "cooking up" (that's a little hint!) with two sticks and friction!
 
 And so obviously I expected my ideas for Pipefish to have largely been pre-empted by someone else; and when that didn't happen, and years went by with no-one saying: "oh, this is X but with Y", the hypothesis that [despite all appearances](******) Pipefish is just a *really bad idea* must become proportionally more plausible in your eyes and mine, because of [Bayes' Theorem]().
 
-The history I am going to recount, rapidly covering a period from the [*********]() to the [********](), does seem among other things to point to a set of historical and social reasons why Pipefish and a number of other potentially useful languages failed to be designed.
+The history I am going to recount, rapidly covering a period from the invention of Fortran to the publication of the Haskell Report, does seem among other things to point to a set of historical and social reasons why Pipefish and a number of other potentially useful languages failed to be designed.
 
-***** is chosen as the end of the story for dramatic effect. We should celebrate loudly that it *wasn't* the end of the FPL story, and that a new wave of user-friendly and problem-orented languages (Gleam, Elixir, Elm) have been coming out over the past 15 years or so. But for my purposes, we can and will stop there.
+The Haskell Report is chosen as the end of the story for dramatic effect. We should celebrate loudly that it *wasn't* the end of the FPL story, and that a new wave of user-friendly and problem-orented languages (Gleam, Elixir, Elm) have been coming out over the past 15 years or so. But for my purposes, we can and will stop there.
 
 ## What is a functional programming language?
 
@@ -24,11 +24,11 @@ Some years ago, but after I'd begun work on Pipefish, I sat quietly observing a 
 
 This left me somewhat puzzled as to what a functional programming language actually is, and whether if I claimed to have implemented one, half of the FP community would politely say "no not really". (Pipefish, for example, has no pattern-matching and its type system is [not algebraic](*******************).)
 
-This puzzlement drove me to look more carefully not only at the history of individual early functional programming languages, but in particular at how the term "functional programming" was first used, on the *apparently* reasonable grounds that just as Adolphe Sax can't really be wrong about what a saxophone is, so the high sage or wizard who first named "functional programming" must have some claim to be right about what it is.
+This puzzlement drove me to look more carefully not only at the history of individual early functional programming languages, but in particular at how the term "functional programming" was first used, on the *apparently* reasonable grounds that just as Adolphe Sax can't really be wrong about what a saxophone is, so the high sage or wizard who first named "functional programming" must have some claim to be right about what it actually is.
 
 ## The purposes of programming languages
 
-Before we go through the key points of our history, I should say what we're looking out for.
+Before we go through the key points of our history, I should say what we're looking out for as we go.
 
 The most important question about any programming language is *"What is it for?"*; and whenever anyone proposes a new language, or tries to sell you on the virtues of one, that should be your first question --- and if they don't have an answer, you needn't bother with a second question.
 
@@ -49,9 +49,11 @@ Some examples (in alphabetical order):
 * Rust was famously inspired by a stuck elevator reminding Graydon Hoare how terribly often things break, a rather more "meta" inspiration than for example C's origin story but still a moment that gave Rust a fixed purpose.
 
 
-(It's worth noting in passing, for the moral of it, that *none* of the "easy" languages on out list were designed in an attempt to dumb programming down for a hypothetical userbase of grateful simple folks, like BASIC was, or Pascal. Rather, they were designed to make things (*specific* things) ergonomic for clever people, which, by a non-coincidence, makes them ergonomic for everyone. SQL is a DSL example of the same thing.)
+(It's worth noting in passing, for the moral of it, that *none* of the "easy" languages on our list were designed in an attempt to dumb programming down for a hypothetical userbase of grateful simple folks, like BASIC was. Rather, they were designed to make things (*specific* things) ergonomic for clever people, which, by a non-coincidence, makes them ergonomic for everyone. SQL is a DSL example of the same thing.)
 
 The glaring exception to the general rule about the genesis of successful languages is of course Java. Its original use-case was embedding into consumer electronics, at which it failed, so to rescue the project it was pivoted into powering "applets" (embeddable client-side applications to be embedded in HTML), at which it failed, and then it became the giant among languages that it is today because Sun Microsystems spent a billion dollars in advertising to persuade Business Idiots that this was How To Do Business Properly. There should be a law against marketing technical solutions directly to management just like there are laws against marketing cigarettes to children *but what do I know*?
+
+C# is Microsoft Java, produced because Sun did one, and because Microsoft is Microsoft.
 
 ## Fortran
 
@@ -79,11 +81,11 @@ You will notice how *exactly* this fails to solve the problems that Backus solve
 
 ## Lisp
 
-In *****, John McCarthy invented Lisp; his own account of it is [here](http://jmc.stanford.edu/articles/lisp/lisp.pdf). *"What was it for?"*, you ask.
+In around 1958-1962, John McCarthy invented Lisp; his own account of it is [here](http://jmc.stanford.edu/articles/lisp/lisp.pdf). *"What was it for?"*, you ask.
 
-McCarthy had been working for **** on an extension of Fortran for list processing. The people at IBM were very happy with his work; he was frustrated. What he wanted, very reasonably, was to be able to automatically differentiate a function and then evaluate it, which sounds like exactly the sort of thing computers should be making easy for us. Fortran made it impossible despite its math orientation *and* despite the fact that McCarthy had been hired to write his own extensions to the language, a privilege which could surely have overcome any *non-fundamental* obstacle in the semantics of Fortran.
+McCarthy had been working for IBM on FLPL (Fortran List Processing Language) an extension of Fortran for list processing. The people at IBM were very happy with his work; he was frustrated. What he wanted, very reasonably, was to be able to automatically differentiate a function and then evaluate it, which sounds like exactly the sort of thing computers should be making easy for us. Fortran made it impossible despite its math orientation *and* despite the fact that McCarthy had been hired to write his own extensions to the language, a privilege which could surely have overcome any *non-fundamental* obstacle in the semantics of Fortran.
 
-It's obvious how this led to the homoiconicity for which Lisp is famous, but as this clearly isn't essential to functional programming, we can ignore that aspect of the language. A more fundamental innovation from our point of view was *flow-of-control as expressions*, and this, too, stems directly from the specific use-case that McCarthy had in mind. The rules we learned in high-school for calculus, the product rule and chain rule and so forth, can be naturally extended by a rule too obvious to explicitly mention even to schoolchildren: that if we define `h(x)` by saying that it's equal to `f(x)` if some condition `C` holds, and `g(x)` otherwise, then `h'(x)` is equal to `f'(x)` if `C` holds, and `g'(x)` otherwise.
+It's obvious how this led to the homoiconicity for which Lisp is famous, and why he needed to add the recursion that Fortran lacked. Another important innovation was *flow-of-control as expressions*, and this, too, stems directly from the specific use-case that McCarthy had in mind. The rules we learned in high-school for calculus, the product rule and chain rule and so forth, can be naturally extended by a rule too obvious to explicitly mention even to schoolchildren: that if we define `h(x)` by saying that it's equal to `f(x)` if some condition `C` holds, and `g(x)` otherwise, then `h'(x)` is equal to `f'(x)` if `C` holds, and `g'(x)` otherwise.
 
 But to work with expressions like that, they do in fact have to be *expressions*; whereas Fortran's `IF` statements are semantically *statements* telling the runtime to *do* something, to jump to this or that part of the code.
 
@@ -127,7 +129,7 @@ Landin both did and didn't call his idea "functional programming": in his talk e
 
 If you're wondering why this is considered a seminal paper despite us not getting the 700 languages and "ISWIM" not being a household word, we'll come back to that.
 
-## The birth of "functional progamming"
+## The birth of "functional programming"
 
 But we were looking for the birth of the phrase "functional programming", and now we're really getting there.
 
@@ -136,7 +138,7 @@ In ******, a somewhat elderly young firebrand gave a talk at ******** with the p
 
 
 
-Now, about that name, "*********". You can see that what's wrong with it is that the paradigm our elederly young Turk is denouncing has nothing to do with Jonny von Neumann. It is in fact entirely the creation of one John Backus, but the speaker was the only person in the room who couldn't possibly say that, because, in a Massive Plot Twist, the young Turk who invented "functional programming" was John Backus, who invented imperative programming.
+Now, about that name, "*********". You can see that what's wrong with it is that the paradigm our elderly young Turk is denouncing has nothing to do with Jonny von Neumann. It is in fact entirely the creation of one John Backus, but the speaker was the only person in the room who couldn't possibly say that, because, in a Massive Plot Twist, the young Turk who invented the phrase "functional programming" was John Backus, who invented imperative programming.
 
 It is not, of course, that Backus repented of Fortran. The brief for Fortran was "make big math go vroom", and it does so to this day. But Moore's Law had given people to think of scope for better things, and to dream of languages further from the metal and closer to what they actually wanted.
 
@@ -146,13 +148,13 @@ In any case, surely we've reached the end of our quest now. Pipefish is *not* a 
 
 Oh, wait. Wait. Hold up one moment, that doesn't sound right at all.
 
-It is at this point that we have to confess the weakness of the historical method in tracking down what the phrase "functional programming" means. (It is also a fact that the original recipe for ketchup contained fish and soy beans but no tomatoes: sometimes we have to bow to semantic shift.)
+It is at this point that we have to confess the weakness of the historical method in tracking down what the phrase "functional programming" means. (It is also a fact that the original recipe for ketchup contained fish and soybeans but no tomatoes: sometimes we have to bow to semantic shift.)
 
 ## The growth of functional programming
 
 The sequel to Backus's talk was not that people started making languages in imitation of his own rather horrible APL-inspired language, but rather that everyone who was working with Scheme or ML and probably a lot of other interesting languages now forgotten rushed to their desks and explained that they were *already* doing functional programming and that *their* languages were readable and had standard libraries and could ping the database.
 
-And so a movement was born, or identified, or called into being, or further and incrementally coallesced, or something. There was in fact a hot minute where "functional programming language" could have meant something very precise, because the table stakes for playing Backus's game was having functions as first-class values. But now that the most imperative languages have them too, this is no distinction.
+And so a movement was born, or identified, or called into being, or further and incrementally coallesced, or something. There was in fact a hot minute where "functional programming language" could have meant something very precise, because the table stakes for playing Backus's game was having functions as first-class values; but now that the most imperative languages have them too, this is no distinction.
 
 ## The rise of laziness
 
@@ -189,13 +191,13 @@ given :
 
 *Now* if we don't evaluate lazily, our function calls explode until we run out of stack.
 
-An ISWIM only needs this small amount of implicit subcucullar laziness to stop it from going crazy. But why stop at a *little laziness? Laziness is powerful juju. Who could resist being able to say "Let P be the list of all primes in order"? We always wanted to.
+An ISWIM only needs this small amount of implicit subcucullar laziness to stop it from going crazy. But why stop at a *little laziness? Laziness is powerful juju. What computer scientist could resist being able to say "Let P be the list of all primes in order"? We always wanted to.
 
 And so inspired by not only by Landin's talk but by earlier work such as ****** (sketching out a lazy Lisp), and other similar suggestions, people set to work making about a dozen lazy functional programming languages to see what you could really do with the idea, almost each of which besides [Miranda](*****) had no use outside the particular university developing it.
 
 And so the Haskell committe was convened, and toiled mightily to specific one programming language to rule them all, and it was glorious, and behold, it had abstraction and power.
 
-And that is really where our story stops.
+And that *is* really where our story stops.
 
 ## The end
 
@@ -215,7 +217,7 @@ You will notice that this story answers my question about re-inventing the wheel
 
 And this also explains why we didn't get Landin's 700 programming languages, and in particular why we don't have Pipefish already, despite how [obviously awesome](*****) it is. Haskell sucked all the laziness out of the room, and we got *one* ISWIM; and for anyone else who thought of writing an ISWIM, Haskell was already there, attempting to be all of them while being oriented to no real-world domain.
 
-Now I've written Pipefish, so we have two ISWIMS, and Pipefish is a much better example of one, because it *is* oriented towards an actual domain. We can have more. Laziness in Haskell may well have taken a lot of sweat to implement, but the amount of laziness necessary for an ISWIM can be hacked out in half-an-hour if you're doing a tree-walking interpreter, a little longer for compiled code, and a little more effort if you care about optimization. How to do it should be in beginners' textbooks, and when I have finished writing mine, it will be.
+Now I've written Pipefish, so we have two ISWIMS, and Pipefish is a much better example of one, because it *is* oriented towards an actual domain. We can have more. Laziness in Haskell may well have taken a lot of sweat to implement, but the amount of laziness necessary for an ISWIM can be hacked out in half-an-hour if you're doing a tree-walking interpreter, a little longer for compiled code, and a little more effort if you care about optimization. How to do it should be in beginners' textbooks, and when I have finished writing my beginners' textbook, it will be.
 
 ## And what *is* a functional programming language?
 
@@ -223,6 +225,6 @@ And finally, while we're tying up loose ends, I promised you an answer to "what 
 
 Into which confusion one wise sage whose name I would certainly credit if I could, spake thus: "We like functional programming because in functional programming there is only one design pattern: The Pipeline." And I recognized this immediately as the right answer because it is an exact description of the joy of coding in Pipefish given by someone who had never heard of it. That's it, *that's* what we like, the soothing feeling of pushing values into a pure function, getting values out, feeding those values into another purpe function, getting values out ... as calming as whitewashing a fence, and with the same inevitability of progress and eventual success.
 
-As a corollary, a functional programming language is one where you code like that. *How* exactly this is done, whether its type system should be algebraic or latticial or as anarchic as Lisp, whether it has homoiconicity, whether it has currying and point-free style, whether it has monads, effect systems, or FC/IS, is a decision, like everything else in language design, that should depend entirely on its primary use-case.
+As a corollary, a functional programming language is one which supports coding like that. *How* exactly this is done, whether its type system should be algebraic or latticial or as anarchic as Lisp, whether it has homoiconicity, whether it has currying and point-free style, whether it has monads, effect systems, or FC/IS, is a decision, like everything else in language design, that should depend entirely on its primary use-case.
 
 Or to put it another way, the most important question about any language is: *"What is it for?"*
