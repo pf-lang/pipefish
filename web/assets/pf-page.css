@@ -21,8 +21,7 @@ pre {
 
 .repl,
 .input-line,
-.input,
-.code-editor {
+.input {
     font-family: "Google Sans Code", monospace;
     font-size: 14px;
     line-height: 1.4;
@@ -69,8 +68,6 @@ pre {
     overflow-wrap: normal;
 }
 
-.code-editor .highlighted,
-.code-editor .code-input,
 .input-editor .highlighted-input,
 .input-editor .input {
     tab-size: 4;
@@ -89,55 +86,6 @@ pre {
     outline: none;
     background: transparent;
 
-    color: transparent;
-    caret-color: var(--code-text);
-}
-
-
-/* Main code editor */
-
-.code-editor {
-    position: relative;
-    width: 100%;
-    height: 300px;
-    box-sizing: border-box;
-    overflow: hidden;
-    background: var(--code-background);
-    border: 1px solid var(--code-border);
-}
-
-.code-editor .highlighted,
-.code-editor .code-input {
-    position: absolute;
-    inset: 0;
-    margin: 0;
-    padding: 1rem;
-
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-
-    font-family: "Google Sans Code", monospace;
-    font-size: 14px;
-    line-height: 1.4;
-
-    white-space: pre-wrap;
-    overflow: hidden;
-}
-
-.code-editor .highlighted {
-    pointer-events: none;
-    color: var(--code-text);
-}
-
-.code-editor .code-input {
-    overflow: auto;
-    resize: none;
-
-    border: 0;
-    outline: none;
-
-    background: transparent;
     color: transparent;
     caret-color: var(--code-text);
 }

@@ -16,7 +16,7 @@ class PipefishReader extends HTMLElement {
             document.createElement("link");
         style.rel = "stylesheet";
         style.href =
-            new URL("./pf-reader.css", import.meta.url);
+            new URL("./assets/pf-reader.css", import.meta.url);
 
         const syntax =
             document.createElement("link");
@@ -33,8 +33,20 @@ class PipefishReader extends HTMLElement {
         this.box = box;
     }
 
-    set padding(value) {
-        this.style.setProperty("--reader-padding", value);
+    get scrollTop() {
+        return this.box.scrollTop;
+    }
+
+    set scrollTop(value) {
+        this.box.scrollTop = value;
+    }
+
+    get scrollLeft() {
+        return this.box.scrollLeft;
+    }
+
+    set scrollLeft(value) {
+        this.box.scrollLeft = value;
     }
 
     async display(source) {

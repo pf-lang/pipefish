@@ -1,235 +1,218 @@
-import "./pf-highlighter.js"
-import "./pf-reader.js"
-import "./pf-service.js"
+import "./pf-editor.js";
+import "./pf-highlighter.js";
+import "./pf-service.js";
 
 class PipefishIde extends HTMLElement {
     constructor() {
         super();
 
-        const service = document.createElement("pf-service");
-        const reader = document.createElement("pf-reader");
-        const highlighter = document.createElement("pf-highlighter");
+        const service =
+            document.createElement("pf-service");
+
+        const editor =
+            document.createElement("pf-editor");
+
+        const highlighter =
+            document.createElement("pf-highlighter");
 
         this.service = service;
-        this.reader = reader;
+        this.editor = editor;
         this.highlighter = highlighter;
 
         this.ready = Promise.all([
             service.ready,
-            reader.ready,
-            highlighter.ready
+            editor.ready,
+            highlighter.ready,
+            this.loadFont()
         ]);
 
         this.history = [];
         this.historyIndex = 0;
         this.multiline = false;
 
-        const shadow = this.attachShadow({ mode: "open" });
+        const shadow =
+            this.attachShadow({ mode: "open" });
 
-        const style = document.createElement("link");
+        const style =
+            document.createElement("link");
         style.rel = "stylesheet";
         style.href = "assets/pf-page.css";
 
-        const wrapper = document.createElement("div");
+        const wrapper =
+            document.createElement("div");
         wrapper.classList.add("service");
 
-        const heading = document.createElement("h2");
+        const heading =
+            document.createElement("h2");
         heading.textContent = "Pipefish service";
 
-        // Main code editor
-        const editor = document.createElement("div");
-        editor.classList.add("code-editor");
-        const code = document.createElement("textarea");
-        code.placeholder = "Type Pipefish code here...";
-        code.classList.add("code-input");
-        code.spellcheck = false;
-        editor.append(reader, code);
-
-        reader.padding = codeStyle.padding;
-        const codeStyle = getComputedStyle(code);
-        reader.style.setProperty(
-            "--reader-padding",
-            codeStyle.padding
-        );
-
-        code.addEventListener("input", async () => {
-            await reader.display(code.value);
-        });
-
-        code.addEventListener("scroll", () => {
-            this.syncEditorScroll(code, reader);
-        });
-
-        code.addEventListener("keydown", event => {
-            if (event.key === "Tab") {
-                event.preventDefault();
-
-                code.setRangeText(
-                    "\t",
-                    code.selectionStart,
-                    code.selectionEnd,
-                    "end"
-                );
-
-                code.dispatchEvent(new Event("input"));
-                return;
-            }
-
-            if (this.handleDelimiter(event, code)) {
-                return;
-            }
-
-            if (event.key !== "Enter") {
-                return;
-            }
-
-            event.preventDefault();
-
-            const start = code.selectionStart;
-            const before = code.value.slice(0, start);
-            const line = before.split("\n").pop();
-
-            const indent = line.match(/^[\t ]*/)[0];
-            const extraIndent =
-                /(:\s*|--\s*)$/.test(line) ? "\t" : "";
-
-            code.setRangeText(
-                "\n" + indent + extraIndent,
-                start,
-                code.selectionEnd,
-                "end"
-            );
-
-            code.dispatchEvent(new Event("input"));
-        });
-
-        this.code = code;
-
-        // Compile button
-        const compileButton = document.createElement("button");
+        const compileButton =
+            document.createElement("button");
         compileButton.textContent = "Compile";
 
         // REPL
-        const repl = document.createElement("div");
+        const repl =
+            document.createElement("div");
         repl.classList.add("repl");
 
-        const transcript = document.createElement("div");
+        const transcript =
+            document.createElement("div");
         transcript.classList.add("transcript");
+
         this.transcript = transcript;
 
-        const inputLine = document.createElement("div");
+        const inputLine =
+            document.createElement("div");
         inputLine.classList.add("input-line");
 
-        const prompt = document.createElement("span");
+        const prompt =
+            document.createElement("span");
         prompt.classList.add("prompt");
         prompt.textContent = "→ ";
 
-        const inputEditor = document.createElement("div");
+        const inputEditor =
+            document.createElement("div");
         inputEditor.classList.add("input-editor");
 
-        const highlightedInput = document.createElement("pre");
+        const highlightedInput =
+            document.createElement("pre");
         highlightedInput.classList.add("highlighted-input");
 
-        const input = document.createElement("textarea");
+        const input =
+            document.createElement("textarea");
         input.classList.add("input");
         input.autocomplete = "off";
         input.spellcheck = false;
         input.rows = 1;
 
-        inputEditor.append(highlightedInput, input);
-        inputLine.append(prompt, inputEditor);
+        inputEditor.append(
+            highlightedInput,
+            input
+        );
+
+        inputLine.append(
+            prompt,
+            inputEditor
+        );
 
         this.input = input;
         this.highlightedInput = highlightedInput;
 
-        // REPL live highlighting and sizing
         input.addEventListener("input", async () => {
             await this.ready;
 
             highlightedInput.innerHTML =
-                await this.highlighter.highlight(input.value);
+                await this.highlighter.highlight(
+                    input.value
+                );
 
             this.resizeReplInput();
         });
 
         input.addEventListener("scroll", () => {
-            this.syncEditorScroll(input, highlightedInput);
+            this.syncEditorScroll(
+                input,
+                highlightedInput
+            );
         });
 
-        // REPL keyboard handling
-        input.addEventListener("keydown", async event => {
-            if (event.key === "Tab") {
-                event.preventDefault();
-
-                input.setRangeText(
-                    "\t",
-                    input.selectionStart,
-                    input.selectionEnd,
-                    "end"
-                );
-
-                input.dispatchEvent(new Event("input"));
-                return;
-            }
-
-            if (this.handleDelimiter(event, input)) {
-                return;
-            }
-
-            if (event.key !== "Enter") {
-                return;
-            }
-
-            const start = input.selectionStart;
-            const before = input.value.slice(0, start);
-            const currentLine = before.split("\n").pop();
-
-            if (!this.multiline) {
-                if (!input.value.trim()) {
-                    event.preventDefault();
-                    return;
-                }
-
-                if (/(:\s*|--\s*)$/.test(currentLine)) {
+        input.addEventListener(
+            "keydown",
+            async event => {
+                if (event.key === "Tab") {
                     event.preventDefault();
 
                     input.setRangeText(
-                        "\n" + this.replIndent(currentLine),
+                        "\t",
                         input.selectionStart,
                         input.selectionEnd,
                         "end"
                     );
 
-                    this.multiline = true;
+                    input.dispatchEvent(
+                        new Event("input")
+                    );
 
-                    input.dispatchEvent(new Event("input"));
+                    return;
+                }
+
+                if (this.handleDelimiter(event, input)) {
+                    return;
+                }
+
+                if (event.key !== "Enter") {
+                    return;
+                }
+
+                const start = input.selectionStart;
+                const before =
+                    input.value.slice(0, start);
+                const currentLine =
+                    before.split("\n").pop();
+
+                if (!this.multiline) {
+                    if (!input.value.trim()) {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    if (
+                        /(:\s*|--\s*)$/.test(
+                            currentLine
+                        )
+                    ) {
+                        event.preventDefault();
+
+                        input.setRangeText(
+                            "\n" +
+                            this.replIndent(currentLine),
+                            input.selectionStart,
+                            input.selectionEnd,
+                            "end"
+                        );
+
+                        this.multiline = true;
+
+                        input.dispatchEvent(
+                            new Event("input")
+                        );
+
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    await this.submitReplInput();
+                    return;
+                }
+
+                if (!currentLine.trim()) {
+                    event.preventDefault();
+
+                    await this.submitReplInput();
                     return;
                 }
 
                 event.preventDefault();
-                await this.submitReplInput();
-                return;
+
+                input.setRangeText(
+                    "\n" +
+                    this.replIndent(currentLine),
+                    input.selectionStart,
+                    input.selectionEnd,
+                    "end"
+                );
+
+                input.dispatchEvent(
+                    new Event("input")
+                );
             }
+        );
 
-            if (!currentLine.trim()) {
-                event.preventDefault();
-                await this.submitReplInput();
-                return;
-            }
-
-            event.preventDefault();
-
-            input.setRangeText(
-                "\n" + this.replIndent(currentLine),
-                input.selectionStart,
-                input.selectionEnd,
-                "end"
-            );
-
-            input.dispatchEvent(new Event("input"));
-        });
-
-        repl.append(transcript, inputLine);
+        repl.append(
+            transcript,
+            inputLine
+        );
 
         wrapper.append(
             heading,
@@ -238,23 +221,37 @@ class PipefishIde extends HTMLElement {
             repl
         );
 
-        shadow.append(style, wrapper);
+        shadow.append(
+            style,
+            wrapper
+        );
 
-        // Compile
-        compileButton.addEventListener("click", async () => {
-            try {
-                await this.service.compile(code.value);
-                this.write("Compiled successfully.");
-                input.focus();
-            } catch (error) {
-                this.write("Error: " + error);
+        compileButton.addEventListener(
+            "click",
+            async () => {
+                try {
+                    await this.service.compile(
+                        editor.value
+                    );
+
+                    this.write(
+                        "Compiled successfully."
+                    );
+
+                    input.focus();
+                } catch (error) {
+                    this.write(
+                        "Error: " + error
+                    );
+                }
             }
-        });
+        );
 
         this.resizeReplInput();
     }
 
     // Delimiter helpers
+
     isEscaped(text, pos) {
         let backslashes = 0;
 
@@ -335,7 +332,10 @@ class PipefishIde extends HTMLElement {
             ) {
                 if (!isQuote) {
                     event.preventDefault();
-                    element.setSelectionRange(pos + 1, pos + 1);
+                    element.setSelectionRange(
+                        pos + 1,
+                        pos + 1
+                    );
                     return true;
                 }
 
@@ -345,10 +345,16 @@ class PipefishIde extends HTMLElement {
                         pos,
                         event.key
                     ) &&
-                    !this.isEscaped(element.value, pos)
+                    !this.isEscaped(
+                        element.value,
+                        pos
+                    )
                 ) {
                     event.preventDefault();
-                    element.setSelectionRange(pos + 1, pos + 1);
+                    element.setSelectionRange(
+                        pos + 1,
+                        pos + 1
+                    );
                     return true;
                 }
             }
@@ -371,10 +377,13 @@ class PipefishIde extends HTMLElement {
 
             event.preventDefault();
 
-            const selected = element.value.slice(start, end);
+            const selected =
+                element.value.slice(start, end);
 
             element.setRangeText(
-                event.key + selected + pairs[event.key],
+                event.key +
+                selected +
+                pairs[event.key],
                 start,
                 end,
                 "select"
@@ -385,7 +394,10 @@ class PipefishIde extends HTMLElement {
                 start + 1 + selected.length
             );
 
-            element.dispatchEvent(new Event("input"));
+            element.dispatchEvent(
+                new Event("input")
+            );
+
             return true;
         }
 
@@ -393,8 +405,10 @@ class PipefishIde extends HTMLElement {
     }
 
     // REPL helpers
+
     replIndent(line) {
-        const indent = line.match(/^[\t ]*/)[0];
+        const indent =
+            line.match(/^[\t ]*/)[0];
 
         if (/(:\s*|--\s*)$/.test(line)) {
             return indent + "\t";
@@ -433,33 +447,65 @@ class PipefishIde extends HTMLElement {
         await this.executeReplCommand(command);
     }
 
+    async loadFont() {
+        const fontURL = new URL(
+            "./assets/GoogleSansCode-VariableFont_MONO,wght.woff2",
+            import.meta.url
+        );
+
+        const font = new FontFace(
+            "Google Sans Code",
+            `url("${fontURL}")`,
+            {
+                weight: "100 900",
+                style: "normal"
+            }
+        );
+
+        await font.load();
+        document.fonts.add(font);
+    }
+
     async executeReplCommand(command) {
         this.history.push(command);
         this.historyIndex = this.history.length;
 
-        const entry = document.createElement("pre");
+        const entry =
+            document.createElement("pre");
+
         entry.classList.add("transcript-input");
 
         entry.innerHTML =
             `<span class="prompt">→ </span>` +
-            await this.highlighter.highlight(command);
+            await this.highlighter.highlight(
+                command
+            );
 
         this.transcript.appendChild(entry);
 
         try {
-            const result = await this.service.do(command);
+            const result =
+                await this.service.do(command);
 
-            if (result !== undefined && result !== "") {
+            if (
+                result !== undefined &&
+                result !== ""
+            ) {
                 this.write(result);
             }
         } catch (error) {
-            this.write("Error: " + error);
+            this.write(
+                "Error: " + error
+            );
         }
     }
 
     write(text) {
-        const line = document.createElement("div");
+        const line =
+            document.createElement("div");
+
         line.textContent = text;
+
         this.transcript.appendChild(line);
     }
 
@@ -470,28 +516,36 @@ class PipefishIde extends HTMLElement {
         input.style.height = "auto";
 
         const lineHeight =
-            parseFloat(getComputedStyle(input).lineHeight);
+            parseFloat(
+                getComputedStyle(input).lineHeight
+            );
 
-        const maxHeight = lineHeight * 12;
-        const height = Math.min(input.scrollHeight, maxHeight);
+        const maxHeight =
+            lineHeight * 12;
 
-        input.style.height = height + "px";
-        editor.style.height = height + "px";
+        const height =
+            Math.min(
+                input.scrollHeight,
+                maxHeight
+            );
+
+        input.style.height =
+            height + "px";
+
+        editor.style.height =
+            height + "px";
     }
 
     syncEditorScroll(input, highlighted) {
-        highlighted.scrollTop = input.scrollTop;
-        highlighted.scrollLeft = input.scrollLeft;
-    }
+        highlighted.scrollTop =
+            input.scrollTop;
 
-    // Main editor
-    async updateHighlighting() {
-        await this.ready;
-
-        await this.reader.display(this.code.value);
-
-        this.syncEditorScroll(this.code, this.reader);
+        highlighted.scrollLeft =
+            input.scrollLeft;
     }
 }
 
-customElements.define("pf-ide", PipefishIde);
+customElements.define(
+    "pf-ide",
+    PipefishIde
+);

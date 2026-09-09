@@ -1,0 +1,42 @@
+:host {
+    display: block;
+}
+
+.editor {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: var(--code-background);
+    border: 1px solid var(--code-border);
+}
+
+.code-input {
+    position: absolute;
+    inset: 0;
+
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 1rem;
+
+    font-family: "Google Sans Code", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+
+    white-space: pre-wrap;
+    tab-size: 4;
+
+    overflow: auto;
+    resize: none;
+
+    border: 0;
+    outline: none;
+
+    background: transparent;
+    color: transparent;
+    caret-color: var(--code-text);
+}
