@@ -29,7 +29,7 @@ class PipefishEditor extends HTMLElement {
         this.ready = reader.ready;
 
         code.addEventListener("input", async () => {
-            await this.display(code.value);
+            await this.reader.display(code.value);
         });
 
         code.addEventListener("scroll", () => {
@@ -89,8 +89,20 @@ class PipefishEditor extends HTMLElement {
         this.display(value);
     }
 
+    async initialize(source) {
+        await this.ready;
+
+        const normalized =
+            await this.reader.initialize(source);
+
+        this.code.value = normalized;
+        this.syncScroll();
+    }
+
     async display(source) {
         await this.ready;
+
+        this.code.value = source;
         await this.reader.display(source);
         this.syncScroll();
     }

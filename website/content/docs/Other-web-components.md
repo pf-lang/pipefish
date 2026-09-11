@@ -7,14 +7,14 @@ We do however need components which can work with Pipefish code as text, correct
 The components fit together in a nestable structure represented by the following diagram, where the `pf-` prefixes of the components are omitted throughout.
 
 ```box
-                                           |-->service
-                                |-->coder--|
-                                |     ^    |-->editor-->reader-->highlighter
-                       |-->ide--|     |
-                       |        |     |
-author-->book-->page-->|        |--->tui--highlighter       
-                       |
-                       |-->image            
+                                          |-->service
+                               |-->coder--|
+                               |     ^    |-->editor-->reader-->highlighter
+                      |-->ide--|     |
+                      |        |     |
+author-->book-->page--|        |--->tui--highlighter       
+                      |
+                      |-->image            
 ```
 
 - The `pf-service` you have already met. Let's take the others more or less from the inside out.

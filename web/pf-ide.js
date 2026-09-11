@@ -500,6 +500,14 @@ class PipefishIde extends HTMLElement {
         }
     }
 
+    async display(source) {
+        await this.editor.display(source);
+    }
+
+    connectedCallback() {
+        this.initialize(this.textContent);
+    }
+
     write(text) {
         const line =
             document.createElement("div");

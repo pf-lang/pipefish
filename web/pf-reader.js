@@ -1,4 +1,5 @@
-import "./pf-highlighter.js";
+// The base visual element that goes inside the `pf-editor` which goes inside the `pf-coder`
+// which goes insde the `pf-ide`, etc.
 
 class PipefishReader extends HTMLElement {
     constructor() {
@@ -33,6 +34,23 @@ class PipefishReader extends HTMLElement {
         this.box = box;
     }
 
+    connectedCallback() {
+        this.display(this.textContent);
+    }
+
+    async initialize(source) {
+        await this.display(
+            normalizeSource(source)
+        );
+    }
+
+    async display(source) {
+        await this.ready;
+
+        this.box.innerHTML =
+            await this.highlighter.highlight(source);
+    }
+
     get scrollTop() {
         return this.box.scrollTop;
     }
@@ -48,13 +66,45 @@ class PipefishReader extends HTMLElement {
     set scrollLeft(value) {
         this.box.scrollLeft = value;
     }
+}
 
-    async display(source) {
-        await this.ready;
+// This strips superfluous indentation from the source code given between 
+// `<pf-reader></pf-reader>` tags.
 
-        this.box.innerHTML =
-            await this.highlighter.highlight(source);
+function normalizeSource(source) {
+    const lines = source.split("\n");
+
+    // Remove blank lines at the beginning and end.
+    while (lines.length && !lines[0].trim()) {
+        lines.shift();
     }
+
+    while (lines.length && !lines[lines.length - 1].trim()) {
+        lines.pop();
+    }
+
+    if (!lines.length) {
+        return "";
+    }
+
+    // Find the common indentation of the non-blank lines.
+    let indent = Infinity;
+
+    for (const line of lines) {
+        if (!line.trim()) {
+            continue;
+        }
+
+        const match = line.match(/^[ \t]*/);
+        indent = Math.min(indent, match[0].length);
+    }
+
+    // Remove the common indentation.
+    for (let i = 0; i < lines.length; i++) {
+        lines[i] = lines[i].slice(indent);
+    }
+
+    return lines.join("\n");
 }
 
 customElements.define("pf-reader", PipefishReader);
