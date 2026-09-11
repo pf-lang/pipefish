@@ -28,12 +28,7 @@ class PipefishIde extends HTMLElement {
             document.createElement("div");
         wrapper.classList.add("service");
 
-        const heading =
-            document.createElement("h2");
-        heading.textContent = "Pipefish service";
-
         wrapper.append(
-            heading,
             coder,
             tui
         );
