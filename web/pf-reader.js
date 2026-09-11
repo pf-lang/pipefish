@@ -39,9 +39,11 @@ class PipefishReader extends HTMLElement {
     }
 
     async initialize(source) {
+        const normalized = normalizeSource(source)
         await this.display(
-            normalizeSource(source)
+            normalized
         );
+        return normalized
     }
 
     async display(source) {
