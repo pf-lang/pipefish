@@ -22,7 +22,7 @@ class PipefishIde extends HTMLElement {
         const style =
             document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "assets/pf-page.css";
+        style.href = "assets/pf-code.css";
 
         const wrapper =
             document.createElement("div");

@@ -7,6 +7,12 @@ import (
 	"github.com/tim-hardcastle/pipefish/source/text"
 )
 
+var mdToHtml = NewHtmlRenderer()
+
+func RenderMdAsHtml(text string) string {
+	return mdToHtml.Render(text)
+}
+
 type Renderer struct {
 	RenderAst func(mdNode) string
 }

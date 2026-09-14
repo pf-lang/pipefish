@@ -1,27 +1,35 @@
-<html lang="en">
-
+<!doctype html>
+<html>
 <head>
     <meta charset="utf-8">
-    <title>Pipefish Web Component Test</title>
+    <title>pf-book test</title>
+    <link rel="stylesheet" href="assets/pf-book.css">
+    <link rel="stylesheet" href="assets/fonts.css">
 </head>
-
 <body>
 
-    <h1>Pipefish Web Component Test</h1>
+    <pf-book src="book/"></pf-book>
 
-    <p>
-        This page exists only to test the component while developing it.
-    </p>
+    <script src="assets/wasm_exec.js"></script>
+    <script>
+        const go = new Go();
 
-    <pf-ide>
-    def
+        let resolvePipefishReady;
+        window.pipefishReady = new Promise(resolve => {
+            resolvePipefishReady = resolve;
+        });
 
-    square(i) :
-        i * i
-    </pf-ide>
+        WebAssembly.instantiateStreaming(
+            fetch("assets/pipefish.wasm"),
+            go.importObject
+        ).then(result => {
+            go.run(result.instance);
+            resolvePipefishReady();
+        });
+    </script>
 
-    <script type="module" src="pf-ide.js"></script>
+    <script type="module" src="pf-page.js"></script>
+    <script type="module" src="pf-book.js"></script>
 
 </body>
-
 </html>

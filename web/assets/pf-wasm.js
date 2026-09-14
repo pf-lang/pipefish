@@ -13,12 +13,12 @@ ready = new Promise(async (resolve, reject) => {
 
         const go = new window.Go();
 
-        const result = await WebAssembly.instantiateStreaming(
-            fetch("assets/pipefish.wasm"),
+        window.pipefishReady = WebAssembly.instantiateStreaming(
+            fetch("pipefish.wasm"),
             go.importObject
-        );
-
-        go.run(result.instance);
+        ).then(result => {
+            go.run(result.instance);
+        });
 
         await waitForFunctions();
 

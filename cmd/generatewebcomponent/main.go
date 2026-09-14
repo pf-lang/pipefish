@@ -39,6 +39,11 @@ func main() {
     ) interface{} {
         return markdown.BlockHighlighter(args[0].String())
     }))
-
+    js.Global().Set("pipefishRenderMdAsHtml", js.FuncOf(func(
+        this js.Value,
+        args []js.Value,
+    ) interface{} {
+        return markdown.RenderMdAsHtml(args[0].String())
+    }))
     select {}
 }

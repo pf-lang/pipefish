@@ -29,7 +29,7 @@ class PipefishTui extends HTMLElement {
         const style =
             document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "assets/pf-page.css";
+        style.href = "assets/pf-code.css";
 
         const repl =
             document.createElement("div");

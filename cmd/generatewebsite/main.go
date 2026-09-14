@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/tim-hardcastle/pipefish/source/dtypes"
 	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
@@ -74,26 +73,6 @@ func main() {
 		sub{"footer", templates["footer"]},
 	)
 
-	// We assemble the landing page.
-
-	// We make the cards.
-	var builder strings.Builder
-	sb := &builder
-	files, _ := os.ReadDir(filepath.Join(settings.PipefishHomeDirectory, "website/content/cards"))
-	for _, file := range files {
-		path := filepath.Join(settings.PipefishHomeDirectory, "website/content/cards", file.Name())
-		text, _ := os.ReadFile(path)
-		sb.WriteString(create("card", sub{"content", mdR.Render(string(text))}))
-		sb.WriteString("\n\n")
-	}
-	landingPage := create("all",
-		sub{"title", "Pipefish"},
-		sub{"description", "Landing page for Pipefish."},
-		sub{"content", create("landing", sub{"cards", sb.String()})},
-	)
-	indexPage := filepath.Join(settings.PipefishHomeDirectory, "website-build/index.html")
-	os.WriteFile(indexPage, []byte(landingPage), 0755)
-
 	// Before generating the docs pages, we need to convert the docstring descriptions of the
 	// libraries into markdown, which we can then convert into HTML. We'll put the generated
 	// markdown into `website/content/docs` so that it'll be converted to HTML like everything
@@ -115,34 +94,17 @@ func main() {
 	// Having got the list of libraries in the previous step, we can construct the sidebars.
 	libraries = strings.TrimSpace(libraries)
 	docsBytes, _ := os.ReadFile(filepath.Join(settings.PipefishHomeDirectory, "website/content/indices/docs.md"))
-	essaysBytes, _ := os.ReadFile(filepath.Join(settings.PipefishHomeDirectory, "website/content/indices/articles.md"))
-	sidebars := make(map[string]string)
-	sidebars["articles"] = string(essaysBytes)
-	sidebars["docs"] = strings.Replace(string(docsBytes), "{{libraries}}", libraries, 1)
-	rawArticleList := strings.Split(string(essaysBytes), "/n")
-	articleSet := make(dtypes.Set[string])
-	for _, raw := range rawArticleList {
-		if raw[:2] == "- " {
-			articleSet = articleSet.Add(raw[2:])
-		}
-	}
-
-	for _, flavor := range []string{"articles", "docs"} {
-		sidebars[flavor] = makeSidebar(flavor, sidebars[flavor])
-	}
+	sidebarRaw := strings.Replace(string(docsBytes), "{{libraries}}", libraries, 1)	
+	sidebar := makeSidebar(sidebarRaw)
 
 	// We convert everything in the docs folder from markdown to HTML and yeet the
 	// results into the appropriate output folder.
 	docsDir := filepath.Join(settings.PipefishHomeDirectory, "website/content/docs")
-	files, _ = os.ReadDir(docsDir)
+	files, _ := os.ReadDir(docsDir)
 	for _, file := range files {
 		path := filepath.Join(docsDir, file.Name())
 		text, _ := os.ReadFile(path)
 		name := file.Name()[0 : len(file.Name())-3]
-		flavor := "docs"
-		if articleSet.Contains(name) {
-			flavor = "articles"
-		}
 		title := strings.ReplaceAll(name, "-", " ")
 		ast := mdR.Parse(string(text))
 		headInfo := mdR.ExtractHeadings(ast)
@@ -156,16 +118,11 @@ func main() {
 			sub{"maybe-toc", toc},
 			sub{"content", mdR.RenderAst(ast)},
 		)
-		articlePlusSidebar := create(flavor,
-			sub{"sidebar", sidebars[flavor]},
+		articlePlusSidebar := create("docs",
+			sub{"sidebar", sidebar},
 			sub{"content", article},
 		)
-		var description string
-		if flavor == "docs" {
-			description = "Description of " + strings.ToLower(title) + " in Pipefish."
-		} else {
-			description = "Article on '" + title + "'."
-		}
+		description := "Article on '" + title + "'."
 		target := filepath.Join(settings.PipefishHomeDirectory, "website-build/docs", name+".html")
 		page := create("all",
 			sub{"title", title},
@@ -176,7 +133,7 @@ func main() {
 	}
 }
 
-func makeSidebar(flavor, raw string) string {
+func makeSidebar(raw string) string {
 	atStart := true
 	result := ""
 	for _, line := range strings.Split(raw, "\n") {
@@ -189,7 +146,7 @@ func makeSidebar(flavor, raw string) string {
 			result = result + "<section>\n<h3>" + line[3:] + "</h3>\n<ul>\n"
 		case line[0:2] == "- ":
 			name := line[2:]
-			result = result + "<li><a href=\"/" + flavor + "/" + text.Hyphenate(name) + ".html\">" + name + "</a></li>\n"
+			result = result + "<li><a href=\"/docs/" + text.Hyphenate(name) + ".html\">" + name + "</a></li>\n"
 		}
 	}
 	result = result + "</ul>\n</section>\n\n"
