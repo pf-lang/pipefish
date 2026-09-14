@@ -94,6 +94,14 @@ class PfBook extends HTMLElement {
         this.header = parsed.header;
         this.contents = parsed.sections;
 
+        const theme =
+                localStorage.getItem("pipefish-theme") ||
+                (window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light");
+
+        document.documentElement.dataset.theme = theme;
+
         this.render();
 
         const hash = location.hash.slice(1);
@@ -199,10 +207,19 @@ class PfBook extends HTMLElement {
 
         themeToggle.classList.add("theme-toggle");
         themeToggle.type = "button";
-        themeToggle.textContent = "Dark";
+        
+        const dark =
+            document.documentElement.getAttribute("data-theme") ===
+            "dark";
+
+        themeToggle.textContent =
+            dark ? "Light" : "Dark";
+
         themeToggle.setAttribute(
             "aria-label",
-            "Switch to dark mode"
+            dark
+                ? "Switch to light mode"
+                : "Switch to dark mode"
         );
 
         themeToggle.addEventListener(
@@ -229,6 +246,13 @@ class PfBook extends HTMLElement {
 
                 themeToggle.textContent =
                     dark ? "Dark" : "Light";
+
+                themeToggle.setAttribute(
+                    "aria-label",
+                    dark
+                        ? "Switch to dark mode"
+                        : "Switch to light mode"
+                );
             }
         );
 

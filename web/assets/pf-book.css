@@ -1,4 +1,4 @@
-/* Pipefish book */
+@import url("syntax.css");
 
 /* ------------------------------------------------------------
    Variables
@@ -23,33 +23,13 @@
     --shadow-large:
         0 8px 24px rgba(0, 0, 0, .10);
 
-    --code-background: #f1f4f8;
-    --code-header: #e4e9f1;
-    --code-text: #202124;
-    --code-border: #d6dce5;
-
-    --inline-code-background: #edf1f6;
-
-    --syntax-reserved: #1544bf;
-    --syntax-number: #9b4d00;
-    --syntax-string: #177245;
-    --syntax-constant: #7a3e9d;
-    --syntax-type: #006b73;
-    --syntax-control: #a23b72;
-    --syntax-comment: #737983;
-    --syntax-docstring: #64733f;
-
-    --bracket-0: #2367c8;
-    --bracket-1: #8a4fb3;
-    --bracket-2: #b66a00;
-
     --font-heading: "Josefin Slab", serif;
     --font-body: "Yrsa", serif;
     --font-ui: "Google Sans Code", monospace;
 
     --page-width: 1200px;
     --content-width: 760px;
-    --sidebar-width: 240px;
+    --sidebar-width: 280px;
 
     --radius: 10px;
     --transition: .18s ease;
@@ -81,26 +61,21 @@
 
     --shadow-small: none;
     --shadow-large: none;
+}
 
-    --code-background: #191c21;
-    --code-header: #292d35;
-    --code-text: #e2e4e8;
-    --code-border: #414752;
 
-    --inline-code-background: #30343c;
+/* ------------------------------------------------------------
+   Base
+   ------------------------------------------------------------ */
 
-    --syntax-reserved: #78a7ff;
-    --syntax-number: #e6a05a;
-    --syntax-string: #70c99a;
-    --syntax-constant: #c28be0;
-    --syntax-type: #61c5cc;
-    --syntax-control: #e28ab2;
-    --syntax-comment: #9298a3;
-    --syntax-docstring: #a9bb72;
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
 
-    --bracket-0: #75adff;
-    --bracket-1: #bd83e5;
-    --bracket-2: #e6a45b;
+body {
+    background: var(--background);
 }
 
 
@@ -110,6 +85,7 @@
 
 pf-book {
     display: block;
+
     width: min(100%, var(--page-width));
     margin: 0 auto;
 
@@ -159,6 +135,7 @@ pf-book {
     display: flex;
     justify-content: center;
     align-items: center;
+
     gap: 3rem;
 
     font-family: var(--font-ui);
@@ -238,7 +215,7 @@ pf-book {
         minmax(0, 1fr)
         var(--sidebar-width);
 
-    gap: 4rem;
+    gap: 2.5rem;
 
     align-items: start;
 }
@@ -256,6 +233,8 @@ pf-page {
     display: block;
     align-self: start;
 
+    height: fit-content;
+
     min-width: 0;
 
     background: var(--paper);
@@ -268,7 +247,7 @@ pf-page {
 
     color: var(--text);
     font-family: var(--font-body);
-    font-size: 1.25rem;
+    font-size: 1rem;
     line-height: 1.65;
 }
 
@@ -320,6 +299,14 @@ pf-page::after {
     position: sticky;
     top: var(--space-l);
 
+    background: var(--paper);
+
+    padding: 1.5rem;
+
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow-small);
+
     font-family: var(--font-body);
     font-size: .95rem;
     line-height: 1.45;
@@ -348,13 +335,11 @@ pf-page::after {
         .3rem
         .5rem;
 
-    margin-left: -.5rem;
-
     border-left: 2px solid transparent;
 
     color: var(--text);
 
-    text-decoration: underline;
+    text-decoration: none;
 
     transition:
         color var(--transition),
@@ -612,53 +597,6 @@ pf-page :not(pre) > code {
     font-family: inherit;
     background: transparent;
     padding: 0;
-}
-
-
-/* Syntax highlighting */
-
-.code-block .reserved {
-    color: var(--syntax-reserved);
-}
-
-.code-block .number {
-    color: var(--syntax-number);
-}
-
-.code-block .string {
-    color: var(--syntax-string);
-}
-
-.code-block .constant {
-    color: var(--syntax-constant);
-}
-
-.code-block .type {
-    color: var(--syntax-type);
-}
-
-.code-block .control {
-    color: var(--syntax-control);
-}
-
-.code-block .comment {
-    color: var(--syntax-comment);
-}
-
-.code-block .docstring {
-    color: var(--syntax-docstring);
-}
-
-.code-block .bracket-0 {
-    color: var(--bracket-0);
-}
-
-.code-block .bracket-1 {
-    color: var(--bracket-1);
-}
-
-.code-block .bracket-2 {
-    color: var(--bracket-2);
 }
 
 
@@ -1014,3 +952,4 @@ pf-page tbody tr:hover {
         padding-right: 1rem;
     }
 }
+

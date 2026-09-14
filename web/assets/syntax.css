@@ -1,7 +1,4 @@
-/* The source of truth for this file is in `web`; if you edit the version in */
-/* `website`, this will simply be overwritten when the site builds/                    */ 
-
-:where(:root, :host) {
+:where(:root) {
     --code-background: #f1f4f8;
     --code-header: #e4e9f1;
     --code-text: #202124;
