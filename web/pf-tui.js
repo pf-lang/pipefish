@@ -11,6 +11,7 @@ class PipefishTui extends HTMLElement {
         this.service = null;
         this.highlighter = highlighter;
         this.ready = highlighter.ready;
+        this.initialized = Promise.resolve();
 
         this.history = [];
         this.historyIndex = 0;
@@ -215,6 +216,11 @@ class PipefishTui extends HTMLElement {
     }
 
     async initialize(source) {
+        this.initialized = this._initialize(source);
+        return this.initialized;
+    }
+
+    async _initialize(source) {
         await this.ready;
         await this.service.ready;
         await this.service.compile(source);
@@ -416,6 +422,7 @@ class PipefishTui extends HTMLElement {
     }
 
     async executeReplCommand(command) {
+        await this.initialized;
         this.history.push(command);
         this.historyIndex = this.history.length;
 

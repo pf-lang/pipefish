@@ -39,6 +39,8 @@ class PipefishService extends HTMLElement {
             await this.loadScript(execURL);
         }
 
+        window.pipefishWasmReady = false;
+
         this.go = new Go();
 
         const result =
@@ -48,6 +50,12 @@ class PipefishService extends HTMLElement {
             );
 
         this.go.run(result.instance);
+
+        while (!window.pipefishWasmReady) {
+            await new Promise(resolve =>
+                setTimeout(resolve, 0)
+            );
+        }
     }
 
     loadScript(url) {
