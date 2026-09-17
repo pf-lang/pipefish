@@ -1038,13 +1038,12 @@ func (iz *Initializer) checkTypesForConsistency() {
 // the .so files first.
 
 func (iz *Initializer) compileGoModules() {
-	// First of all, the recursion.
 	for pair := iz.initializers.Oldest(); pair != nil; pair = pair.Next() {
 		dependencyIz := pair.Value
 		dependencyIz.compileGoModules()
 	}
 
-	iz.compileGo() // This is in 'gohandler.go' in this package.
+	iz.compileGo()
 }
 
 var IMPERATIVES = dtypes.SetOf(commandDeclaration, testDeclaration)

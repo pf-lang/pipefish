@@ -33,7 +33,7 @@ import (
 // when it uses imports or external services. Hence it will in fact have parsed *everything*
 // by the time it hands back control to initializer.go.
 
-// Just exists to wrap around the next function.
+// Just exists to wrap around `ParseEverythingFromSourceCode`.
 func (iz *Initializer) ParseEverythingFromFilePath(mc *vm.Vm, cpb *parser.CommonParserBindle, ccb *compiler.CommonCompilerBindle, scriptFilepath, namespacePath string) (*compiler.Compiler, error) {
 	sourcecode, e := GetSourceCode(scriptFilepath)
 	if e != nil {

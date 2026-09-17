@@ -85,6 +85,50 @@ type types = dtypes.Set[values.ValueType]
 // Most of the code generation is in the `gogen.go` file in this same `initializer` package.
 func (iz *Initializer) makeNewSoFile(source string, newTime int64) *plugin.Plugin {
 	sourceToken := &token.Token{Source: source}
+	goCode, ok := iz.generateGoSource(source)
+	if !ok {
+		return nil
+	}
+	counter++ // The number of the gocode_<counter>.go source file we're going to write.
+	soFile := filepath.Join(settings.PipefishHomeDirectory, filepath.FromSlash("source/initializer/gobucket/"+text.Flatten(source)+"_"+strconv.Itoa(int(newTime))+".so"))
+	timeMap := iz.getGoTimes()
+	if oldTime, ok := timeMap[source]; ok {
+		os.Remove(filepath.Join(settings.PipefishHomeDirectory, filepath.FromSlash("source/initializer/gobucket/"+text.Flatten(source)+"_"+strconv.Itoa(int(oldTime))+".so")))
+	}
+	goFile := filepath.Join(settings.PipefishHomeDirectory, "gocode_"+strconv.Itoa(counter)+".go")
+	iz.cmG("Creating goFile with filepath '"+goFile+"'\n\n", source)
+	file, err := os.Create(goFile)
+	if err != nil {
+		iz.throw("golang/create", sourceToken, err.Error())
+		return nil
+	}
+	file.WriteString(goCode)
+	iz.cmG("*************GENERATED GO IS*************\n\n"+goCode+"*****************************************\n\n", source)
+	file.Close()
+	if settings.SHOW_GOLANG && !(settings.MandatoryImportSet()).Contains(source) {
+		println("Creating soFile with filepath '" + soFile + "'\n\n")
+	}
+	cmd := exec.Command("go", "build", "-buildmode=plugin", "-o", soFile, goFile) // Version to use running from terminal.
+	// cmd := exec.Command("go", "build", "-gcflags=all=-N -l", "-buildmode=plugin", "-o", soFile, goFile) // Version to use with debugger.
+	output, err := cmd.Output()
+	if err != nil {
+		iz.throw("golang/build", sourceToken, err.Error()+": "+string(output))
+		return nil
+	}
+	plugins, err := plugin.Open(soFile)
+	if err != nil {
+		iz.throw("golang/open.a", sourceToken, err.Error())
+		return nil
+	}
+	// We do this here and not earlier with defer because a .go file that doesn't compile should
+	// be visible for debugging.
+	os.Remove(goFile)
+	timeMap[source] = newTime
+	iz.recordGoTimes(timeMap)
+	return plugins
+}
+
+func (iz *Initializer) generateGoSource(source string) (string, bool) {
 	iz.cmG("Making golang from source '"+source+"'\n\n", source)
 	var StringBuilder strings.Builder
 	sb := &StringBuilder
@@ -135,7 +179,7 @@ func (iz *Initializer) makeNewSoFile(source string, newTime int64) *plugin.Plugi
 	}
 	iz.transitivelyCloseTypes(userDefinedTypes)
 	if iz.errorsExist() {
-		return nil
+		return "", false
 	}
 	// We emit the type declarations and converters.
 	iz.generateDeclarations(sb, userDefinedTypes)
@@ -147,43 +191,7 @@ func (iz *Initializer) makeNewSoFile(source string, newTime int64) *plugin.Plugi
 	for _, pureGo := range iz.goBucket.pureGo[source] {
 		fmt.Fprint(sb, pureGo)
 	}
-	counter++ // The number of the gocode_<counter>.go source file we're going to write.
-	soFile := filepath.Join(settings.PipefishHomeDirectory, filepath.FromSlash("source/initializer/gobucket/"+text.Flatten(source)+"_"+strconv.Itoa(int(newTime))+".so"))
-	timeMap := iz.getGoTimes()
-	if oldTime, ok := timeMap[source]; ok {
-		os.Remove(filepath.Join(settings.PipefishHomeDirectory, filepath.FromSlash("source/initializer/gobucket/"+text.Flatten(source)+"_"+strconv.Itoa(int(oldTime))+".so")))
-	}
-	goFile := filepath.Join(settings.PipefishHomeDirectory, "gocode_"+strconv.Itoa(counter)+".go")
-	iz.cmG("Creating goFile with filepath '"+goFile+"'\n\n", source)
-	file, err := os.Create(goFile)
-	if err != nil {
-		iz.throw("golang/create", sourceToken, err.Error())
-		return nil
-	}
-	file.WriteString(sb.String())
-	iz.cmG("*************GENERATED GO IS*************\n\n"+sb.String()+"*****************************************\n\n", source)
-	file.Close()
-	if settings.SHOW_GOLANG && !(settings.MandatoryImportSet()).Contains(source) {
-		println("Creating soFile with filepath '" + soFile + "'\n\n")
-	}
-	cmd := exec.Command("go", "build", "-buildmode=plugin", "-o", soFile, goFile) // Version to use running from terminal.
-	// cmd := exec.Command("go", "build", "-gcflags=all=-N -l", "-buildmode=plugin", "-o", soFile, goFile) // Version to use with debugger.
-	output, err := cmd.Output()
-	if err != nil {
-		iz.throw("golang/build", sourceToken, err.Error()+": "+string(output))
-		return nil
-	}
-	plugins, err := plugin.Open(soFile)
-	if err != nil {
-		iz.throw("golang/open.a", sourceToken, err.Error())
-		return nil
-	}
-	// We do this here and not earlier with defer because a .go file that doesn't compile should
-	// be visible for debugging.
-	os.Remove(goFile)
-	timeMap[source] = newTime
-	iz.recordGoTimes(timeMap)
-	return plugins
+	return sb.String(), true
 }
 
 // This makes sure that if  we're generating declarations for a struct type,
