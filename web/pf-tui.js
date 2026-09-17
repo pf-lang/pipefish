@@ -10,8 +10,7 @@ class PipefishTui extends HTMLElement {
 
         this.service = null;
         this.highlighter = highlighter;
-
-        this.ready = highlighter.ready
+        this.ready = highlighter.ready;
 
         this.history = [];
         this.historyIndex = 0;
@@ -35,6 +34,7 @@ class PipefishTui extends HTMLElement {
         transcript.classList.add("transcript");
 
         this.transcript = transcript;
+        this.repl = repl;
 
         const inputLine =
             document.createElement("div");
@@ -81,7 +81,10 @@ class PipefishTui extends HTMLElement {
                     input.value
                 );
 
-            this.resizeReplInput();
+            input.scrollTop = input.scrollHeight;
+
+            highlightedInput.scrollTop =
+                input.scrollTop;
         });
 
         input.addEventListener("scroll", () => {
@@ -196,8 +199,6 @@ class PipefishTui extends HTMLElement {
             style,
             repl
         );
-
-        this.resizeReplInput();
     }
 
     get service() {
@@ -218,8 +219,6 @@ class PipefishTui extends HTMLElement {
         await this.service.ready;
         await this.service.compile(source);
     }
-
-    // Delimiter helpers
 
     isEscaped(text, pos) {
         let backslashes = 0;
@@ -377,8 +376,6 @@ class PipefishTui extends HTMLElement {
         return false;
     }
 
-    // REPL helpers
-
     replIndent(line) {
         const indent =
             line.match(/^[\t ]*/)[0];
@@ -407,7 +404,6 @@ class PipefishTui extends HTMLElement {
             this.multiline = false;
             this.input.value = "";
             this.highlightedInput.innerHTML = "";
-            this.resizeReplInput();
             return;
         }
 
@@ -415,7 +411,6 @@ class PipefishTui extends HTMLElement {
 
         this.input.value = "";
         this.highlightedInput.innerHTML = "";
-        this.resizeReplInput();
 
         await this.executeReplCommand(command);
     }
@@ -454,6 +449,8 @@ class PipefishTui extends HTMLElement {
                 "Error: " + error
             );
         }
+
+        this.scrollToBottom();
     }
 
     write(text) {
@@ -465,31 +462,9 @@ class PipefishTui extends HTMLElement {
         this.transcript.appendChild(line);
     }
 
-    resizeReplInput() {
-        const input = this.input;
-        const editor = input.parentElement;
-
-        input.style.height = "auto";
-
-        const lineHeight =
-            parseFloat(
-                getComputedStyle(input).lineHeight
-            );
-
-        const maxHeight =
-            lineHeight * 12;
-
-        const height =
-            Math.min(
-                input.scrollHeight,
-                maxHeight
-            );
-
-        input.style.height =
-            height + "px";
-
-        editor.style.height =
-            height + "px";
+    scrollToBottom() {
+        this.repl.scrollTop =
+            this.repl.scrollHeight;
     }
 
     syncEditorScroll(input, highlighted) {
