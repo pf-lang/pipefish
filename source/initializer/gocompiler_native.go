@@ -23,30 +23,7 @@ func (iz *Initializer) compileGo() {
 	// we're looking up times anyway this is a reasonable way to achieve that.
 
 	// We get the blocks of pure Go, if any, and put them in the appropriate place in the goBucket.
-	for _, tc := range iz.tokenizedCode[golangDeclaration] {
-		golang := tc.(*tokenizedGolangDeclaration)
-		iz.goBucket.sources.Add(golang.goCode.Source)
-		iz.goBucket.pureGo[golang.goCode.Source] = append(iz.goBucket.pureGo[golang.goCode.Source],
-			golang.goCode.Literal)
-	}
-
-	// And the Go types declared by `wrapper` in the `newtype` section.
-	for _, tc := range iz.tokenizedCode[wrapperDeclaration] {
-		wrapper := tc.(*tokenizedWrapperDeclaration)
-		iz.goBucket.sources.Add(wrapper.op.Source)
-		iz.goBucket.types[wrapper.op.Source] = append(iz.goBucket.types[wrapper.op.Source],
-			iz.cp.ConcreteTypeNow(wrapper.op.Literal))
-	}
-
-	for j := functionDeclaration; j <= commandDeclaration; j++ {
-		for _, pc := range iz.parsedCode[j] {
-			fn := pc.(*parsedFunction)
-			if fn.body.GetToken().Type == token.GOLANG {
-				iz.goBucket.sources.Add(fn.op.Source)
-				iz.goBucket.functions[fn.op.Source] = append(iz.goBucket.functions[fn.op.Source], fn)
-			}
-		}
-	}
+	iz.collectGo()
 
 	timeMap := iz.getGoTimes() // We slurp a map from sources to times from the `gotimes` file.
 
@@ -110,6 +87,33 @@ func (iz *Initializer) compileGo() {
 		for _, function := range iz.goBucket.functions[source] {
 			goFunction, _ := plugins.Lookup(capitalize(function.op.Literal))
 			function.body.(*parser.GolangExpression).GoFunction = reflect.ValueOf(goFunction)
+		}
+	}
+}
+
+func (iz *Initializer) collectGo() {
+	for _, tc := range iz.tokenizedCode[golangDeclaration] {
+		golang := tc.(*tokenizedGolangDeclaration)
+		iz.goBucket.sources.Add(golang.goCode.Source)
+		iz.goBucket.pureGo[golang.goCode.Source] = append(iz.goBucket.pureGo[golang.goCode.Source],
+			golang.goCode.Literal)
+	}
+
+	// And the Go types declared by `wrapper` in the `newtype` section.
+	for _, tc := range iz.tokenizedCode[wrapperDeclaration] {
+		wrapper := tc.(*tokenizedWrapperDeclaration)
+		iz.goBucket.sources.Add(wrapper.op.Source)
+		iz.goBucket.types[wrapper.op.Source] = append(iz.goBucket.types[wrapper.op.Source],
+			iz.cp.ConcreteTypeNow(wrapper.op.Literal))
+	}
+
+	for j := functionDeclaration; j <= commandDeclaration; j++ {
+		for _, pc := range iz.parsedCode[j] {
+			fn := pc.(*parsedFunction)
+			if fn.body.GetToken().Type == token.GOLANG {
+				iz.goBucket.sources.Add(fn.op.Source)
+				iz.goBucket.functions[fn.op.Source] = append(iz.goBucket.functions[fn.op.Source], fn)
+			}
 		}
 	}
 }
