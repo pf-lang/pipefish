@@ -85,7 +85,7 @@ type types = dtypes.Set[values.ValueType]
 // Most of the code generation is in the `gogen.go` file in this same `initializer` package.
 func (iz *Initializer) makeNewSoFile(source string, newTime int64) *plugin.Plugin {
 	sourceToken := &token.Token{Source: source}
-	goCode, ok := iz.generateGoSource(source)
+	goCode, ok := iz.generateGoSource(source, "main")
 	if !ok {
 		return nil
 	}
@@ -128,12 +128,12 @@ func (iz *Initializer) makeNewSoFile(source string, newTime int64) *plugin.Plugi
 	return plugins
 }
 
-func (iz *Initializer) generateGoSource(source string) (string, bool) {
+func (iz *Initializer) generateGoSource(source, pkg string) (string, bool) {
 	iz.cmG("Making golang from source '"+source+"'\n\n", source)
 	var StringBuilder strings.Builder
 	sb := &StringBuilder
 	// We emit the package declaration and builtins.
-	fmt.Fprint(sb, "package main\n\n")
+	fmt.Fprint(sb, "package ", pkg, "\n\n")
 	if len(iz.goBucket.imports) > 0 {
 		fmt.Fprint(sb, "import (\n")
 		for _, v := range iz.goBucket.imports[source] {
