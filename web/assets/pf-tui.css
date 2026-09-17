@@ -1,0 +1,17 @@
+@import url("pf-code.css");
+
+:host {
+    display: block;
+}
+
+.repl {
+    box-sizing: border-box;
+    width: 100%;
+
+    padding: 1rem;
+
+    border: 1px solid var(--code-border);
+    border-radius: 10px;
+
+    background: var(--code-background);
+}

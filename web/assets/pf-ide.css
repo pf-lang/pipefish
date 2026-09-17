@@ -1,0 +1,19 @@
+@import url("syntax.css");
+
+:host {
+    display: block;
+    border: 1px solid #808080;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.service {
+    box-sizing: border-box;
+    padding: 0.4rem;
+    border-radius: 10px;
+}
+
+pf-coder {
+    display: block;
+    margin-bottom: 0.4rem;
+}
