@@ -73,6 +73,7 @@ class PipefishTui extends HTMLElement {
 
         this.input = input;
         this.highlightedInput = highlightedInput;
+        this.inputEditor = inputEditor;
 
         input.addEventListener("input", async () => {
             await this.ready;
@@ -82,10 +83,11 @@ class PipefishTui extends HTMLElement {
                     input.value
                 );
 
+            this.updateInputHeight();
             input.scrollTop = input.scrollHeight;
-
             highlightedInput.scrollTop =
                 input.scrollTop;
+            this.scrollToInput();
         });
 
         input.addEventListener("scroll", () => {
@@ -201,6 +203,35 @@ class PipefishTui extends HTMLElement {
             repl
         );
     }
+
+    updateInputHeight() {
+        const lineHeight = 14 * 1.4;
+        const maxHeight = lineHeight * 12;
+
+        this.inputEditor.style.height = "auto";
+
+        const height =
+            Math.min(this.input.scrollHeight, maxHeight);
+
+        this.inputEditor.style.height =
+            `${height}px`;
+    }
+
+    scrollToInput() {
+        const bottom =
+            this.inputEditor.offsetTop +
+            this.inputEditor.offsetHeight;
+
+        const visibleBottom =
+            this.repl.scrollTop +
+            this.repl.clientHeight;
+
+        if (bottom > visibleBottom) {
+            this.repl.scrollTop =
+                bottom - this.repl.clientHeight;
+        }
+    }
+
 
     get service() {
         if (this._service === null) {
