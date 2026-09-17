@@ -26,6 +26,8 @@ class PipefishEditor extends HTMLElement {
         this.reader = reader;
         this.code = code;
         this.ready = reader.ready;
+        this.editor = editor
+        this.initialHeightSet = false;
 
         code.addEventListener("input", async () => {
             await this.reader.display(code.value);
@@ -112,6 +114,7 @@ class PipefishEditor extends HTMLElement {
             await this.reader.initialize(source);
 
         this.code.value = normalized;
+        this.setInitialHeight();
         this.syncScroll();
     }
 
@@ -120,7 +123,42 @@ class PipefishEditor extends HTMLElement {
 
         this.code.value = source;
         await this.reader.display(source);
+        this.setInitialHeight();
         this.syncScroll();
+    }
+
+    setInitialHeight() {
+        if (this.initialHeightSet) {
+            return;
+        }
+
+        const lines =
+            Math.max(1, this.code.value.split("\n").length);
+
+        const visibleLines =
+            Math.min(lines, 20);
+
+        const style =
+            getComputedStyle(this.code);
+
+        const lineHeight =
+            parseFloat(style.lineHeight);
+
+        const padding =
+            parseFloat(style.paddingTop) +
+            parseFloat(style.paddingBottom);
+
+        const editorStyle =
+            getComputedStyle(this.editor);
+
+        const borders =
+            parseFloat(editorStyle.borderTopWidth) +
+            parseFloat(editorStyle.borderBottomWidth);
+
+        this.editor.style.height =
+            `${visibleLines * lineHeight + padding + borders}px`;
+
+        this.initialHeightSet = true;
     }
 
     syncScroll() {

@@ -23,7 +23,7 @@
     white-space: pre-wrap;
     tab-size: 4;
 
-    overflow: hidden;
+    overflow: auto;
 
     color: var(--code-text);
 }

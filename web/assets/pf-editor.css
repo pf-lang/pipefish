@@ -17,6 +17,9 @@
 
     border: 1px solid var(--code-border);
     border-radius: 10px;
+
+    resize: vertical;
+    min-height: 1.4em;
 }
 
 .code-input {
