@@ -46,4 +46,6 @@
     background: transparent;
     color: transparent;
     caret-color: var(--code-text);
+
+    overscroll-behavior: auto;
 }

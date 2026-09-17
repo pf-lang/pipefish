@@ -35,6 +35,23 @@ class PipefishEditor extends HTMLElement {
             this.syncScroll();
         });
 
+        code.addEventListener("wheel", event => {
+            const atTop = code.scrollTop === 0;
+            const atBottom =
+                code.scrollTop + code.clientHeight >= code.scrollHeight;
+
+            if (
+                (atTop && event.deltaY < 0) ||
+                (atBottom && event.deltaY > 0)
+            ) {
+                event.preventDefault();
+                window.scrollBy({
+                    top: event.deltaY,
+                    behavior: "auto"
+                });
+            }
+        }, { passive: false });
+
         code.addEventListener("keydown", event => {
             if (event.key === "Tab") {
                 event.preventDefault();
