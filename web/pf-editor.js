@@ -9,8 +9,7 @@ class PipefishEditor extends HTMLElement {
         const style = document.createElement("link");
         style.rel = "stylesheet";
         style.href =
-            new URL("./assets/pf-editor.css", import.meta.url);
-
+            new URL("../assets/pf-editor.css", import.meta.url);
         const editor = document.createElement("div");
         editor.classList.add("editor");
 

@@ -3,6 +3,8 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .reader {

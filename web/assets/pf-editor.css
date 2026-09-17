@@ -1,5 +1,11 @@
 :host {
     display: block;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+:host {
+    display: block;
 }
 
 .editor {
@@ -8,8 +14,9 @@
     height: 300px;
     box-sizing: border-box;
     overflow: hidden;
-    background: var(--code-background);
+
     border: 1px solid var(--code-border);
+    border-radius: 10px;
 }
 
 .code-input {

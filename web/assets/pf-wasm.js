@@ -14,7 +14,7 @@ ready = new Promise(async (resolve, reject) => {
         const go = new window.Go();
 
         window.pipefishReady = WebAssembly.instantiateStreaming(
-            fetch("pipefish.wasm"),
+            fetch("assets/pipefish.wasm"),
             go.importObject
         ).then(result => {
             go.run(result.instance);

@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/tim-hardcastle/pipefish/source/dtypes"
 	"github.com/tim-hardcastle/pipefish/source/text"
 )
 
@@ -121,7 +122,17 @@ func MakeRenderFunction(textWrapper map[mdStyle]func(s string) string, codeHighl
 				result = result + sep + codeHighlighter(line)
 				sep = "\n"
 			}
-			sb.WriteString(textWrapper[stCodeBlock](result))
+			if dtypes.SetOf("pf-coder", "pf-editor", "pf-ide", "pf-reader", "pf-service", "pf-tui").Contains(n.tag) {
+				sb.WriteString("<")
+				sb.WriteString(n.tag)
+				sb.WriteString(">")
+				sb.WriteString(result)
+				sb.WriteString("</")
+				sb.WriteString(n.tag)
+				sb.WriteString(">")
+			} else {
+				sb.WriteString(textWrapper[stCodeBlock](result))
+			}
 		case mdCliBlock:
 			result := ""
 			for _, line := range n.lines {
@@ -156,6 +167,7 @@ const (
 	stInline
 	stList
 	stListItem
+	stIde
 	stCodeBlock
 	stTuiBlock
 	stH1
@@ -171,6 +183,7 @@ var html = map[mdStyle]func(string) string{
 	stInline:    func(s string) string { return "<code>" + s + "</code>" },
 	stList:      func(s string) string { return "<ul>\n" + s + "\n</ul>\n" },
 	stListItem:  func(s string) string { return "  <li>" + s + "</li>" },
+	stIde:       func(s string) string { return "<pf-ide>" + s + "</pf-ide>" },
 	stCodeBlock: func(s string) string {
 		return "" +
 			`<div class="code-block">

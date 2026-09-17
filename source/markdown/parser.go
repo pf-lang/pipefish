@@ -25,6 +25,7 @@ func (rnd Renderer) Parse(raw string) mdDocument {
 	docNodes := []mdNode{}
 	accumulator := []string{}
 	mode := mdUnassigned
+	var codeTag string
 mainloop:
 	for i := range len(lines) + 1 {
 		line := ""
@@ -50,6 +51,7 @@ mainloop:
 			if mode == mdGettingCodeBlock || mode == mdGettingCliBlock {
 				newMode = mdUnassigned
 			} else {
+				codeTag = line[3:]
 				newMode = mdGettingCodeBlock
 			}
 		}
@@ -66,7 +68,8 @@ mainloop:
 			case mdGettingParagraph:
 				docNodes = append(docNodes, makeParagraph(accumulator))
 			case mdGettingCodeBlock:
-				docNodes = append(docNodes, makeCodeBlock(accumulator))
+				docNodes = append(docNodes, makeCodeBlock(codeTag, accumulator))
+				codeTag = ""
 			case mdGettingCliBlock:
 				docNodes = append(docNodes, makeCliBlock(accumulator))
 			case mdGettingQuote:
@@ -108,8 +111,8 @@ func makeHeading(lines []string) mdHeading {
 	return mdHeading{level, ip.parseAll()}
 }
 
-func makeCodeBlock(lines []string) mdCodeBlock {
-	return mdCodeBlock{lines}
+func makeCodeBlock(codeTag string, lines []string) mdCodeBlock {
+	return mdCodeBlock{codeTag, lines}
 }
 
 func makeCliBlock(lines []string) mdCliBlock {

@@ -89,7 +89,6 @@ class PfBook extends HTMLElement {
         const text = await response.text();
 
         const parsed = parseContents(text);
-        console.log("PARSED HEADER:", parsed.header);
 
         this.header = parsed.header;
         this.contents = parsed.sections;

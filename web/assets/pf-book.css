@@ -252,7 +252,7 @@ pf-page {
 }
 
 
-/* Corners */
+/* Corner bling */
 
 pf-page::before {
     content: "";
@@ -339,7 +339,7 @@ pf-page::after {
 
     color: var(--text);
 
-    text-decoration: none;
+    text-decoration: underline;
 
     transition:
         color var(--transition),

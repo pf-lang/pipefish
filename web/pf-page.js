@@ -1,3 +1,5 @@
+import "./pf-ide.js";
+
 class PfPage extends HTMLElement {
     static get observedAttributes() {
         return ["src", "title"];

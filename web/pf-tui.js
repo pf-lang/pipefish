@@ -5,19 +5,13 @@ class PipefishTui extends HTMLElement {
     constructor() {
         super();
 
-        const service =
-            document.createElement("pf-service");
-
         const highlighter =
             document.createElement("pf-highlighter");
 
-        this.service = service;
+        this.service = null;
         this.highlighter = highlighter;
 
-        this.ready = Promise.all([
-            service.ready,
-            highlighter.ready
-        ]);
+        this.ready = highlighter.ready
 
         this.history = [];
         this.historyIndex = 0;
@@ -29,7 +23,8 @@ class PipefishTui extends HTMLElement {
         const style =
             document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "assets/pf-code.css";
+        style.href =
+            new URL("../assets/pf-tui.css", import.meta.url);
 
         const repl =
             document.createElement("div");
@@ -205,8 +200,22 @@ class PipefishTui extends HTMLElement {
         this.resizeReplInput();
     }
 
+    get service() {
+        if (this._service === null) {
+            this._service =
+                document.createElement("pf-service");
+        }
+
+        return this._service;
+    }
+
+    set service(service) {
+        this._service = service;
+    }
+
     async initialize(source) {
         await this.ready;
+        await this.service.ready;
         await this.service.compile(source);
     }
 
@@ -429,6 +438,8 @@ class PipefishTui extends HTMLElement {
         this.transcript.appendChild(entry);
 
         try {
+            await this.service.ready;
+
             const result =
                 await this.service.do(command);
 
