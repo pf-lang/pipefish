@@ -1,11 +1,13 @@
 const DEFAULT_LOGO = "/assets/rene.png";
+const DEFAULT_ICON = "/assets/icon.ico";
 
 function parseContents(text) {
     const sections = [];
     let section = null;
     let header = {
         links: [],
-        logo: DEFAULT_LOGO
+        logo: DEFAULT_LOGO,
+        icon: DEFAULT_ICON
     };
 
     for (const line of text.split(/\r?\n/)) {
@@ -42,6 +44,8 @@ function parseContents(text) {
             if (!section) {
                 if (title.toLowerCase() === "logo") {
                     header.logo = url;
+                } else if (title.toLowerCase() === "icon") {
+                    header.icon = url;
                 } else {
                     header.links.push({
                         title,
@@ -179,10 +183,18 @@ class PfBook extends HTMLElement {
             document.createElement("img");
 
         logo.src = this.header.logo;
-        logo.alt = "Pipefish";
 
         logoLink.appendChild(logo);
         header.appendChild(logoLink);
+
+        const icon =
+            document.querySelector("link[rel='icon']") ||
+            document.createElement("link");
+
+        icon.rel = "icon";
+        icon.href = this.header.icon;
+
+        document.head.appendChild(icon);
 
         const topNav =
             document.createElement("nav");

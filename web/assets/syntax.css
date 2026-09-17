@@ -4,6 +4,8 @@
     --code-text: #202124;
     --code-border: #d6dce5;
 
+    --inline-code-background: var(--code-background);
+
     /* Syntax highlighting */
 
     --syntax-reserved: #4b69c6;
@@ -58,7 +60,7 @@
     --code-text: #dcdcaa;
     --code-border: #414752;
 
-    --inline-code-background: #30343c;
+    --inline-code-background: var(--code-background);
 
     /* Syntax highlighting */
 

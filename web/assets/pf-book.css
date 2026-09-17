@@ -91,8 +91,8 @@ pf-book {
 
     color: var(--text);
     font-family: var(--font-body);
-    font-size: 1rem;
-    line-height: 1.65;
+    font-size: 1.2rem;
+    line-height: 1.5rem;
 }
 
 
@@ -247,8 +247,8 @@ pf-page {
 
     color: var(--text);
     font-family: var(--font-body);
-    font-size: 1rem;
-    line-height: 1.65;
+    font-size: 1.2rem;
+    line-height: 1.5rem;
 }
 
 
@@ -288,6 +288,10 @@ pf-page::after {
     pointer-events: none;
 }
 
+pf-page pf-ide {
+    display: block;
+    margin-bottom: var(--space-m);
+}
 
 /* ------------------------------------------------------------
    Sidebar
@@ -374,7 +378,7 @@ pf-page h6 {
 
 pf-page h1 {
     font-family: var(--font-heading);
-    font-size: 3rem;
+    font-size: 2.5rem;
     line-height: 1.1;
 
     margin:
@@ -492,7 +496,7 @@ pf-page hr {
 
 pf-page :not(pre) > code {
     font-family: var(--font-ui);
-    font-size: .88em;
+    font-size: .70em;
 
     background: var(--inline-code-background);
 
