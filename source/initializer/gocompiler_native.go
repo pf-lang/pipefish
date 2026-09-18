@@ -91,29 +91,3 @@ func (iz *Initializer) compileGo() {
 	}
 }
 
-func (iz *Initializer) collectGo() {
-	for _, tc := range iz.tokenizedCode[golangDeclaration] {
-		golang := tc.(*tokenizedGolangDeclaration)
-		iz.goBucket.sources.Add(golang.goCode.Source)
-		iz.goBucket.pureGo[golang.goCode.Source] = append(iz.goBucket.pureGo[golang.goCode.Source],
-			golang.goCode.Literal)
-	}
-
-	// And the Go types declared by `wrapper` in the `newtype` section.
-	for _, tc := range iz.tokenizedCode[wrapperDeclaration] {
-		wrapper := tc.(*tokenizedWrapperDeclaration)
-		iz.goBucket.sources.Add(wrapper.op.Source)
-		iz.goBucket.types[wrapper.op.Source] = append(iz.goBucket.types[wrapper.op.Source],
-			iz.cp.ConcreteTypeNow(wrapper.op.Literal))
-	}
-
-	for j := functionDeclaration; j <= commandDeclaration; j++ {
-		for _, pc := range iz.parsedCode[j] {
-			fn := pc.(*parsedFunction)
-			if fn.body.GetToken().Type == token.GOLANG {
-				iz.goBucket.sources.Add(fn.op.Source)
-				iz.goBucket.functions[fn.op.Source] = append(iz.goBucket.functions[fn.op.Source], fn)
-			}
-		}
-	}
-}

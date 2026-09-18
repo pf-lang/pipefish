@@ -284,3 +284,46 @@ func withoutDots(s string) string {
 		return s
 	}
 }
+
+func (iz *Initializer) collectGo() {
+	for _, tc := range iz.tokenizedCode[golangDeclaration] {
+		golang := tc.(*tokenizedGolangDeclaration)
+		iz.goBucket.sources.Add(golang.goCode.Source)
+		iz.goBucket.pureGo[golang.goCode.Source] = append(iz.goBucket.pureGo[golang.goCode.Source],
+			golang.goCode.Literal)
+	}
+
+	// And the Go types declared by `wrapper` in the `newtype` section.
+	for _, tc := range iz.tokenizedCode[wrapperDeclaration] {
+		wrapper := tc.(*tokenizedWrapperDeclaration)
+		iz.goBucket.sources.Add(wrapper.op.Source)
+		iz.goBucket.types[wrapper.op.Source] = append(iz.goBucket.types[wrapper.op.Source],
+			iz.cp.ConcreteTypeNow(wrapper.op.Literal))
+	}
+
+	for j := functionDeclaration; j <= commandDeclaration; j++ {
+		for _, pc := range iz.parsedCode[j] {
+			fn := pc.(*parsedFunction)
+			if fn.body.GetToken().Type == token.GOLANG {
+				iz.goBucket.sources.Add(fn.op.Source)
+				iz.goBucket.functions[fn.op.Source] = append(iz.goBucket.functions[fn.op.Source], fn)
+			}
+		}
+	}
+}
+
+func (iz *Initializer) generateWasmGoModules(outputDirectory string) error {
+    for pair := iz.initializers.Oldest(); pair != nil; pair = pair.Next() {
+        if err := pair.Value.generateWasmGoModules(outputDirectory); err != nil {
+            return err
+        }
+    }
+
+    iz.collectGo()
+
+    for source := range iz.goBucket.sources {
+        println(source)
+    }
+
+    return nil
+}
