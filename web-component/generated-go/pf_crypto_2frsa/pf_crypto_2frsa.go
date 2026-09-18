@@ -32,6 +32,7 @@ type PublicKey struct {
 }
 
 var PIPEFISH_FUNCTION_CONVERTER = map[string](func(t uint32, v any) any){
+	"EncryptPkcs": func(t uint32, v any) any { return EncryptPkcs{v.([]any)[0].(PublicKey), v.([]any)[1].(string)} },
 	"EncryptOaep": func(t uint32, v any) any {
 		return EncryptOaep{v.([]any)[0].(PublicKey), v.([]any)[1].(string), v.([]any)[2].(string)}
 	},
@@ -39,14 +40,13 @@ var PIPEFISH_FUNCTION_CONVERTER = map[string](func(t uint32, v any) any){
 	"PrivateKey": func(t uint32, v any) any {
 		return PrivateKey{v.([]any)[0].(PublicKey), v.([]any)[1].(*big.Int), v.([]any)[2].(*big.Int), v.([]any)[3].(*big.Int)}
 	},
-	"EncryptPkcs": func(t uint32, v any) any { return EncryptPkcs{v.([]any)[0].(PublicKey), v.([]any)[1].(string)} },
 }
 
 var PIPEFISH_VALUE_CONVERTER = map[string]any{
-	"EncryptOaep": (*EncryptOaep)(nil),
-	"PublicKey":   (*PublicKey)(nil),
 	"PrivateKey":  (*PrivateKey)(nil),
 	"EncryptPkcs": (*EncryptPkcs)(nil),
+	"EncryptOaep": (*EncryptOaep)(nil),
+	"PublicKey":   (*PublicKey)(nil),
 }
 
 func DecryptPkcs(k PrivateKey, ciphertext string) any {

@@ -2,17 +2,23 @@ package initializer
 
 import (
 	"fmt"
-	"go/ast"
 	"go/format"
-	"go/parser"
-	"go/token"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/values"
 )
+
+type wasmGoPackageInfo struct {
+	source         string
+	packageName    string
+	functions      []string
+	hasEquals      bool
+	hasLiteral     bool
+}
 
 func GenerateWasmGoFromSource(
 	scriptFilepath string,
@@ -35,34 +41,17 @@ func GenerateWasmGoFromSource(
 		)
 	}
 
-	return GenerateWasmGo(iz, outputDirectory)
+	return iz.generateWasmGoModules(outputDirectory, nil)
 }
 
-type wasmGoPackageInfo struct {
-	source      string
-	packageName string
-	functions   []string
-	hasEquals   bool
-	hasLiteral  bool
-}
-
-func GenerateWasmGo(
-	iz *Initializer,
-	outputDirectory string,
-) error {
+func GenerateWasmGo(iz *Initializer, outputDirectory string) error {
 	var packages []wasmGoPackageInfo
 
-	if err := iz.generateWasmGoModules(
-		outputDirectory,
-		&packages,
-	); err != nil {
+	if err := iz.generateWasmGoModules(outputDirectory, &packages); err != nil {
 		return err
 	}
 
-	return generateWasmGoRegistry(
-		outputDirectory,
-		packages,
-	)
+	return generateWasmGoRegistry(outputDirectory, packages)
 }
 
 func (iz *Initializer) generateWasmGoModules(
@@ -70,10 +59,7 @@ func (iz *Initializer) generateWasmGoModules(
 	packages *[]wasmGoPackageInfo,
 ) error {
 	for pair := iz.initializers.Oldest(); pair != nil; pair = pair.Next() {
-		if err := pair.Value.generateWasmGoModules(
-			outputDirectory,
-			packages,
-		); err != nil {
+		if err := pair.Value.generateWasmGoModules(outputDirectory, packages); err != nil {
 			return err
 		}
 	}
@@ -83,10 +69,7 @@ func (iz *Initializer) generateWasmGoModules(
 	for source := range iz.goBucket.sources {
 		packageName := wasmGoPackageName(source)
 
-		goSource, ok := iz.generateGoSource(
-			source,
-			packageName,
-		)
+		goSource, ok := iz.generateGoSource(source, packageName)
 		if !ok {
 			return fmt.Errorf(
 				"could not generate Go source for %q",
@@ -108,10 +91,7 @@ func (iz *Initializer) generateWasmGoModules(
 			packageName,
 		)
 
-		if err := os.MkdirAll(
-			packageDirectory,
-			0755,
-		); err != nil {
+		if err := os.MkdirAll(packageDirectory, 0755); err != nil {
 			return fmt.Errorf(
 				"creating generated Go package directory %q: %w",
 				packageDirectory,
@@ -124,11 +104,7 @@ func (iz *Initializer) generateWasmGoModules(
 			packageName+".go",
 		)
 
-		if err := os.WriteFile(
-			filename,
-			formatted,
-			0644,
-		); err != nil {
+		if err := os.WriteFile(filename, formatted, 0644); err != nil {
 			return fmt.Errorf(
 				"writing generated Go source %q: %w",
 				filename,
@@ -136,152 +112,182 @@ func (iz *Initializer) generateWasmGoModules(
 			)
 		}
 
-		info, err := inspectWasmGoPackage(
-			filename,
-			source,
-			packageName,
-			iz.goBucket.functions[source],
-		)
-		if err != nil {
-			return err
-		}
+		if packages != nil {
+			functions := make([]string, 0, len(iz.goBucket.functions[source]))
 
-		*packages = append(*packages, info)
+			for _, function := range iz.goBucket.functions[source] {
+				functions = append(
+					functions,
+					function.op.Literal,
+				)
+			}
+
+			*packages = append(
+				*packages,
+				wasmGoPackageInfo{
+					source:      source,
+					packageName: packageName,
+					functions:   functions,
+					hasEquals:   strings.Contains(goSource, "func Equals("),
+					hasLiteral:  strings.Contains(goSource, "func Literal("),
+				},
+			)
+		}
 	}
 
 	return nil
 }
 
-func inspectWasmGoPackage(
-	filename string,
-	source string,
-	packageName string,
-	functions []*parsedFunction,
-) (wasmGoPackageInfo, error) {
-	file, err := parser.ParseFile(
-		token.NewFileSet(),
-		filename,
-		nil,
-		0,
+func GenerateWasmGoStandardLibraries(
+	outputDirectory string,
+) error {
+	settings.PipefishHomeDirectory = "."
+
+	var packages []wasmGoPackageInfo
+
+	for source := range StandardLibraries {
+		fmt.Printf("Generating Go for %s\n", source)
+
+		filename := filepath.Join(
+			"source",
+			"initializer",
+			"libraries",
+			source+".pf",
+		)
+
+		sourcecode, err := os.ReadFile(filename)
+		if err != nil {
+			return fmt.Errorf(
+				"reading standard library %q from %q: %w",
+				source,
+				filename,
+				err,
+			)
+		}
+
+		iz := NewInitializer(
+			NewCommonInitializerBindle(values.Map{}, nil),
+		)
+
+		iz.prepareForCompilation(source, string(sourcecode))
+
+		if iz.errorsExist() {
+			return fmt.Errorf(
+				"errors while preparing %q:\n%s",
+				source,
+				iz.P.ReturnErrors(),
+			)
+		}
+
+		if err := iz.generateWasmGoModules(
+			outputDirectory,
+			&packages,
+		); err != nil {
+			return fmt.Errorf(
+				"generating Go for standard library %q: %w",
+				source,
+				err,
+			)
+		}
+	}
+
+	return generateWasmGoRegistry(
+		outputDirectory,
+		packages,
 	)
-	if err != nil {
-		return wasmGoPackageInfo{}, fmt.Errorf(
-			"parsing generated Go package %q: %w",
-			source,
-			err,
-		)
-	}
-
-	var hasEquals bool
-	var hasLiteral bool
-
-	for _, declaration := range file.Decls {
-		function, ok := declaration.(*ast.FuncDecl)
-		if !ok {
-			continue
-		}
-
-		switch function.Name.Name {
-		case "Equals":
-			hasEquals = true
-		case "Literal":
-			hasLiteral = true
-		}
-	}
-
-	functionNames := make([]string, 0, len(functions))
-
-	for _, function := range functions {
-		functionNames = append(
-			functionNames,
-			capitalize(function.op.Literal),
-		)
-	}
-
-	return wasmGoPackageInfo{
-		source:      source,
-		packageName: packageName,
-		functions:   functionNames,
-		hasEquals:   hasEquals,
-		hasLiteral:  hasLiteral,
-	}, nil
 }
 
 func generateWasmGoRegistry(
 	outputDirectory string,
 	packages []wasmGoPackageInfo,
 ) error {
+	// The same package can be encountered more than once because
+	// standard-library initializers recursively generate their
+	// dependencies. Keep only one registry entry for each source.
+	unique := make(map[string]wasmGoPackageInfo)
+
+	for _, packageInfo := range packages {
+		unique[packageInfo.source] = packageInfo
+	}
+
+	packages = packages[:0]
+
+	for _, packageInfo := range unique {
+		packages = append(packages, packageInfo)
+	}
+
+	sort.Slice(
+		packages,
+		func(i, j int) bool {
+			return packages[i].source < packages[j].source
+		},
+	)
+
 	var sb strings.Builder
 
 	fmt.Fprintln(&sb, "package registry")
 	fmt.Fprintln(&sb)
 	fmt.Fprintln(&sb, "import (")
-	fmt.Fprintln(&sb, "\t\"reflect\"")
 
-	for _, pkg := range packages {
+	fmt.Fprintln(
+		&sb,
+		"\t\"reflect\"",
+	)
+
+	fmt.Fprintln(
+		&sb,
+		"\t\"github.com/tim-hardcastle/pipefish/source/initializer\"",
+	)
+
+	for _, packageInfo := range packages {
 		fmt.Fprintf(
 			&sb,
 			"\t%s %q\n",
-			pkg.packageName,
-			"github.com/tim-hardcastle/pipefish/web-component/generated-go/"+pkg.packageName,
+			packageInfo.packageName,
+			"github.com/tim-hardcastle/pipefish/web-component/generated-go/"+packageInfo.packageName,
 		)
 	}
 
 	fmt.Fprintln(&sb, ")")
 	fmt.Fprintln(&sb)
 
-	fmt.Fprintln(&sb, "type Package struct {")
 	fmt.Fprintln(
 		&sb,
-		"\tFunctionConverter map[string](func(t uint32, v any) any)",
-	)
-	fmt.Fprintln(&sb, "\tValueConverter map[string]any")
-	fmt.Fprintln(&sb, "\tEquals func(x any, y any) bool")
-	fmt.Fprintln(&sb, "\tLiteral func(x any) string")
-	fmt.Fprintln(&sb, "\tFunctions map[string]reflect.Value")
-	fmt.Fprintln(&sb, "}")
-	fmt.Fprintln(&sb)
-
-	fmt.Fprintln(
-		&sb,
-		"var Packages = map[string]Package{",
+		"var Packages = map[string]initializer.WasmGoPackage{",
 	)
 
-	seen := make(map[string]bool)
-
-	for _, pkg := range packages {
-		if seen[pkg.source] {
-			continue
-		}
-		seen[pkg.source] = true
-
-		fmt.Fprintf(&sb, "\t%q: {\n", pkg.source)
+	for _, packageInfo := range packages {
+		fmt.Fprintf(
+			&sb,
+			"\t%q: {\n",
+			packageInfo.source,
+		)
 
 		fmt.Fprintf(
 			&sb,
 			"\t\tFunctionConverter: %s.PIPEFISH_FUNCTION_CONVERTER,\n",
-			pkg.packageName,
+			packageInfo.packageName,
 		)
 
 		fmt.Fprintf(
 			&sb,
 			"\t\tValueConverter: %s.PIPEFISH_VALUE_CONVERTER,\n",
-			pkg.packageName,
+			packageInfo.packageName,
 		)
 
-		if pkg.hasEquals {
+		if packageInfo.hasEquals {
 			fmt.Fprintf(
 				&sb,
 				"\t\tEquals: %s.Equals,\n",
-				pkg.packageName,
+				packageInfo.packageName,
 			)
 		}
 
-		if pkg.hasLiteral {
+		if packageInfo.hasLiteral {
 			fmt.Fprintf(
 				&sb,
 				"\t\tLiteral: %s.Literal,\n",
-				pkg.packageName,
+				packageInfo.packageName,
 			)
 		}
 
@@ -290,13 +296,13 @@ func generateWasmGoRegistry(
 			"\t\tFunctions: map[string]reflect.Value{",
 		)
 
-		for _, function := range pkg.functions {
+		for _, function := range packageInfo.functions {
 			fmt.Fprintf(
 				&sb,
 				"\t\t\t%q: reflect.ValueOf(%s.%s),\n",
-				strings.ToLower(function[:1])+function[1:],
-				pkg.packageName,
 				function,
+				packageInfo.packageName,
+				capitalize(function),
 			)
 		}
 
@@ -305,6 +311,7 @@ func generateWasmGoRegistry(
 	}
 
 	fmt.Fprintln(&sb, "}")
+	fmt.Fprintln(&sb)
 
 	formatted, err := format.Source([]byte(sb.String()))
 	if err != nil {
@@ -319,12 +326,9 @@ func generateWasmGoRegistry(
 		"registry",
 	)
 
-	if err := os.MkdirAll(
-		registryDirectory,
-		0755,
-	); err != nil {
+	if err := os.MkdirAll(registryDirectory, 0755); err != nil {
 		return fmt.Errorf(
-			"creating WASM Go registry directory %q: %w",
+			"creating registry directory %q: %w",
 			registryDirectory,
 			err,
 		)
@@ -335,13 +339,9 @@ func generateWasmGoRegistry(
 		"registry.go",
 	)
 
-	if err := os.WriteFile(
-		filename,
-		formatted,
-		0644,
-	); err != nil {
+	if err := os.WriteFile(filename, formatted, 0644); err != nil {
 		return fmt.Errorf(
-			"writing WASM Go registry %q: %w",
+			"writing generated WASM Go registry %q: %w",
 			filename,
 			err,
 		)
@@ -360,6 +360,7 @@ func wasmGoPackageName(source string) string {
 		case r >= 'a' && r <= 'z',
 			r >= 'A' && r <= 'Z',
 			r >= '0' && r <= '9':
+
 			b.WriteRune(r)
 
 		default:

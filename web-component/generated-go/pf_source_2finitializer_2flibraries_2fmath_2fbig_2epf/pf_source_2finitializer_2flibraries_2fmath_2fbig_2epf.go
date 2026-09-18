@@ -13,9 +13,9 @@ var PIPEFISH_FUNCTION_CONVERTER = map[string](func(t uint32, v any) any){
 }
 
 var PIPEFISH_VALUE_CONVERTER = map[string]any{
-	"Float": (**big.Float)(nil),
 	"Int":   (**big.Int)(nil),
 	"Rat":   (**big.Rat)(nil),
+	"Float": (**big.Float)(nil),
 }
 
 func Float(x float64) any {

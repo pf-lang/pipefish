@@ -7,13 +7,6 @@ import (
 	"path/filepath"
 )
 
-type FileSearchMode int
-
-const (
-	NONRECURSIVE FileSearchMode = iota
-	RECURSIVE
-)
-
 type Filenames struct {
 	Directory      string
 	FileSearchMode FileSearchMode
@@ -24,6 +17,13 @@ type DirectoryNames struct {
 	FileSearchMode FileSearchMode
 }
 
+type FileSearchMode int
+
+const (
+	NONRECURSIVE FileSearchMode = iota
+	RECURSIVE
+)
+
 var PIPEFISH_FUNCTION_CONVERTER = map[string](func(t uint32, v any) any){
 	"Filenames":      func(t uint32, v any) any { return Filenames{v.([]any)[0].(string), v.([]any)[1].(FileSearchMode)} },
 	"DirectoryNames": func(t uint32, v any) any { return DirectoryNames{v.([]any)[0].(string), v.([]any)[1].(FileSearchMode)} },
@@ -31,9 +31,9 @@ var PIPEFISH_FUNCTION_CONVERTER = map[string](func(t uint32, v any) any){
 }
 
 var PIPEFISH_VALUE_CONVERTER = map[string]any{
-	"FileSearchMode": (*FileSearchMode)(nil),
 	"Filenames":      (*Filenames)(nil),
 	"DirectoryNames": (*DirectoryNames)(nil),
+	"FileSearchMode": (*FileSearchMode)(nil),
 }
 
 func GoFileExists(fname string) any {

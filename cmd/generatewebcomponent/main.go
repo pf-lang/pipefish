@@ -7,6 +7,8 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/pf"
+	"github.com/tim-hardcastle/pipefish/source/initializer"
+	"github.com/tim-hardcastle/pipefish/web-component/generated-go/registry"
 )
 
 var service *pf.Service
@@ -31,6 +33,8 @@ func do(this js.Value, args []js.Value) any {
 }
 
 func main() {
+	initializer.RegisterWasmGoPackages(registry.Packages)
+
 	js.Global().Set(
 		"pipefishCompile",
 		js.FuncOf(compile),

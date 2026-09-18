@@ -1,4 +1,3 @@
-//go:build js && wasm
 
 package initializer
 
@@ -7,26 +6,42 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/parser"
 	"github.com/tim-hardcastle/pipefish/source/token"
-	//"github.com/tim-hardcastle/pipefish/web-component/generated-go/registry"
 )
+
+type WasmGoPackage struct {
+	FunctionConverter map[string](func(t uint32, v any) any)
+	ValueConverter    map[string]any
+	Equals            func(x any, y any) bool
+	Literal           func(x any) string
+	Functions         map[string]reflect.Value
+}
+
+var wasmGoPackages map[string]WasmGoPackage
+
+func RegisterWasmGoPackages(
+	packages map[string]WasmGoPackage,
+) {
+	wasmGoPackages = packages
+}
 
 func (iz *Initializer) compileGo() {
 	iz.collectGo()
 
 	for source := range iz.goBucket.sources {
-		pkg, ok := registry.Packages[source]
+		sourceToken := &token.Token{Source: source}
+
+		pkg, ok := wasmGoPackages[source]
 		if !ok {
-			sourceToken := &token.Token{Source: source}
 			iz.throw(
-				"golang/wasm",
+				"golang/compile",
 				sourceToken,
-				"no precompiled Go package for source "+source,
+				"no precompiled WASM Go package for "+source,
 			)
-			return
+			continue
 		}
 
 		newGoConverter := make(
-			[]func(t uint32, v any) any,
+			[](func(t uint32, v any) any),
 			len(iz.cp.Vm.ConcreteTypeInfo),
 		)
 
@@ -35,35 +50,25 @@ func (iz *Initializer) compileGo() {
 			iz.cp.Vm.GoConverter,
 		)
 
-		functionConverter := pkg.FunctionConverter
+		functionConverter := make(
+			map[string](func(t uint32, v any) any),
+			len(pkg.FunctionConverter),
+		)
+
+		for k, v := range pkg.FunctionConverter {
+			functionConverter[k] = v
+		}
 
 		for k, v := range BUILTIN_FUNCTION_CONVERTER {
 			functionConverter[k] = v
 		}
 
 		for typeName, constructor := range functionConverter {
-			typeNumber := iz.cp.ConcreteTypeWithNamespaceNow(
-				typeName,
-			)
-
+			typeNumber := iz.cp.ConcreteTypeWithNamespaceNow(typeName)
 			newGoConverter[typeNumber] = constructor
 		}
 
 		iz.cp.Vm.GoConverter = newGoConverter
-
-		valueConverter := pkg.ValueConverter
-
-		for k, v := range BUILTIN_VALUE_CONVERTER {
-			valueConverter[k] = v
-		}
-
-		for typeName, goValue := range valueConverter {
-			iz.cp.Vm.GoToPipefishTypes[
-				reflect.TypeOf(goValue).Elem(),
-			] = iz.cp.ConcreteTypeWithNamespaceNow(
-				typeName,
-			)
-		}
 
 		if pkg.Equals != nil {
 			iz.cp.Vm.GoEquals = pkg.Equals
@@ -73,24 +78,38 @@ func (iz *Initializer) compileGo() {
 			iz.cp.Vm.GoLiteral = pkg.Literal
 		}
 
+		valueConverter := make(
+			map[string]any,
+			len(pkg.ValueConverter),
+		)
+
+		for k, v := range pkg.ValueConverter {
+			valueConverter[k] = v
+		}
+
+		for k, v := range BUILTIN_VALUE_CONVERTER {
+			valueConverter[k] = v
+		}
+
+		for typeName, goValue := range valueConverter {
+			iz.cp.Vm.GoToPipefishTypes[
+				reflect.TypeOf(goValue).Elem(),
+			] = iz.cp.ConcreteTypeWithNamespaceNow(typeName)
+		}
+
 		for _, function := range iz.goBucket.functions[source] {
 			goFunction, ok := pkg.Functions[function.op.Literal]
+
 			if !ok {
-				sourceToken := &token.Token{
-					Source: source,
-				}
-
 				iz.throw(
-					"golang/wasm",
+					"golang/function",
 					sourceToken,
-					"no precompiled Go function for "+function.op.Literal,
+					"no precompiled function for "+function.op.Literal,
 				)
-
-				return
+				continue
 			}
 
-			function.body.(*parser.GolangExpression).GoFunction =
-				goFunction
+			function.body.(*parser.GolangExpression).GoFunction = goFunction
 		}
 	}
 }
