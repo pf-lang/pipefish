@@ -311,19 +311,3 @@ func (iz *Initializer) collectGo() {
 		}
 	}
 }
-
-func (iz *Initializer) generateWasmGoModules(outputDirectory string) error {
-    for pair := iz.initializers.Oldest(); pair != nil; pair = pair.Next() {
-        if err := pair.Value.generateWasmGoModules(outputDirectory); err != nil {
-            return err
-        }
-    }
-
-    iz.collectGo()
-
-    for source := range iz.goBucket.sources {
-        println(source)
-    }
-
-    return nil
-}
