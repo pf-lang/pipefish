@@ -42,23 +42,6 @@ func (iz *Initializer) ParseEverythingFromFilePath(mc *vm.Vm, cpb *parser.Common
 	return iz.ParseEverythingFromSourcecode(mc, cpb, ccb, scriptFilepath, sourcecode, namespacePath), nil
 }
 
-func GetSourceCode(scriptFilepath string) (string, error) {
-	var sourcebytes []byte
-	var err error
-	if scriptFilepath != "" { // In which case we're making a blank VM.
-		if len(scriptFilepath) >= 11 && scriptFilepath[:11] == "test-files/" {
-			sourcebytes, err = compiler.TestFolder.ReadFile(scriptFilepath)
-		} else {
-			sourcebytes, err = os.ReadFile(MakeFilepath(scriptFilepath))
-		}
-		if err != nil {
-			return "", err
-		}
-	}
-	sourcebytes = append(sourcebytes, '\n')
-	return string(sourcebytes), nil
-}
-
 // This is broken into separate named steps basically so that I can in fact give the steps names.
 func (iz *Initializer) parseEverything(scriptFilepath, sourcecode string) {
 	iz.inclusions = dtypes.SetOf(scriptFilepath)

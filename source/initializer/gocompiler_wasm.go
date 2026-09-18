@@ -1,20 +1,18 @@
+//go:build js && wasm
 
 package initializer
 
 import (
+	"embed"
+	"io/fs"
+	"os"
 	"reflect"
+	"strings"
 
 	"github.com/tim-hardcastle/pipefish/source/parser"
+	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/token"
 )
-
-type WasmGoPackage struct {
-	FunctionConverter map[string](func(t uint32, v any) any)
-	ValueConverter    map[string]any
-	Equals            func(x any, y any) bool
-	Literal           func(x any) string
-	Functions         map[string]reflect.Value
-}
 
 var wasmGoPackages map[string]WasmGoPackage
 
@@ -111,5 +109,64 @@ func (iz *Initializer) compileGo() {
 
 			function.body.(*parser.GolangExpression).GoFunction = goFunction
 		}
+	}
+}
+
+func GetSourceCode(scriptFilepath string) (string, error) {
+	var sourcebytes []byte
+	var err error
+
+	if scriptFilepath != "" {
+		if sourcecode, ok := wasmStandardLibrarySources[scriptFilepath]; ok {
+			sourcebytes = []byte(sourcecode)
+		} else if len(scriptFilepath) >= 11 && scriptFilepath[:11] == "test-files/" {
+			sourcebytes, err = compiler.TestFolder.ReadFile(scriptFilepath)
+		} else {
+			sourcebytes, err = os.ReadFile(MakeFilepath(scriptFilepath))
+		}
+
+		if err != nil {
+			return "", err
+		}
+	}
+
+	sourcebytes = append(sourcebytes, '\n')
+	return string(sourcebytes), nil
+}
+
+//go:embed libraries
+var wasmStandardLibraryFiles embed.FS
+
+var wasmStandardLibrarySources = make(map[string]string)
+
+func init() {
+	err := fs.WalkDir(
+		wasmStandardLibraryFiles,
+		"libraries",
+		func(path string, entry fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if entry.IsDir() || !strings.HasSuffix(path, ".pf") {
+				return nil
+			}
+
+			data, err := wasmStandardLibraryFiles.ReadFile(path)
+			if err != nil {
+				return err
+			}
+
+			source := strings.TrimPrefix(path, "libraries/")
+			wasmStandardLibrarySources[
+				"/source/initializer/libraries/"+source,
+			] = string(data)
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		panic(err)
 	}
 }

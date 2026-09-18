@@ -207,7 +207,7 @@ func (sv *Service) SetInHandler(in InHandler) error {
 		return errors.New("service is uninitialized")
 	}
 	if sv.IsBroken() {
-		return errors.New("service is broken")
+		return errors.New("SetInhandler: service is broken")
 	}
 	sv.cp.Vm.InHandle = in
 	return nil
@@ -220,7 +220,7 @@ func (sv *Service) SetOutHandler(out vm.OutHandler) error {
 		return errors.New("service is uninitialized")
 	}
 	if sv.IsBroken() {
-		return errors.New("service is broken")
+		return errors.New("SetOutHandler: service is broken")
 	}
 	sv.cp.Vm.OutHandle = out
 	return nil
@@ -235,7 +235,8 @@ func (sv *Service) Do(line string) (Value, error) {
 		return Value{}, errors.New("service is uninitialized")
 	}
 	if sv.IsBroken() {
-		return Value{}, errors.New("service is broken")
+		errs, _ := sv.GetErrorReport()
+		return Value{}, errors.New("Do: service is broken"+"\n\n"+errs)
 	}
 	sv.cp.P.ResetAfterError()
 	sv.cp.Vm.LiveTracking = make([]vm.TrackingData, 0)
@@ -273,7 +274,7 @@ func (sv *Service) GetVariable(vname string) (values.Value, error) {
 		return Value{}, errors.New("service is uninitialized")
 	}
 	if sv.IsBroken() {
-		return Value{}, errors.New("service is broken")
+		return Value{}, errors.New("GetVariable: service is broken")
 	}
 	v, ok := sv.cp.GlobalVars.GetVar(vname)
 	if !ok {
@@ -293,7 +294,7 @@ func (sv *Service) SetVariable(vname string, ty values.ValueType, v any) error {
 		return errors.New("service is uninitialized")
 	}
 	if sv.IsBroken() {
-		return errors.New("service is broken")
+		return errors.New("SetVariable: service is broken")
 	}
 	_, ok := sv.cp.GlobalVars.GetVar(vname)
 	if !ok {
@@ -308,7 +309,7 @@ func (sv *Service) SetEnv(env values.Map) error {
 		return errors.New("service is uninitialized")
 	}
 	if sv.IsBroken() {
-		return errors.New("service is broken")
+		return errors.New("SetEnv: service is broken")
 	}
 	sv.cp.SetEnv(env)
 	return nil
@@ -483,7 +484,7 @@ func (sv *Service) TypeToTypeName(t Type) (string, error) {
 		return "", errors.New("service is uninitialized")
 	}
 	if sv.IsBroken() {
-		return "", errors.New("service is broken")
+		return "", errors.New("TypeToTypename: service is broken")
 	}
 	if int(t) >= len(sv.cp.Vm.ConcreteTypeInfo) {
 		return "", errors.New("type does not exist")
@@ -499,7 +500,7 @@ func (sv *Service) GetTrackingReport() (string, error) {
 		return "", errors.New("service is uninitialized")
 	}
 	if sv.IsBroken() {
-		return "", errors.New("service is broken")
+		return "", errors.New("GetTrackingReport: service is broken")
 	}
 	return sv.cp.Vm.TrackingToString(sv.cp.Vm.LiveTracking), nil
 }

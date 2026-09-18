@@ -125,7 +125,7 @@ func (iz *Initializer) generateWasmGoModules(
 			*packages = append(
 				*packages,
 				wasmGoPackageInfo{
-					source:      source,
+					source:      wasmGoSourcePath(source),
 					packageName: packageName,
 					functions:   functions,
 					hasEquals:   strings.Contains(goSource, "func Equals("),
@@ -136,6 +136,16 @@ func (iz *Initializer) generateWasmGoModules(
 	}
 
 	return nil
+}
+
+func wasmGoSourcePath(source string) string {
+	path := filepath.ToSlash(MakeFilepath(source))
+
+	if !strings.HasPrefix(path, "/") {
+		path = "/" + path
+	}
+
+	return path
 }
 
 func GenerateWasmGoStandardLibraries(

@@ -235,7 +235,7 @@ func AsBling(s string) parser.TypeNode {
 }
 
 var StandardLibraries = dtypes.SetOf("crypto/aes", "crypto/bcrypt", "crypto/rand",
-	"crypto/rsa", "crypto/sha_256", "crypto/sha_512", "database/sql", "database/sql", 
+	"crypto/rsa", "crypto/sha_256", "crypto/sha_512", "database/prolog", "database/sql", 
 	"encoding/csv", "encoding/base_32", "encoding/base_64", "encoding/json", "files", 
 	"fmt", "html", "image", "image/bmp", "image/color", "image/jpeg", "image/png", 
 	"lists", "markdown", "math", "math/big", "math/cmplx", "math/rand", "net/http", 

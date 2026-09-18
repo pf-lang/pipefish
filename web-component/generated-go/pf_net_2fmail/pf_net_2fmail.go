@@ -30,17 +30,17 @@ type Message struct {
 }
 
 var PIPEFISH_FUNCTION_CONVERTER = map[string](func(t uint32, v any) any){
+	"Address": func(t uint32, v any) any { return Address{v.([]any)[0].(string), v.([]any)[1].(string)} },
+	"Message": func(t uint32, v any) any { return Message{v.([]any)[0].(map[any]any), v.([]any)[1].(string)} },
 	"Time": func(t uint32, v any) any {
 		return Time{v.([]any)[0].(int), v.([]any)[1].(int), v.([]any)[2].(int), v.([]any)[3].(int), v.([]any)[4].(int), v.([]any)[5].(int), v.([]any)[6].(int), v.([]any)[7].(string)}
 	},
-	"Address": func(t uint32, v any) any { return Address{v.([]any)[0].(string), v.([]any)[1].(string)} },
-	"Message": func(t uint32, v any) any { return Message{v.([]any)[0].(map[any]any), v.([]any)[1].(string)} },
 }
 
 var PIPEFISH_VALUE_CONVERTER = map[string]any{
-	"Time":    (*Time)(nil),
 	"Address": (*Address)(nil),
 	"Message": (*Message)(nil),
+	"Time":    (*Time)(nil),
 }
 
 func AddressList(header map[any]any, key string) any {

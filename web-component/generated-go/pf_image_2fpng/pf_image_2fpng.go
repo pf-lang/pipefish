@@ -7,23 +7,11 @@ import (
 	"os"
 )
 
-type Rgb_64 struct {
-	R int
-	G int
-	B int
-}
-
 type Cmyk struct {
 	C int
 	M int
 	Y int
 	K int
-}
-
-type Rgb struct {
-	R int
-	G int
-	B int
 }
 
 type Rgba struct {
@@ -37,13 +25,6 @@ type Gray struct {
 	G int
 }
 
-type Rgba_64 struct {
-	R int
-	G int
-	B int
-	A int
-}
-
 type YCbCr struct {
 	Y  int
 	Cb int
@@ -52,32 +33,51 @@ type YCbCr struct {
 
 type Image []any
 
+type Rgb struct {
+	R int
+	G int
+	B int
+}
+
+type Rgb_64 struct {
+	R int
+	G int
+	B int
+}
+
+type Rgba_64 struct {
+	R int
+	G int
+	B int
+	A int
+}
+
 var PIPEFISH_FUNCTION_CONVERTER = map[string](func(t uint32, v any) any){
-	"Image":  func(t uint32, v any) any { return Image(v.([]any)) },
-	"Rgb_64": func(t uint32, v any) any { return Rgb_64{v.([]any)[0].(int), v.([]any)[1].(int), v.([]any)[2].(int)} },
 	"Cmyk": func(t uint32, v any) any {
 		return Cmyk{v.([]any)[0].(int), v.([]any)[1].(int), v.([]any)[2].(int), v.([]any)[3].(int)}
 	},
-	"Rgb": func(t uint32, v any) any { return Rgb{v.([]any)[0].(int), v.([]any)[1].(int), v.([]any)[2].(int)} },
 	"Rgba": func(t uint32, v any) any {
 		return Rgba{v.([]any)[0].(int), v.([]any)[1].(int), v.([]any)[2].(int), v.([]any)[3].(int)}
 	},
-	"Gray": func(t uint32, v any) any { return Gray{v.([]any)[0].(int)} },
+	"Gray":   func(t uint32, v any) any { return Gray{v.([]any)[0].(int)} },
+	"YCbCr":  func(t uint32, v any) any { return YCbCr{v.([]any)[0].(int), v.([]any)[1].(int), v.([]any)[2].(int)} },
+	"Image":  func(t uint32, v any) any { return Image(v.([]any)) },
+	"Rgb":    func(t uint32, v any) any { return Rgb{v.([]any)[0].(int), v.([]any)[1].(int), v.([]any)[2].(int)} },
+	"Rgb_64": func(t uint32, v any) any { return Rgb_64{v.([]any)[0].(int), v.([]any)[1].(int), v.([]any)[2].(int)} },
 	"Rgba_64": func(t uint32, v any) any {
 		return Rgba_64{v.([]any)[0].(int), v.([]any)[1].(int), v.([]any)[2].(int), v.([]any)[3].(int)}
 	},
-	"YCbCr": func(t uint32, v any) any { return YCbCr{v.([]any)[0].(int), v.([]any)[1].(int), v.([]any)[2].(int)} },
 }
 
 var PIPEFISH_VALUE_CONVERTER = map[string]any{
-	"Cmyk":    (*Cmyk)(nil),
+	"Image":   (*Image)(nil),
 	"Rgb":     (*Rgb)(nil),
+	"Rgb_64":  (*Rgb_64)(nil),
+	"Rgba_64": (*Rgba_64)(nil),
+	"Cmyk":    (*Cmyk)(nil),
 	"Rgba":    (*Rgba)(nil),
 	"Gray":    (*Gray)(nil),
-	"Rgba_64": (*Rgba_64)(nil),
 	"YCbCr":   (*YCbCr)(nil),
-	"Image":   (*Image)(nil),
-	"Rgb_64":  (*Rgb_64)(nil),
 }
 
 func GoGetPngFile(filename string) any {

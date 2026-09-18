@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 
+	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/parser"
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
@@ -91,3 +92,22 @@ func (iz *Initializer) compileGo() {
 	}
 }
 
+func GetSourceCode(scriptFilepath string) (string, error) {
+	var sourcebytes []byte
+	var err error
+
+	if scriptFilepath != "" {
+		if len(scriptFilepath) >= 11 && scriptFilepath[:11] == "test-files/" {
+			sourcebytes, err = compiler.TestFolder.ReadFile(scriptFilepath)
+		} else {
+			sourcebytes, err = os.ReadFile(MakeFilepath(scriptFilepath))
+		}
+
+		if err != nil {
+			return "", err
+		}
+	}
+
+	sourcebytes = append(sourcebytes, '\n')
+	return string(sourcebytes), nil
+}

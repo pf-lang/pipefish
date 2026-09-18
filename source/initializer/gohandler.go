@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"plugin"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -310,4 +311,12 @@ func (iz *Initializer) collectGo() {
 			}
 		}
 	}
+}
+
+type WasmGoPackage struct {
+	FunctionConverter map[string](func(t uint32, v any) any)
+	ValueConverter    map[string]any
+	Equals            func(x any, y any) bool
+	Literal           func(x any) string
+	Functions         map[string]reflect.Value
 }

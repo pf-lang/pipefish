@@ -5,6 +5,11 @@ import (
 	"net/url"
 )
 
+type UserInfo struct {
+	Username string
+	Password string
+}
+
 type Url struct {
 	Scheme      string
 	Opaque      string
@@ -17,11 +22,6 @@ type Url struct {
 	RawQuery    string
 	Fragment    string
 	RawFragment string
-}
-
-type UserInfo struct {
-	Username string
-	Password string
 }
 
 var PIPEFISH_FUNCTION_CONVERTER = map[string](func(t uint32, v any) any){
