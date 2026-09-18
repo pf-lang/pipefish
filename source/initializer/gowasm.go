@@ -156,7 +156,6 @@ func GenerateWasmGoStandardLibraries(
 	var packages []wasmGoPackageInfo
 
 	for source := range StandardLibraries {
-		fmt.Printf("Generating Go for %s\n", source)
 
 		filename := filepath.Join(
 			"source",
