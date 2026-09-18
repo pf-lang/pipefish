@@ -6,7 +6,30 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/tim-hardcastle/pipefish/source/values"
 )
+
+func GenerateWasmGoFromSource(
+	scriptFilepath string,
+	sourcecode string,
+	outputDirectory string,
+) error {
+	iz := NewInitializer(
+		NewCommonInitializerBindle(values.Map{}, nil),
+	)
+
+	iz.prepareForCompilation(scriptFilepath, sourcecode)
+
+	if iz.errorsExist() {
+		return fmt.Errorf(
+			"errors while preparing %q",
+			scriptFilepath,
+		)
+	}
+
+	return GenerateWasmGo(iz, outputDirectory)
+}
 
 func GenerateWasmGo(iz *Initializer, outputDirectory string) error {
 	return iz.generateWasmGoModules(outputDirectory)

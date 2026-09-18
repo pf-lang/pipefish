@@ -145,14 +145,19 @@ func StartCompilerFromFilepath(filepath string, svs map[string]*compiler.Compile
 	return StartCompiler(filepath, sourcecode, svs, store), nil
 }
 
-func StartCompiler(scriptFilepath, sourcecode string, hubServices map[string]*compiler.Compiler, store values.Map) *compiler.Compiler {
-	// We begin by creating an initializer and injecting a new CommonInitializerBindle into it.
-	iz := NewInitializer(NewCommonInitializerBindle(store, hubServices))
-	// We carry out several phases of initialization each of which is performed recursively on
-	// all of the modules in the dependency tree before moving on to the next. (The need to do this is
-	// in fact what defines the phases.)
+func (iz *Initializer) prepareForCompilation(
+	scriptFilepath string,
+	sourcecode string,
+) *compiler.Compiler {
 	iz.cmI("Parsing everything.")
-	result := iz.ParseEverythingFromSourcecode(vm.BlankVm(), parser.NewCommonParserBindle(), compiler.NewCommonCompilerBindle(), scriptFilepath, sourcecode, "")
+	result := iz.ParseEverythingFromSourcecode(
+		vm.BlankVm(),
+		parser.NewCommonParserBindle(),
+		compiler.NewCommonCompilerBindle(),
+		scriptFilepath,
+		sourcecode,
+		"",
+	)
 	if iz.errorsExist() {
 		iz.cp.P.Common.IsBroken = true
 		return result
@@ -164,24 +169,28 @@ func StartCompiler(scriptFilepath, sourcecode string, hubServices map[string]*co
 		iz.cp.P.Common.IsBroken = true
 		return result
 	}
+
 	iz.cmI("Finishing alias types.")
 	iz.finishMakingAliasTypes()
 	if iz.errorsExist() {
 		iz.cp.P.Common.IsBroken = true
 		return result
 	}
+
 	iz.cmI("Finding shareable functions.")
 	iz.findAllShareableFunctions()
 	if iz.errorsExist() {
 		iz.cp.P.Common.IsBroken = true
 		return result
 	}
+
 	iz.cmI("Populating interface types.")
 	iz.populateInterfaceTypes()
 	if iz.errorsExist() {
 		iz.cp.P.Common.IsBroken = true
 		return result
 	}
+
 	iz.cmI("Populating abstract types and creating alternate types.")
 	iz.populateAbstractTypes()
 	if iz.errorsExist() {
@@ -209,12 +218,14 @@ func StartCompiler(scriptFilepath, sourcecode string, hubServices map[string]*co
 		iz.cp.P.Common.IsBroken = true
 		return result
 	}
+
 	iz.cmI("Adding abstract types to struct fields.")
 	iz.addFieldsToStructsAndCheckForConsistency()
 	if iz.errorsExist() {
 		iz.cp.P.Common.IsBroken = true
 		return result
 	}
+
 	iz.cmI("Adding abstract types to parameterized types.")
 	iz.tweakParameterizedTypes()
 	if iz.errorsExist() {
@@ -231,6 +242,28 @@ func StartCompiler(scriptFilepath, sourcecode string, hubServices map[string]*co
 
 	iz.cmI("Making namespace map.")
 	iz.makeNamespaceMap()
+	if iz.errorsExist() {
+		iz.cp.P.Common.IsBroken = true
+		return result
+	}
+
+	return result
+}
+
+func StartCompiler(
+	scriptFilepath,
+	sourcecode string,
+	hubServices map[string]*compiler.Compiler,
+	store values.Map,
+) *compiler.Compiler {
+	iz := NewInitializer(
+		NewCommonInitializerBindle(store, hubServices),
+	)
+
+	result := iz.prepareForCompilation(scriptFilepath, sourcecode)
+	if iz.errorsExist() {
+		return result
+	}
 
 	iz.cmI("Compiling Go.")
 	iz.compileGoModules()
@@ -238,6 +271,7 @@ func StartCompiler(scriptFilepath, sourcecode string, hubServices map[string]*co
 		iz.cp.P.Common.IsBroken = true
 		return result
 	}
+
 	iz.cmI("Compiling everything else.")
 	iz.compileEverythingElse()
 	if iz.errorsExist() {
