@@ -299,6 +299,9 @@ flts : dst mem tok
 Float from string
 Token number n#2 is used to make an error if the conversion fails.
 
+gfsy : dst mem
+Get file system
+
 gofn : dst mem gfn tup
 Call Go function
 Operands are :

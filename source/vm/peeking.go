@@ -316,6 +316,7 @@ var OPCODES = map[string]Opcode{
 	"flps": Flps,
 	"flti": Flti,
 	"flts": Flts,
+	"gfsy": Gfsy,
 	"gofn": Gofn,
 	"gsql": Gsql,
 	"gtef": Gtef,

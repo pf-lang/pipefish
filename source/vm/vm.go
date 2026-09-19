@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"src.elv.sh/pkg/persistent/vector"
 	"github.com/tim-hardcastle/pipefish/source/err"
+	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/token"
@@ -69,6 +70,9 @@ type Vm struct {
 	OutputTo    string            // Gives a filename to dump output to.
 	IndentBy    int               // Indentation to allow us to display the children of a node att a different depth.
 	IsCompiling bool              // So we can optionally only dump the VM during compilation, i.e. when it's doing constant folding.
+	// An interface exposing either the actual file system, or a virtual filesystem if
+	// we're running inside the browswer.
+	FileSystem filesystem.FileSystem
 }
 // In general, the VM can't convert from type names to type numbers, because it doesn't
 // need to. And we don't need the whole map of them because only a tiny proportion are
@@ -163,6 +167,7 @@ func BlankVm() *Vm {
 		NamespaceInfo:     []map[values.ValueType]string{},
 		FieldLabelsInMem:  make(map[string]uint32),
 		PeekStack:         []map[string]bool{},
+		FileSystem:        filesystem.OSFileSystem{},
 	}
 	vm.OutHandle = &SimpleOutHandler{os.Stdout, vm}
 	copy(vm.Mem, CONSTANTS)
@@ -821,6 +826,8 @@ loop:
 				} else {
 					vm.Mem[args[0]] = values.Value{values.FLOAT, i}
 				}
+			case Gfsy: // Get file system (dst mem)
+				vm.Mem[args[0]] = values.Value{vm.Mem[args[1]].V.(values.AbstractType).Types[0], vm.FileSystem}
 			case Gofn: // Call Go function (dst mem gfn tup)
 				// Operands are :
 				//     m#1 : contains an error which we will doctor before (if necessary) returning it.

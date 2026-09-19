@@ -17,6 +17,7 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/err"
+	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/initializer"
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
@@ -40,11 +41,6 @@ func NewService() *Service {
 	}
 }
 
-// Initializes the service with the source code supplied in the string.
-func (sv *Service) InitializeFromCode(code string) error {
-	return sv.initialize("InitializeFromCode", code, values.Map{})
-}
-
 // Initializes the service with the source code supplied in the file indicated by the filepath.
 func (sv *Service) InitializeFromFilepath(scriptFilepath string) error {
 	sourcecode, e := initializer.GetSourceCode(scriptFilepath)
@@ -52,6 +48,11 @@ func (sv *Service) InitializeFromFilepath(scriptFilepath string) error {
 		return e
 	}
 	return sv.initialize(scriptFilepath, sourcecode, values.Map{})
+}
+
+// Initializes the service with the source code supplied in the string.
+func (sv *Service) InitializeFromCode(code string) error {
+	return sv.initialize("InitializeFromCode", code, values.Map{})
 }
 
 // The same as the previous two functions, except that we pass in a map of values to initialize
@@ -285,6 +286,10 @@ func (sv *Service) GetVariable(vname string) (values.Value, error) {
 
 func (sv *Service) DumpCode(functionName string, showMemory bool) string {
 	return sv.cp.DumpFunction(functionName, showMemory)
+}
+
+func(sv *Service) SetFileSystem(f filesystem.FileSystem) {
+	sv.cp.Vm.FileSystem = f
 }
 
 // Sets the value of a global variable given its name. Unlike using `Do` for the

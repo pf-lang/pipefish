@@ -40,6 +40,7 @@ var BUILTINS = map[string]functionAndReturnType{
 	"first_in_tuple":            {(*Compiler).btFirstInTuple, AltType()}, // Types need to be added by the caller.
 	"float_of_int":              {(*Compiler).btFloatOfInt, AltType(values.FLOAT)},
 	"float_of_string":           {(*Compiler).btFloatOfString, AltType(values.ERROR, values.FLOAT)},
+	"get_file_system":			 {(*Compiler).btGetFileSystem , AltType()},   // Types need to be added by the caller.
 	"get_from_input":            {(*Compiler).btGetFromInput, AltType(values.SUCCESSFUL_VALUE)},
 	"get_from_masked_input":     {(*Compiler).btGetFromMaskedInput, AltType(values.SUCCESSFUL_VALUE)},
 	"get_pf_from_json":          {(*Compiler).btGetPfFromJson, AltType()},     // Types need to be added by the caller.
@@ -222,6 +223,10 @@ func (cp *Compiler) btFloatOfInt(tok *token.Token, dest uint32, args []uint32) {
 
 func (cp *Compiler) btFloatOfString(tok *token.Token, dest uint32, args []uint32) {
 	cp.Emit(vm.Flts, dest, args[0], cp.ReserveToken(tok))
+}
+
+func (cp *Compiler) btGetFileSystem(tok *token.Token, dest uint32, args []uint32) {
+	cp.Emit(vm.Gfsy, dest, args[0], cp.ReserveToken(tok))
 }
 
 func (cp *Compiler) btGetFromInput(tok *token.Token, dest uint32, args []uint32) {

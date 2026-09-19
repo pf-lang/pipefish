@@ -32,6 +32,8 @@ func do(this js.Value, args []js.Value) any {
 	return service.ToString(result)
 }
 
+
+
 func main() {
 	initializer.RegisterWasmGoPackages(registry.Packages)
 

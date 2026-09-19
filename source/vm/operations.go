@@ -121,6 +121,8 @@ const (
 	Flti
 	// Float from string (dst mem tok)
 	Flts
+	// Get file system (dst mem)
+	Gfsy
 	// Call Go function (dst mem gfn tup)
 	Gofn
 	// Get from SQL (dst mem mem mem mem num tok)

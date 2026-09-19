@@ -591,7 +591,8 @@ func (cp *Compiler) seekFunctionCall(b *bindle) (AlternateType, bool) { // The b
 				if ok {
 					switch builtinTag { // Then for these we need to special-case their return types.
 					// TODO --- can we do something better with the JSON?
-					case "get_from_sql", "get_pf_from_json", "get_pf_from_json_as", "get_pf_from_json_like":
+					case "get_from_sql", "get_pf_from_json", "get_pf_from_json_as", "get_pf_from_json_like",
+					     "get_file_system":
 						functionAndType.T = cp.Common.AnyTypeScheme
 					case "eval":
 						functionAndType.T = cp.Common.AnyTypeScheme.Union(cp.Common.AnyTuple)
