@@ -1,0 +1,1 @@
+This package implements a filesystem interface that can be used either to wrap around the native file system or around a virtual file system used when running in the browser.
