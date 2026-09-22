@@ -16,9 +16,9 @@ class PipefishService extends HTMLElement {
         if (source === this.source) {
             return;
         }
-
+        const path = new URL(".", import.meta.url).pathname
         const result =
-            await window.pipefishCompile(source);
+            await window.pipefishCompile(source, path);
 
         this.source = source;
 

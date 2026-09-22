@@ -31,7 +31,7 @@ func GenerateWasmGoFromSource(
 		NewCommonInitializerBindle(values.Map{}, nil),
 	)
 
-	iz.prepareForCompilation(scriptFilepath, sourcecode)
+	iz.prepareForCompilation(scriptFilepath, sourcecode, nil)
 
 	if iz.errorsExist() {
 		return fmt.Errorf(
@@ -178,7 +178,7 @@ func GenerateWasmGoStandardLibraries(
 			NewCommonInitializerBindle(values.Map{}, nil),
 		)
 
-		iz.prepareForCompilation(source, string(sourcecode))
+		iz.prepareForCompilation(source, string(sourcecode), nil)
 
 		if iz.errorsExist() {
 			return fmt.Errorf(

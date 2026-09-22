@@ -31,6 +31,7 @@ type Service struct {
 	cp             *compiler.Compiler
 	localExternals map[string]*Service
 	db             *sql.DB
+	fs             filesystem.FileSystem
 }
 
 // Returns a new service.
@@ -38,6 +39,7 @@ func NewService() *Service {
 	return &Service{cp: nil,
 		localExternals: make(map[string]*Service),
 		db:             nil,
+		fs:             filesystem.OSFileSystem{},         
 	}
 }
 
@@ -81,10 +83,10 @@ func (sv *Service) initialize(scriptFilepath, sourcecode string, store Map) erro
 	for k, v := range sv.localExternals {
 		compilerMap[k] = v.cp
 	}
-	cp := initializer.StartCompiler(scriptFilepath, sourcecode, compilerMap, store)
+	cp := initializer.StartCompiler(scriptFilepath, sourcecode, compilerMap, store, sv.fs)
 	sv.cp = cp
 	for k, v := range compilerMap {
-		sv.localExternals[k] = &Service{v, sv.localExternals, sv.db}
+		sv.localExternals[k] = &Service{v, sv.localExternals, sv.db, v.Vm.FileSystem}
 	}
 	if sv.IsBroken() {
 		return errors.New("compilation error")
@@ -289,7 +291,7 @@ func (sv *Service) DumpCode(functionName string, showMemory bool) string {
 }
 
 func(sv *Service) SetFileSystem(f filesystem.FileSystem) {
-	sv.cp.Vm.FileSystem = f
+	sv.fs = f
 }
 
 // Sets the value of a global variable given its name. Unlike using `Do` for the

@@ -14,6 +14,7 @@ import (
 	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/dtypes"
 	"github.com/tim-hardcastle/pipefish/source/err"
+	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/parser"
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
@@ -142,16 +143,20 @@ func StartCompilerFromFilepath(filepath string, svs map[string]*compiler.Compile
 	if e != nil {
 		return nil, e
 	}
-	return StartCompiler(filepath, sourcecode, svs, store), nil
+	// We use OSFileSystem because it's either an external on the same hub or a test service, but this may get us into trouble eventually.
+	return StartCompiler(filepath, sourcecode, svs, store, filesystem.OSFileSystem{}), nil
 }
 
 func (iz *Initializer) prepareForCompilation(
 	scriptFilepath string,
 	sourcecode string,
+	fs filesystem.FileSystem,
 ) *compiler.Compiler {
 	iz.cmI("Parsing everything.")
+	vm := vm.BlankVm()
+	vm.FileSystem = fs
 	result := iz.ParseEverythingFromSourcecode(
-		vm.BlankVm(),
+		vm,
 		parser.NewCommonParserBindle(),
 		compiler.NewCommonCompilerBindle(),
 		scriptFilepath,
@@ -255,12 +260,12 @@ func StartCompiler(
 	sourcecode string,
 	hubServices map[string]*compiler.Compiler,
 	store values.Map,
+	fs filesystem.FileSystem,
 ) *compiler.Compiler {
 	iz := NewInitializer(
 		NewCommonInitializerBindle(store, hubServices),
 	)
-
-	result := iz.prepareForCompilation(scriptFilepath, sourcecode)
+	result := iz.prepareForCompilation(scriptFilepath, sourcecode, fs)
 	if iz.errorsExist() {
 		return result
 	}
