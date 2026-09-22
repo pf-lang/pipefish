@@ -61,15 +61,6 @@ func (vfs *VFS) ReadFile(path string) ([]byte, error) {
 	return append([]byte(nil), data...), nil
 }
 
-func (vfs *VFS) CreateFile(path string) error {
-	path = vfs.cleanPath(path)
-	if _, exists := vfs.files[path]; exists {
-		return errors.New("file already exists")
-	}
-	vfs.files[path] = []byte{}
-	return nil
-}
-
 func (vfs *VFS) WriteFile(path string, data []byte) error {
 	path = vfs.cleanPath(path)
 	if _, exists := vfs.files[path]; !exists {

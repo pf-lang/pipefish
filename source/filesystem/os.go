@@ -14,12 +14,6 @@ func (OSFileSystem) WriteFile(path string, data []byte) error {
 	return os.WriteFile(path, data, 0666)
 }
 
-
-func (OSFileSystem) CreateFile(path string) (*os.File, error) {
-	f, err := os.Create(path)
-	return f, err
-}
-
 func (OSFileSystem) DeleteFile(path string) error {
 	return os.Remove(path)
 }

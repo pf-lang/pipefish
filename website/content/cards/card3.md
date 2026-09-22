@@ -1,3 +1,0 @@
-## Batteries included
-
-So far Pipefish has 40 industrial-strength standard libraries, with more on the way: `aes`, `base_32`, `base_64`, `bcrypt`, `big`, `bmp`, `cmplx`, `color`, `csv`, `exec`, `filepath`, `files`, `fmt`, `html`, `http`, `image`, `jpeg`, `json`, `lists`, `mail`, `markdown`, `math`,  `path`, `png`, `prolog`, a regular `rand` library and one strong enough for crypto; `reflect`, `regexp`, `rsa`, `sha_256`, `sha_512`, `smtp`  `sql`, `strconv`, `string`, `terminal`, `time`, `unicode`, and `url`.
