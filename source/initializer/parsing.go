@@ -1,7 +1,6 @@
 package initializer
 
 import (
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -230,25 +229,26 @@ func (iz *Initializer) addToNamespace(thingsToImport []tokenizedCode) {
 		path := pathTok.Literal
 		source := pathTok.Source
 		_, path = TweakNameAndPath("", path, source)
-		file, err := os.Stat(MakeFilepath(path))
-		if err != nil && !settings.ThingsToIgnore.Contains(pathTok.Literal) {
-			iz.throw("init/null/path", &pathTok, pathTok.Literal, err.Error())
-			continue
-		}
-		if !settings.ThingsToIgnore.Contains(pathTok.Literal) {
-			iz.cp.Sources[path] = file.ModTime().UnixMilli()
-		}
+		// if !settings.ThingsToIgnore.Contains(pathTok.Literal) {
+		// 	iz.cp.Sources[path] = file.ModTime().UnixMilli()
+		// }
 		if dec.getDeclarationType() == includeDeclaration {
 			iz.inclusions = iz.inclusions.Add(path)
 		}
 		iz.cmI("Adding '" + path + "' to namespace")
-		var libDat []byte
+		var libDat string
+		var e error
 		if strings.HasPrefix(filepath.ToSlash(path), "rsc-pf/") {
-			libDat, _ = folder.ReadFile(filepath.ToSlash(path))
+			libBytes, _ := folder.ReadFile(filepath.ToSlash(path))
+			libDat = string(libBytes)
 		} else {
-			libDat, _ = os.ReadFile(path)
+			libDat, e = GetSourceCode(iz.cp.Vm.FileSystem, path)
+			if e != nil && !settings.ThingsToIgnore.Contains(pathTok.Literal) {
+				iz.throw("init/null/path", &pathTok, pathTok.Literal, e.Error())
+				continue
+			}
 		}
-		stdImp := strings.TrimRight(string(libDat), "\n") + "\n"
+		stdImp := strings.TrimRight(libDat, "\n") + "\n"
 		iz.cmI("Making new relexer with filepath '" + path + "'")
 		iz.P.TokenizedCode = lexer.NewRelexer(path, stdImp)
 		iz.getTokenizedCode(private) // This is cumulative, it throws them all into the parser together.
