@@ -2,8 +2,6 @@
 
 import
 
-golang "os"
-golang "path/filepath"
 golang "errors"
 golang "github.com/tim-hardcastle/pipefish/source/filesystem"
 
@@ -80,6 +78,14 @@ goGetFile(fileSystem FileSystem, fname string) : golang {
     return string(fileContent)
 }
 
+// To explain what's going on here. When we initialize the VM, before we compile anything, we
+// pass in a file system, by default the actual file system, but a virtual one if we're running
+// on the browser.
+//
+// This function allows us to get the file system out of the VM and then pass it to the Go 
+// functions, meaning that we can extend what it does by extending the interface and implementations
+// in the `filesystem` package, rather than in the VM.
+//
 // We pass in the type of `FileSystem` because the compiler doesn't know it.
 getFileSystem(t type) : builtin "get_file_system"
 
@@ -105,57 +111,19 @@ goPutStringInFile(fileSystem FileSystem, output string, fname string) : golang {
 def
 
 goGetFilenames(fileSystem FileSystem, filenames Filenames) : golang {
-    resultList := []string{}
-    if filenames.FileSearchMode == 0 {
-        fileInfos, err := fileSystem.(filesystem.FileSystem).ReadDir(filenames.Directory)
-        if err != nil {
-            return err
-        }
-        for _, info := range fileInfos {
-            if !info.IsDir() {
-                resultList = append(resultList, filepath.Join(filenames.Directory, info.Name()))
-            }
-        }
+    result, err := fileSystem.(filesystem.FileSystem).GetFilenames(filenames.Directory, filenames.FileSearchMode == 1)
+    if err != nil {
+        return err
+    } else {
+        return result
     }
-    err := filepath.Walk(filenames.Directory, func(path string, info os.FileInfo, err error) error {
-        if err != nil {
-            return err
-        }
-        if !info.IsDir() {
-            resultList = append(resultList, path)
-        }
-        return nil
-    })
-	if err != nil {
-		return err
-	}
-    return resultList
 }
 
 goGetDirectoryNames(fileSystem FileSystem, directoryNames DirectoryNames) : golang {
-    resultList := []string{}
-    if directoryNames.FileSearchMode == 0 {
-        fileInfos, err := fileSystem.(filesystem.FileSystem).ReadDir(directoryNames.Directory)
-        if err != nil {
-            return err
-        }
-        for _, info := range fileInfos {
-            if info.IsDir() {
-                resultList = append(resultList, filepath.Join(directoryNames.Directory, info.Name()))
-            }
-        }
+    result, err := fileSystem.(filesystem.FileSystem).GetDirectoryNames(directoryNames.Directory, directoryNames.FileSearchMode == 1)
+    if err != nil {
+        return err
+    } else {
+        return result
     }
-    err := filepath.Walk(directoryNames.Directory, func(path string, info os.FileInfo, err error) error {
-        if err != nil {
-            return err
-        }
-        if info.IsDir() {
-            resultList = append(resultList, path)
-        }
-        return nil
-    })
-	if err != nil {
-		return err
-	}
-    return resultList
 }

@@ -85,52 +85,6 @@ func (vfs *VFS) FileExists(path string) bool {
 	return exists
 }
 
-func (vfs *VFS) ReadDir(path string) ([]FileInfo, error) {
-	path = vfs.cleanPath(path)
-	if !vfs.dirs[path] {
-		return nil, errors.New("directory does not exist")
-	}
-	var result []FileInfo
-	prefix := path
-	if prefix != "." {
-		prefix += "/"
-	} else {
-		prefix = ""
-	}
-
-	for filePath := range vfs.files {
-		if strings.HasPrefix(filePath, prefix) {
-			remainder := strings.TrimPrefix(filePath, prefix)
-
-			if !strings.Contains(remainder, "/") {
-				result = append(result, vfsFileInfo{
-					name:  remainder,
-					isDir: false,
-				})
-			}
-		}
-	}
-
-	for dirPath := range vfs.dirs {
-		if dirPath == path {
-			continue
-		}
-
-		if strings.HasPrefix(dirPath, prefix) {
-			remainder := strings.TrimPrefix(dirPath, prefix)
-
-			if !strings.Contains(remainder, "/") {
-				result = append(result, vfsFileInfo{
-					name:  remainder,
-					isDir: true,
-				})
-			}
-		}
-	}
-
-	return result, nil
-}
-
 func (vfs *VFS) cleanPath(path string) string {
 	path = filepath.ToSlash(path)
 	path = strings.TrimPrefix(path, "./")
@@ -152,4 +106,42 @@ func (info vfsFileInfo) Name() string {
 
 func (info vfsFileInfo) IsDir() bool {
 	return info.isDir
+}
+
+func (fs *VFS) GetFilenames(directory string, recursive bool) ([]string, error) {
+    result := []string{}
+
+    for path := range fs.files {
+        if recursive {
+            if filepath.Dir(path) == directory ||
+                strings.HasPrefix(path, directory+string(filepath.Separator)) {
+                result = append(result, path)
+            }
+        } else if filepath.Dir(path) == directory {
+            result = append(result, path)
+        }
+    }
+
+    return result, nil
+}
+
+func (fs *VFS) GetDirectoryNames(directory string, recursive bool) ([]string, error) {
+    result := []string{}
+
+    for path := range fs.dirs {
+        if path == directory {
+            continue
+        }
+
+        if recursive {
+            if filepath.Dir(path) == directory ||
+                strings.HasPrefix(path, directory+string(filepath.Separator)) {
+                result = append(result, path)
+            }
+        } else if filepath.Dir(path) == directory {
+            result = append(result, path)
+        }
+    }
+
+    return result, nil
 }

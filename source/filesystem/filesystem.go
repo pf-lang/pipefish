@@ -5,7 +5,8 @@ type FileSystem interface {
 	WriteFile(path string, data []byte) error
 	DeleteFile(path string) error
 	FileExists(path string) bool
-	ReadDir(path string) ([]FileInfo, error)
+	GetFilenames(directory string, recursive bool) ([]string, error)
+    GetDirectoryNames(directory string, recursive bool) ([]string, error)
 }
 
 type FileInfo interface {
