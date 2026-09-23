@@ -12,6 +12,7 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/err"
+	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/hub"
 	"github.com/tim-hardcastle/pipefish/source/initializer"
 	"github.com/tim-hardcastle/pipefish/source/parser"
@@ -45,15 +46,15 @@ func RunTest(t *testing.T, filename string, tests []TestItem, F func(cp *compile
 		var cp *compiler.Compiler
 		switch filename {
 		case "":
-			cp, _ = initializer.StartCompilerFromFilepath(filename, map[string]*compiler.Compiler{}, values.Map{})
+			cp, _ = initializer.StartCompilerFromFilepath(filename, map[string]*compiler.Compiler{}, values.Map{}, filesystem.OSFileSystem{})
 		case "test initialization errors":
 			cp, _ = initializer.StartCompilerFromFilepath(filepath.Join(wd, "../compiler/test-files/initialization-error-tests/"+
-				text.Flatten(test.Input)+".pf"), map[string]*compiler.Compiler{}, values.Map{})
+				text.Flatten(test.Input)+".pf"), map[string]*compiler.Compiler{}, values.Map{}, filesystem.OSFileSystem{})
 		case "test compiler errors":
 			cp, _ = initializer.StartCompilerFromFilepath(filepath.Join(wd, "../compiler/test-files/compiler-error-tests/"+
-				text.Flatten(test.Input)+".pf"), map[string]*compiler.Compiler{}, values.Map{})
+				text.Flatten(test.Input)+".pf"), map[string]*compiler.Compiler{}, values.Map{}, filesystem.OSFileSystem{})
 		default:
-			cp, _ = initializer.StartCompilerFromFilepath(filepath.Join(wd, "../compiler/test-files/", filename), map[string]*compiler.Compiler{}, values.Map{})
+			cp, _ = initializer.StartCompilerFromFilepath(filepath.Join(wd, "../compiler/test-files/", filename), map[string]*compiler.Compiler{}, values.Map{}, filesystem.OSFileSystem{})
 		}
 		got, e := F(cp, test.Input)
 		if e != nil {

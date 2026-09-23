@@ -247,6 +247,17 @@ func (iz *Initializer) prepareForCompilation(
 	return result
 }
 
+// Initializes a compiler given the filepath.
+// This works without referring to the initializer, since sometimes we want to make a compiler
+// without one, and so a bunch of stuff is injected instead.
+func StartCompilerFromFilepath(filepath string, svs map[string]*compiler.Compiler, store values.Map, fs filesystem.FileSystem) (*compiler.Compiler, error) {
+	sourcecode, e := GetSourceCode(fs, filepath)
+	if e != nil {
+		return nil, e
+	}
+	return StartCompiler(filepath, sourcecode, svs, store, fs), nil
+}
+
 func StartCompiler(
 	scriptFilepath,
 	sourcecode string,

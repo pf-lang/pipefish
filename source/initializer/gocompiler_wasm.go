@@ -13,7 +13,6 @@ import (
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/parser"
 	"github.com/tim-hardcastle/pipefish/source/token"
-	"github.com/tim-hardcastle/pipefish/source/values"
 )
 
 var wasmGoPackages map[string]WasmGoPackage
@@ -114,7 +113,7 @@ func (iz *Initializer) compileGo() {
 	}
 }
 
-func GetSourceCode(scriptFilepath string) (string, error) {
+func GetSourceCode(fs filesystem.FileSystem, scriptFilepath string) (string, error) {
 	var sourcebytes []byte
 	var err error
 
@@ -171,14 +170,4 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-// Initializes a compiler given the filepath.
-func StartCompilerFromFilepath(filepath string, svs map[string]*compiler.Compiler, store values.Map) (*compiler.Compiler, error) {
-	sourcecode, e := GetSourceCode(filepath)
-	if e != nil {
-		return nil, e
-	}
-	// We use OSFileSystem because it's either an external on the same hub or a test service, but this may get us into trouble eventually.
-	return StartCompiler(filepath, sourcecode, svs, store, &filesystem.VFS{}), nil
 }

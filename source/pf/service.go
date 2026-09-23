@@ -45,7 +45,7 @@ func NewService(fs filesystem.FileSystem) *Service {
 
 // Initializes the service with the source code supplied in the file indicated by the filepath.
 func (sv *Service) InitializeFromFilepath(scriptFilepath string) error {
-	sourcecode, e := initializer.GetSourceCode(scriptFilepath)
+	sourcecode, e := initializer.GetSourceCode(sv.fs, scriptFilepath)
 	if e != nil {
 		return e
 	}
@@ -66,7 +66,7 @@ func (sv *Service) InitializeFromCodeWithStore(code string, store Map) error {
 
 // Initializes the service with the source code supplied in the file indicated by the filepath.
 func (sv *Service) InitializeFromFilepathWithStore(scriptFilepath string, store Map) error {
-	sourcecode, e := initializer.GetSourceCode(scriptFilepath)
+	sourcecode, e := initializer.GetSourceCode(sv.fs, scriptFilepath)
 	if e != nil {
 		return e
 	}

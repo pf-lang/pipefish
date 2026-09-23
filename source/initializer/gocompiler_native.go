@@ -14,7 +14,6 @@ import (
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/token"
-	"github.com/tim-hardcastle/pipefish/source/values"
 )
 
 // This will if necessary compile or recompile the relevant .so files, and will extract from them
@@ -94,7 +93,7 @@ func (iz *Initializer) compileGo() {
 	}
 }
 
-func GetSourceCode(scriptFilepath string) (string, error) {
+func GetSourceCode(fs filesystem.FileSystem, scriptFilepath string) (string, error) {
 	var sourcebytes []byte
 	var err error
 
@@ -114,12 +113,3 @@ func GetSourceCode(scriptFilepath string) (string, error) {
 	return string(sourcebytes), nil
 }
 
-// Initializes a compiler given the filepath.
-func StartCompilerFromFilepath(filepath string, svs map[string]*compiler.Compiler, store values.Map) (*compiler.Compiler, error) {
-	sourcecode, e := GetSourceCode(filepath)
-	if e != nil {
-		return nil, e
-	}
-	// We use OSFileSystem because it's either an external on the same hub or a test service, but this may get us into trouble eventually.
-	return StartCompiler(filepath, sourcecode, svs, store, filesystem.OSFileSystem{}), nil
-}

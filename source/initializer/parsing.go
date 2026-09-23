@@ -22,20 +22,13 @@ import (
 )
 
 // This consists of everything we do up until we parse the functions, validation, etc.
-
-// TODO ---
-//
-// Ideally, this would contain only things that need to be initialized before we perform
-// the parsing. In fact, it doesn't, and a lot of the work of initializing types is in
-// this section, and should be moved if possible.
 //
 // The parseEverythingFromFilepath function is recursive, calling itself (by a circuitous route)
 // when it uses imports or external services. Hence it will in fact have parsed *everything*
 // by the time it hands back control to initializer.go.
 
-// Just exists to wrap around `ParseEverythingFromSourceCode`.
 func (iz *Initializer) ParseEverythingFromFilePath(mc *vm.Vm, cpb *parser.CommonParserBindle, ccb *compiler.CommonCompilerBindle, scriptFilepath, namespacePath string) (*compiler.Compiler, error) {
-	sourcecode, e := GetSourceCode(scriptFilepath)
+	sourcecode, e := GetSourceCode(mc.FileSystem, scriptFilepath)
 	if e != nil {
 		return nil, e
 	}
@@ -371,7 +364,7 @@ func (iz *Initializer) initializeExternals(startAt int) {
 			continue // Either we've thrown an error or we don't need to do anything.
 		}
 		// Otherwise we need to start up the service, add it to the hub, and then declare it as external.
-		newServiceCp, e := StartCompilerFromFilepath(path, iz.Common.serviceCompilers, iz.Common.hubStore)
+		newServiceCp, e := StartCompilerFromFilepath(path, iz.Common.serviceCompilers, iz.Common.hubStore, iz.cp.Vm.FileSystem)
 		if e != nil { // Then we couldn't open the file.
 			iz.throw("init/external/file", &dec.path, path, e.Error())
 			return
