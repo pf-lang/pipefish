@@ -15,8 +15,8 @@ import (
 var service *pf.Service
 
 func compile(this js.Value, args []js.Value) any {
-	service = pf.NewService()
 	fs, _ := filesystem.NewVFSFromDirectory(args[1].String())
+	service = pf.NewService(fs)
 	service.SetFileSystem(fs)
 	if err := service.InitializeFromCode(args[0].String()); err != nil {
 		return err.Error()

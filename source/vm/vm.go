@@ -167,7 +167,6 @@ func BlankVm() *Vm {
 		NamespaceInfo:     []map[values.ValueType]string{},
 		FieldLabelsInMem:  make(map[string]uint32),
 		PeekStack:         []map[string]bool{},
-		FileSystem:        filesystem.OSFileSystem{},
 	}
 	vm.OutHandle = &SimpleOutHandler{os.Stdout, vm}
 	copy(vm.Mem, CONSTANTS)

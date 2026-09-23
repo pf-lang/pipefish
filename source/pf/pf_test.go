@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/pf"
 	"github.com/tim-hardcastle/pipefish/source/test_helper"
 	"github.com/tim-hardcastle/pipefish/source/text"
@@ -89,7 +90,7 @@ func TestMisc(t *testing.T) {
 	// no t.Parallel()
 	wd, _ := os.Getwd()
 	pfFile, _ := filepath.Abs(filepath.Join(wd, "/../hub/test-files/togo.pf"))
-	srv := pf.NewService()
+	srv := pf.NewService(filesystem.OSFileSystem{})
 	srv.InitializeFromFilepath(pfFile)
 	fortytwo, _ := srv.Do(`42`)
 	runeClone, _ := srv.Do(`RuneClone 'q'`)
@@ -168,7 +169,7 @@ func TestToGo(t *testing.T) {
 	// no t.Parallel()
 	wd, _ := os.Getwd()
 	pfFile, _ := filepath.Abs(filepath.Join(wd, "/../hub/test-files/togo.pf"))
-	srv := pf.NewService()
+	srv := pf.NewService(filesystem.OSFileSystem{})
 	srv.InitializeFromFilepath(pfFile)
 	pfVal, _ := srv.Do(`42`)
 	goVal, _ := srv.ToGoWithType(pfVal, reflect.TypeFor[int]())

@@ -35,11 +35,11 @@ type Service struct {
 }
 
 // Returns a new service.
-func NewService() *Service {
+func NewService(fs filesystem.FileSystem) *Service {
 	return &Service{cp: nil,
 		localExternals: make(map[string]*Service),
 		db:             nil,
-		fs:             filesystem.OSFileSystem{},         
+		fs:             fs,         
 	}
 }
 

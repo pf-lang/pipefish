@@ -137,15 +137,7 @@ func newCompiler(Common *parser.CommonParserBindle, ccb *compiler.CommonCompiler
 	return cp
 }
 
-// Initializes a compiler given the filepath.
-func StartCompilerFromFilepath(filepath string, svs map[string]*compiler.Compiler, store values.Map) (*compiler.Compiler, error) {
-	sourcecode, e := GetSourceCode(filepath)
-	if e != nil {
-		return nil, e
-	}
-	// We use OSFileSystem because it's either an external on the same hub or a test service, but this may get us into trouble eventually.
-	return StartCompiler(filepath, sourcecode, svs, store, filesystem.OSFileSystem{}), nil
-}
+
 
 func (iz *Initializer) prepareForCompilation(
 	scriptFilepath string,

@@ -28,6 +28,7 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/dtypes"
 	"github.com/tim-hardcastle/pipefish/source/err"
+	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/initializer"
 	"github.com/tim-hardcastle/pipefish/source/pf"
 	"github.com/tim-hardcastle/pipefish/source/settings"
@@ -903,7 +904,7 @@ func (h *Hub) createService(name, scriptFilepath string, forceUpdate bool) bool 
 	if !needsRebuild {
 		return false
 	}
-	newService := pf.NewService()
+	newService := pf.NewService(filesystem.OSFileSystem{})
 	newService.SetLocalExternalServices(h.Services)
 	if text.Head(scriptFilepath, "!") {
 		scriptFilepath = filepath.Join(settings.PipefishHomeDirectory, scriptFilepath[1:])
@@ -951,7 +952,7 @@ func StartServiceFromCli() {
 		os.Exit(6)
 	}
 	filename := os.Args[2]
-	newService := pf.NewService()
+	newService := pf.NewService(filesystem.OSFileSystem{})
 	// This ought to get the `$_env` settings.
 	// Then we could do proper markdown in the errors.
 	newService.InitializeFromFilepathWithStore(filename, values.Map{})
@@ -985,7 +986,7 @@ func GetWiki() {
 		os.Exit(6)
 	}
 	filename := os.Args[2]
-	newService := pf.NewService()
+	newService := pf.NewService(filesystem.OSFileSystem{})
 	newService.InitializeFromFilepathWithStore(filename, values.Map{})
 	if newService.IsBroken() {
 		fmt.Println("\nThere were errors running the script " + text.CYAN + "\"" + filename + "\"" + text.RESET + ".\n")
