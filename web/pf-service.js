@@ -16,13 +16,93 @@ class PipefishService extends HTMLElement {
         if (source === this.source) {
             return;
         }
-        const path = new URL(".", import.meta.url).pathname
+
+        let files = null;
+
+        const lines = source.replace(/\r\n/g, "\n").split("\n");
+
+        if (lines[0].trim().startsWith("./")) {
+            files = await this.loadDirectory(lines);
+        } else {
+            files = [
+                {
+                    path: "main.pf",
+                    data: new TextEncoder().encode(source)
+                }
+            ];
+        }
+
         const result =
-            await window.pipefishCompile(source, path);
+            await window.pipefishCompile(files);
 
         this.source = source;
 
         return result;
+    }
+
+    async loadDirectory(lines) {
+        const base = lines[0].trim();
+        const entries = this.parseDirectory(lines.slice(1));
+        const files = [];
+
+        for (const path of entries) {
+            const response =
+                await fetch(new URL(path, new URL(base, document.baseURI)));
+
+            if (!response.ok) {
+                throw new Error(
+                    `Unable to load ${path}: ${response.status} ${response.statusText}`
+                );
+            }
+
+            const data =
+                new Uint8Array(await response.arrayBuffer());
+
+            files.push({
+                path,
+                data
+            });
+        }
+
+        return files;
+    }
+
+    parseDirectory(lines) {
+        const entries = [];
+        const stack = [];
+
+        for (const line of lines) {
+            if (!line.trim()) {
+                continue;
+            }
+
+            const match = line.match(/^(\s*)(.*)$/);
+            const indent = match[1].replace(/\t/g, "    ").length;
+            const name = match[2].trim();
+
+            while (
+                stack.length > 0 &&
+                indent <= stack[stack.length - 1].indent
+            ) {
+                stack.pop();
+            }
+
+            const path =
+                stack.length > 0
+                    ? stack[stack.length - 1].path + name
+                    : name;
+
+            if (name.endsWith("/")) {
+                stack.push({
+                    indent,
+                    path
+                });
+            } else {
+                entries.push(path);
+            }
+        }
+
+        return entries;
     }
 
     async do(line) {

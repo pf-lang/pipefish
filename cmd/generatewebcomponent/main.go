@@ -15,10 +15,33 @@ import (
 var service *pf.Service
 
 func compile(this js.Value, args []js.Value) any {
-	fs, _ := filesystem.NewVFSFromDirectory(args[1].String())
+	files := args[0]
+
+	fs := filesystem.NewVFS()
+
+	for i := 0; i < files.Length(); i++ {
+		file := files.Index(i)
+
+		path := file.Get("path").String()
+		dataJS := file.Get("data")
+
+		data := make([]byte, dataJS.Get("byteLength").Int())
+		js.CopyBytesToGo(data, dataJS)
+
+		if err := fs.WriteFile(path, data); err != nil {
+			return err.Error()
+		}
+	}
+
+	main, err := fs.ReadFile("main.pf")
+	if err != nil {
+		return err.Error()
+	}
+
 	service = pf.NewService(fs)
 	service.SetFileSystem(fs)
-	if err := service.InitializeFromCode(args[0].String()); err != nil {
+
+	if err := service.InitializeFromCode(string(main)); err != nil {
 		return err.Error()
 	}
 

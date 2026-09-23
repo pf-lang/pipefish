@@ -4,53 +4,9 @@ package filesystem
 
 import (
 	"errors"
-	"os"
 	"path/filepath"
 	"strings"
 )
-
-type VFS struct {
-	files map[string][]byte
-	dirs  map[string]bool
-}
-
-func NewVFS() *VFS {
-	return &VFS{
-		files: make(map[string][]byte),
-		dirs:  map[string]bool{".": true},
-	}
-}
-
-func NewVFSFromDirectory(path string) (*VFS, error) {
-	vfs := NewVFS()
-	err := filepath.Walk(path, func(currentPath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		relativePath, err := filepath.Rel(path, currentPath)
-		if err != nil {
-			return err
-		}
-		if relativePath == "." {
-			return nil
-		}
-		relativePath = filepath.ToSlash(relativePath)
-		if info.IsDir() {
-			vfs.dirs[relativePath] = true
-			return nil
-		}
-		data, err := os.ReadFile(currentPath)
-		if err != nil {
-			return err
-		}
-		vfs.files[relativePath] = data
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	return vfs, nil
-}
 
 func (vfs *VFS) ReadFile(path string) ([]byte, error) {
 	path = vfs.cleanPath(path)
@@ -65,10 +21,8 @@ func (vfs *VFS) ReadFile(path string) ([]byte, error) {
 
 func (vfs *VFS) WriteFile(path string, data []byte) error {
 	path = vfs.cleanPath(path)
-	if _, exists := vfs.files[path]; !exists {
-		return errors.New("file does not exist")
-	}
 	vfs.files[path] = append([]byte(nil), data...)
+	vfs.dirs[path] = false
 	return nil
 }
 
@@ -78,6 +32,7 @@ func (vfs *VFS) DeleteFile(path string) error {
 		return errors.New("file does not exist")
 	}
 	delete(vfs.files, path)
+	delete(vfs.dirs, path)
 	return nil
 }
 

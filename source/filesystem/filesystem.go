@@ -13,3 +13,16 @@ type FileInfo interface {
 	Name() string
 	IsDir() bool
 }
+
+type VFS struct {
+	files map[string][]byte
+	dirs  map[string]bool
+}
+
+func NewVFS() *VFS {
+	return &VFS{
+		files: make(map[string][]byte),
+		dirs:  map[string]bool{".": true},
+	}
+}
+

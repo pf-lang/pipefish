@@ -85,3 +85,35 @@ func (fs OSFileSystem) GetDirectoryNames(directory string, recursive bool) ([]st
 
     return result, err
 }
+
+// This is here for testing purposes.
+func NewVFSFromDirectory(path string) (*VFS, error) {
+	vfs := NewVFS()
+	err := filepath.Walk(path, func(currentPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		relativePath, err := filepath.Rel(path, currentPath)
+		if err != nil {
+			return err
+		}
+		if relativePath == "." {
+			return nil
+		}
+		relativePath = filepath.ToSlash(relativePath)
+		if info.IsDir() {
+			vfs.dirs[relativePath] = true
+			return nil
+		}
+		data, err := os.ReadFile(currentPath)
+		if err != nil {
+			return err
+		}
+		vfs.files[relativePath] = data
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return vfs, nil
+}
