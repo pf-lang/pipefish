@@ -21,35 +21,40 @@ class PipefishCoder extends HTMLElement {
 
         this.service = service;
         this.editor = editor;
+        this.dirty = false;
+
+        editor.addEventListener("change", () => {
+            this.dirty = true;
+        });
 
         this.ready = Promise.all([
             service.ready,
             editor.ready
         ]);
-        console.log("Coder constructed.")
     }
 
     async initialize(source) {
         await this.ready;
-        console.log("coder.initialize called");
-        await this.service.compile(source);
+        await this.service.initialize(source);
         await this.editor.initialize(source);
+        this.dirty = false;
     }
 
     async compile() {
         await this.ready;
-        console.log("coder.compile called");
-        console.trace();
-        return this.service.compileMain();
+        if (!this.dirty) {
+            return
+        }
+        await this.service.compileMain();
+        this.dirty = false
     }
 
     async do(line) {
         await this.ready;
-        console.log("coder.do called");
-        await this.service.compileMain();
-
+        await this.compile();
         return this.service.do(line);
     }
+    
 }
 
 customElements.define(

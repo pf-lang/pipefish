@@ -229,9 +229,10 @@ func (iz *Initializer) addToNamespace(thingsToImport []tokenizedCode) {
 		path := pathTok.Literal
 		source := pathTok.Source
 		_, path = TweakNameAndPath("", path, source)
-		// if !settings.ThingsToIgnore.Contains(pathTok.Literal) {
-		// 	iz.cp.Sources[path] = file.ModTime().UnixMilli()
-		// }
+		
+		if !settings.ThingsToIgnore.Contains(pathTok.Literal) {
+			iz.cp.Sources[path] = iz.cp.Vm.FileSystem.ModTime(path).UnixMilli()
+		}
 		if dec.getDeclarationType() == includeDeclaration {
 			iz.inclusions = iz.inclusions.Add(path)
 		}

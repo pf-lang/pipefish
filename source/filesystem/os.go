@@ -5,6 +5,7 @@ package filesystem
 import (
 	"os"
 	"path/filepath"
+    "time"
 )
 
 type OSFileSystem struct{}
@@ -84,6 +85,14 @@ func (fs OSFileSystem) GetDirectoryNames(directory string, recursive bool) ([]st
     })
 
     return result, err
+}
+
+func (fs OSFileSystem) ModTime(path string) time.Time {
+    fileInfo, err := os.Stat(path)
+    if err != nil {
+        return time.Time{}
+    }
+    return fileInfo.ModTime()
 }
 
 // This is here for testing purposes.

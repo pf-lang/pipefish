@@ -6,16 +6,11 @@ import (
 	"errors"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 func (vfs *VFS) ReadFile(path string) ([]byte, error) {
 	path = vfs.cleanPath(path)
-	if vfs == nil {
-		println("Vfs is nil")
-	}
-	if vfs.files == nil {
-		println("Files is nil")
-	}
 	data, ok := vfs.files[path]
 	if !ok {
 		return nil, errors.New("file does not exist")
@@ -106,4 +101,9 @@ func (fs *VFS) GetDirectoryNames(directory string, recursive bool) ([]string, er
     }
 
     return result, nil
+}
+
+// TODO --- will need to do this properly to implement the hub.
+func (fs VFS) ModTime(path string) time.Time {
+    return time.Time{}
 }
