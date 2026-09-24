@@ -36,6 +36,9 @@ class PipefishEditor extends HTMLElement {
                 this.reader.currentFile,
                 code.value
             );
+            this.dispatchEvent(
+                new CustomEvent("change")
+            );
         });
 
         this.reader.addEventListener("filechange", event => {

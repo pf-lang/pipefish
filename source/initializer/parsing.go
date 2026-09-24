@@ -230,7 +230,7 @@ func (iz *Initializer) addToNamespace(thingsToImport []tokenizedCode) {
 		source := pathTok.Source
 		_, path = TweakNameAndPath("", path, source)
 		
-		if !settings.ThingsToIgnore.Contains(pathTok.Literal) {
+		if !settings.ThingsToIgnore.Contains(pathTok.Literal) && iz.cp.Vm.FileSystem != nil {
 			iz.cp.Sources[path] = iz.cp.Vm.FileSystem.ModTime(path).UnixMilli()
 		}
 		if dec.getDeclarationType() == includeDeclaration {
