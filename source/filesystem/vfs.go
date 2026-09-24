@@ -10,7 +10,12 @@ import (
 
 func (vfs *VFS) ReadFile(path string) ([]byte, error) {
 	path = vfs.cleanPath(path)
-
+	if vfs == nil {
+		println("Vfs is nil")
+	}
+	if vfs.files == nil {
+		println("Files is nil")
+	}
 	data, ok := vfs.files[path]
 	if !ok {
 		return nil, errors.New("file does not exist")
@@ -42,16 +47,6 @@ func (vfs *VFS) FileExists(path string) bool {
 	return exists
 }
 
-func (vfs *VFS) cleanPath(path string) string {
-	path = filepath.ToSlash(path)
-	path = strings.TrimPrefix(path, "./")
-	path = strings.TrimPrefix(path, "/")
-	if path == "" {
-		return "."
-	}
-	return path
-}
-
 type vfsFileInfo struct {
 	name  string
 	isDir bool
@@ -63,6 +58,16 @@ func (info vfsFileInfo) Name() string {
 
 func (info vfsFileInfo) IsDir() bool {
 	return info.isDir
+}
+
+func (vfs *VFS) cleanPath(path string) string {
+	path = filepath.ToSlash(path)
+	path = strings.TrimPrefix(path, "./")
+	path = strings.TrimPrefix(path, "/")
+	if path == "" {
+		return "."
+	}
+	return path
 }
 
 func (fs *VFS) GetFilenames(directory string, recursive bool) ([]string, error) {

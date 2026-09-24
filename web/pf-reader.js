@@ -207,10 +207,20 @@ class PipefishReader extends HTMLElement {
     async display(source) {
         await this.ready;
 
+        const extension =
+            this.currentFile
+                .slice(this.currentFile.lastIndexOf("."))
+                .toLowerCase();
+
+        const highlighters = {
+            ".pf": source => this.highlighter.highlight(source)
+        };
+
+        const highlighter =
+            highlighters[extension] || (source => source);
+
         this.box.innerHTML =
-            await this.highlighter.highlight(
-                normalizeSource(source)
-            );
+            await highlighter(normalizeSource(source));
     }
 
     get scrollTop() {

@@ -51,8 +51,6 @@ class PipefishIde extends HTMLElement {
 
     async initialize(source) {
         await this.ready;
-
-        await this.coder.initialize(source);
         await this.tui.initialize(source);
     }
 }

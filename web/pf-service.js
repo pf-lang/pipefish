@@ -31,13 +31,17 @@ class PipefishService extends HTMLElement {
                 }
             ];
         }
-
         const result =
             await window.pipefishCompile(files);
 
         this.source = source;
 
         return result;
+    }
+
+    async compileMain() {
+        await this.ready;
+        return window.pipefishCompileMain();
     }
 
     async loadDirectory(lines) {

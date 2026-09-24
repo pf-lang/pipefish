@@ -12,12 +12,15 @@ import (
 	"github.com/tim-hardcastle/pipefish/web-component/generated-go/registry"
 )
 
-var service *pf.Service
+var (
+	service *pf.Service
+	fs      *filesystem.VFS
+)
 
 func compile(this js.Value, args []js.Value) any {
 	files := args[0]
 
-	fs := filesystem.NewVFS()
+	fs = filesystem.NewVFS()
 
 	for i := 0; i < files.Length(); i++ {
 		file := files.Index(i)
@@ -40,6 +43,30 @@ func compile(this js.Value, args []js.Value) any {
 
 	service = pf.NewService(fs)
 	service.SetFileSystem(fs)
+
+	if err := service.InitializeFromCode(string(main)); err != nil {
+		return err.Error()
+	}
+
+	return nil
+}
+
+func updateFile(this js.Value, args []js.Value) any {
+	path := args[0].String()
+	data := []byte(args[1].String())
+
+	if err := fs.WriteFile(path, data); err != nil {
+		return err.Error()
+	}
+
+	return nil
+}
+
+func compileMain(this js.Value, args []js.Value) any {
+	main, err := fs.ReadFile("main.pf")
+	if err != nil {
+		return err.Error()
+	}
 
 	if err := service.InitializeFromCode(string(main)); err != nil {
 		return err.Error()
@@ -99,6 +126,16 @@ func main() {
 	js.Global().Set(
 		"pipefishWasmReady",
 		true,
+	)
+
+	js.Global().Set(
+		"pipefishUpdateFile",
+		js.FuncOf(updateFile),
+	)
+
+	js.Global().Set(
+		"pipefishCompileMain",
+		js.FuncOf(compileMain),
 	)
 
 	select {}

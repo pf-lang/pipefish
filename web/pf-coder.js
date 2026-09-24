@@ -26,29 +26,27 @@ class PipefishCoder extends HTMLElement {
             service.ready,
             editor.ready
         ]);
+        console.log("Coder constructed.")
     }
 
     async initialize(source) {
         await this.ready;
-
+        console.log("coder.initialize called");
+        await this.service.compile(source);
         await this.editor.initialize(source);
-        await this.service.compile(this.editor.value);
     }
 
     async compile() {
         await this.ready;
-
-        return this.service.compile(
-            this.editor.value
-        );
+        console.log("coder.compile called");
+        console.trace();
+        return this.service.compileMain();
     }
 
     async do(line) {
         await this.ready;
-
-        await this.service.compile(
-            this.editor.value
-        );
+        console.log("coder.do called");
+        await this.service.compileMain();
 
         return this.service.do(line);
     }

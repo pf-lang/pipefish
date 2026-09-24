@@ -31,6 +31,11 @@ class PipefishEditor extends HTMLElement {
 
         code.addEventListener("input", async () => {
             await this.reader.display(code.value);
+
+            await window.pipefishUpdateFile(
+                this.reader.currentFile,
+                code.value
+            );
         });
 
         this.reader.addEventListener("filechange", event => {
