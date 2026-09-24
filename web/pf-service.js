@@ -47,7 +47,9 @@ class PipefishService extends HTMLElement {
 
         for (const path of entries) {
             const response =
-                await fetch(new URL(path, new URL(base, document.baseURI)));
+                await fetch(new URL(path, new URL(base, document.baseURI)), {
+                    cache: "no-store"
+                });;
 
             if (!response.ok) {
                 throw new Error(

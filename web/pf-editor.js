@@ -33,6 +33,11 @@ class PipefishEditor extends HTMLElement {
             await this.reader.display(code.value);
         });
 
+        this.reader.addEventListener("filechange", event => {
+            this.code.value = event.detail.data;
+            this.syncScroll();
+        });
+
         code.addEventListener("scroll", () => {
             this.syncScroll();
         });

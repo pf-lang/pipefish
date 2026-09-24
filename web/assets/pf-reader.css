@@ -7,6 +7,54 @@
     overflow: hidden;
 }
 
+.tabs {
+    position: absolute;
+    z-index: 2;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 2.5rem;
+
+    display: flex;
+    align-items: stretch;
+
+    pointer-events: auto;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    background: var(--code-background);
+}
+
+.tab {
+    box-sizing: border-box;
+
+    padding: 0 1rem;
+
+    border: 0;
+    border-right: 1px solid var(--code-border);
+
+    background: transparent;
+    color: var(--code-text);
+
+    font-family: "Google Sans Code", monospace;
+    font-size: 13px;
+
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.tab:hover {
+    background: var(--code-border);
+}
+
+.tab.selected {
+    background: var(--code-background);
+    box-shadow: inset 0 -2px var(--link);
+}
+
 .reader {
     box-sizing: border-box;
 
@@ -14,7 +62,7 @@
     height: 100%;
 
     margin: 0;
-    padding: 1rem;
+    padding: 3.5rem 1rem 1rem 1rem;
 
     font-family: "Google Sans Code", monospace;
     font-size: 14px;

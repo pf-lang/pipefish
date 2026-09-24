@@ -4,10 +4,6 @@
     overflow: hidden;
 }
 
-:host {
-    display: block;
-}
-
 .editor {
     position: relative;
     width: 100%;
@@ -31,7 +27,7 @@
     height: 100%;
 
     margin: 0;
-    padding: 1rem;
+    padding: 3.5rem 1rem 1rem 1rem;
 
     font-family: "Google Sans Code", monospace;
     font-size: 14px;
@@ -51,4 +47,6 @@
     caret-color: var(--code-text);
 
     overscroll-behavior: auto;
+
+    z-index: 1;
 }
