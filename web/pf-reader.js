@@ -220,7 +220,8 @@ class PipefishReader extends HTMLElement {
             highlighters[extension] || (source => source);
 
         this.box.innerHTML =
-            await highlighter(normalizeSource(source));
+            await highlighter(source) +
+            (source.endsWith("\n") ? "\u00a0" : "");
     }
 
     get scrollTop() {
