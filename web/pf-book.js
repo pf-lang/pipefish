@@ -214,23 +214,24 @@ class PfBook extends HTMLElement {
         header.appendChild(topNav);
 
         const themeToggle =
-            document.createElement("button");
+        document.createElement("button");
 
         themeToggle.classList.add("theme-toggle");
         themeToggle.type = "button";
-        
-        const dark =
-            document.documentElement.getAttribute("data-theme") ===
-            "dark";
 
-        themeToggle.textContent =
-            dark ? "Light" : "Dark";
+        const dark =
+        document.documentElement.getAttribute("data-theme") ===
+        "dark";
+
+        setThemeToggleIcon(themeToggle, dark);
+
+        const svg = themeToggle.querySelector("svg");
 
         themeToggle.setAttribute(
-            "aria-label",
-            dark
-                ? "Switch to light mode"
-                : "Switch to dark mode"
+        "aria-label",
+        dark
+            ? "Switch to light mode"
+            : "Switch to dark mode"
         );
 
         themeToggle.addEventListener(
@@ -255,14 +256,13 @@ class PfBook extends HTMLElement {
                     theme
                 );
 
-                themeToggle.textContent =
-                    dark ? "Dark" : "Light";
+                setThemeToggleIcon(themeToggle, !dark);
 
                 themeToggle.setAttribute(
                     "aria-label",
                     dark
-                        ? "Switch to dark mode"
-                        : "Switch to light mode"
+                        ? "Switch to light mode"
+                        : "Switch to dark mode"
                 );
             }
         );
@@ -329,6 +329,22 @@ class PfBook extends HTMLElement {
         footer.appendChild(text);
         this.appendChild(footer);
     }
+}
+
+function setThemeToggleIcon(button, dark) {
+    button.innerHTML = dark
+        ? `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+            </svg>
+        `
+        : `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3
+                         7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        `;
 }
 
 customElements.define("pf-book", PfBook);
