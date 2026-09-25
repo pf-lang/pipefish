@@ -135,11 +135,6 @@ class PipefishTui extends HTMLElement {
                     before.split("\n").pop();
 
                 if (!this.multiline) {
-                    if (!input.value.trim()) {
-                        event.preventDefault();
-                        return;
-                    }
-
                     if (
                         /(:\s*|--\s*)$/.test(
                             currentLine
@@ -438,8 +433,26 @@ class PipefishTui extends HTMLElement {
 
         if (!command.trim()) {
             this.multiline = false;
+
+            const entry =
+                document.createElement("pre");
+
+            entry.classList.add("transcript-input");
+
+            entry.innerHTML =
+                `<span class="prompt">→ </span>` +
+                await this.highlighter.highlight(
+                    command
+                );
+
+            this.transcript.appendChild(entry);
+
             this.input.value = "";
             this.highlightedInput.innerHTML = "";
+
+            await this.service.compile();
+
+            this.scrollToBottom();
             return;
         }
 
