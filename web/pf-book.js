@@ -120,6 +120,8 @@ class PfBook extends HTMLElement {
             }
         }
 
+        
+
         window.addEventListener("hashchange", () => {
             this.showPage(location.hash.slice(1));
         });
@@ -144,6 +146,14 @@ class PfBook extends HTMLElement {
         const pageElement =
             this.querySelector("pf-page");
 
+        const loaded = new Promise(resolve => {
+            pageElement.addEventListener(
+                "page-loaded",
+                resolve,
+                { once: true }
+            );
+        });
+
         pageElement.setAttribute(
             "title",
             page.title
@@ -153,6 +163,13 @@ class PfBook extends HTMLElement {
             "src",
             this.pageSrc(page)
         );
+
+        await loaded;
+
+        pageElement.scrollIntoView({
+            behavior: "auto",
+            block: "start"
+        });
     }
 
     pageSrc(page) {

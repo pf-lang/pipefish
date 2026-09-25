@@ -41,6 +41,8 @@ class PfPage extends HTMLElement {
         h1.textContent = title;
 
         this.prepend(h1);
+
+        this.dispatchEvent(new Event("page-loaded"));
     }
 }
 
