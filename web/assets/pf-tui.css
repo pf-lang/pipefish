@@ -1,4 +1,4 @@
-@import url("pf-code.css");
+@import url("syntax.css");
 
 :host {
     display: block;
@@ -20,6 +20,22 @@
 
     overflow-y: auto;
     resize: vertical;
+
+    font-family: "Google Sans Code", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.transcript {
+    font-family: "Google Sans Code", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.transcript-input {
+    font-family: "Google Sans Code", monospace;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 pre {
@@ -31,22 +47,10 @@ pre {
     white-space: pre;
 }
 
-.repl,
-.input-line,
-.input {
-    font-family: "Google Sans Code", monospace;
-    font-size: 14px;
-    line-height: 1.4;
-}
-
 .input-line {
     display: flex;
     align-items: flex-start;
     margin: 0;
-}
-
-.prompt {
-    flex: none;
 }
 
 .input-editor {
