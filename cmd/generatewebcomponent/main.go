@@ -9,12 +9,14 @@ import (
 	"github.com/tim-hardcastle/pipefish/source/initializer"
 	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/pf"
+	"github.com/tim-hardcastle/pipefish/source/vm"
 	"github.com/tim-hardcastle/pipefish/web-component/generated-go/registry"
 )
 
 var (
 	service *pf.Service
 	fs      *filesystem.VFS
+	oH      *vm.CapturingOutHandler
 )
 
 func compile(this js.Value, args []js.Value) any {
@@ -47,7 +49,7 @@ func compile(this js.Value, args []js.Value) any {
 	if err := service.InitializeFromCode(string(main)); err != nil {
 		return err.Error()
 	}
-
+	service.SetOutHandler(service.MakeCapturingOutHandler())
 	return nil
 }
 
@@ -71,7 +73,7 @@ func compileMain(this js.Value, args []js.Value) any {
 	if err := service.InitializeFromCode(string(main)); err != nil {
 		return err.Error()
 	}
-
+	service.SetOutHandler(service.MakeCapturingOutHandler())
 	return nil
 }
 
@@ -79,6 +81,10 @@ func do(this js.Value, args []js.Value) any {
 	result, err := service.Do(args[0].String())
 	if err != nil {
 		return err.Error()
+	}
+	if service.PostHappened() {
+		dump, _ := service.Dump()
+		return dump
 	}
 
 	return service.ToString(result)

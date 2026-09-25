@@ -185,6 +185,12 @@ func (sv *Service) MakeTerminalOutHandler() *SimpleOutHandler {
 	return vm.MakeSimpleOutHandler(os.Stdout, sv.cp.Vm)
 }
 
+// Makes a `CapturingOutHandler` which will store the output until requested with its "dump"
+// method.
+func (sv *Service) MakeCapturingOutHandler() *vm.CapturingOutHandler {
+	return vm.MakeCapturingOutHandler(sv.cp.Vm)
+}
+
 // Makes an `InHandler` which will get input from the terminal using the string supplied
 // to prompt the end user.
 func MakeTerminalInHandler(prompt string, cancel chan os.Signal) *TerminalInHandler {
@@ -227,6 +233,20 @@ func (sv *Service) SetOutHandler(out vm.OutHandler) error {
 	}
 	sv.cp.Vm.OutHandle = out
 	return nil
+}
+
+func (sv *Service) Dump() (string, error) {
+	if sv.cp == nil {
+		return "", errors.New("service is uninitialized")
+	}
+	if sv.IsBroken() {
+		return "", errors.New("SetOutHandler: service is broken")
+	}
+	if oH, ok := sv.cp.Vm.OutHandle.(*vm.CapturingOutHandler); ok {
+		return oH.Dump(), nil
+	} else {
+		return "", errors.New("wrong OutHandler")
+	}
 }
 
 // Once the service is initialized, will interpret the string supplied as though

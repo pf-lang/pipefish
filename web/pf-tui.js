@@ -255,7 +255,7 @@ class PipefishTui extends HTMLElement {
         await this.ready;
         await this.service.initialize(source);
     }
-    
+
     isEscaped(text, pos) {
         let backslashes = 0;
 
