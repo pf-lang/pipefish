@@ -2,6 +2,7 @@ package markdown
 
 import (
 	"bytes"
+	"html/template"
 	"regexp"
 	"strconv"
 	"strings"
@@ -80,7 +81,7 @@ func highlightGivenWrapper(code []rune, wrapper highlightWrapper) string {
 		case runes.CurrentRune() == '/' && runes.PeekRune() == '/':
 			result := "/" + runes.ReadComment()
 			out.WriteString(wrapper.wrap(result, "comment"))
-		// A comment.
+		// A docstring.
 		case runes.CurrentRune() == '~' && runes.PeekRune() == '~':
 			result := "~" + runes.ReadComment()
 			out.WriteString(wrapper.wrap(result, "docstring"))
@@ -145,7 +146,7 @@ func IsProtectedPunctuation(ch rune) bool {
 
 var htmlWrapper = highlightWrapper{
 	wrap: func(s, flavor string) string {
-		return "<span class=\"" + flavor + "\">" + s + "</span>"
+		return "<span class=\"" + flavor + "\">" + template.HTMLEscapeString(s) + "</span>"
 	},
 
 	brackets: func(depth int, r rune) string {
