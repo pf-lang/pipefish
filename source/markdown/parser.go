@@ -154,12 +154,24 @@ const (
 	pmText
 	pmBold
 	pmItalic
+	pmRed 
+	pmYellow 
+	pmGreen 
+	pmCyan 
+	pmBlue
+	pmPurple
 )
 
 var stopAt = map[parserMode][]string{
-	pmText:   {"**", "*", "`"},
+	pmText:   {"**", "*", "`", "<R>", "<Y>", "<G>", "<C>", "<B>", "<P>"},
 	pmBold:   {"**"},
 	pmItalic: {"*"},
+	pmRed:    {"</>"},
+	pmYellow: {"</>"},
+	pmGreen:  {"</>"},
+	pmCyan:   {"</>"},
+	pmBlue:   {"</>"},
+	pmPurple: {"</>"},
 }
 
 func (ip *inlineParser) parseAll() []mdNode {
@@ -193,6 +205,42 @@ func (ip *inlineParser) parse(pM parserMode) []mdNode {
 			italicized := ip.parse(pmItalic)
 			ip.next()
 			return append([]mdNode{mdFormat{stItalic, italicized}})
+		}
+		if (pM == pmNone && ip.headIs("<R>")) {
+			ip.next(); ip.next(); ip.next()
+			coloredText := ip.parse(pmRed)
+			ip.next()
+			return append([]mdNode{mdFormat{stRed, coloredText}})
+		}
+		if (pM == pmNone && ip.headIs("<Y>")) {
+			ip.next(); ip.next(); ip.next()
+			coloredText := ip.parse(pmYellow)
+			ip.next()
+			return append([]mdNode{mdFormat{stYellow, coloredText}})
+		}
+		if (pM == pmNone && ip.headIs("<G>")) {
+			ip.next(); ip.next(); ip.next()
+			coloredText := ip.parse(pmRed)
+			ip.next()
+			return append([]mdNode{mdFormat{stYellow, coloredText}})
+		}
+		if (pM == pmNone && ip.headIs("<C>")) {
+			ip.next(); ip.next(); ip.next()
+			coloredText := ip.parse(pmCyan)
+			ip.next()
+			return append([]mdNode{mdFormat{stCyan, coloredText}})
+		}
+		if (pM == pmNone && ip.headIs("<B>")) {
+			ip.next(); ip.next(); ip.next()
+			coloredText := ip.parse(pmBlue)
+			ip.next()
+			return append([]mdNode{mdFormat{stBlue, coloredText}})
+		}
+		if (pM == pmNone && ip.headIs("<P>")) {
+			ip.next(); ip.next(); ip.next()
+			coloredText := ip.parse(pmPurple)
+			ip.next()
+			return append([]mdNode{mdFormat{stPurple, coloredText}})
 		}
 		if pM == pmNone {
 			pM = pmText
@@ -244,15 +292,6 @@ func (ip *inlineParser) skip(i int) {
 func (ip *inlineParser) headIs(s string) bool {
 	upperBound := ip.pos + len(s)
 	return upperBound < len(ip.line) && ip.line[ip.pos:upperBound] == s
-}
-
-func (ip *inlineParser) passHead(s string) bool {
-	upperBound := ip.pos + len(s)
-	if upperBound < len(ip.line) && ip.line[ip.pos:upperBound] == s {
-		ip.skip(len(s))
-		return true
-	}
-	return false
 }
 
 func newInlineParser(raw string) inlineParser {

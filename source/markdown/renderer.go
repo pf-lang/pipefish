@@ -174,6 +174,12 @@ const (
 	stH2
 	stH3
 	stH4
+	stRed
+	stYellow
+	stGreen
+	stCyan
+	stBlue
+	stPurple
 )
 
 var html = map[mdStyle]func(string) string{
@@ -184,6 +190,12 @@ var html = map[mdStyle]func(string) string{
 	stList:      func(s string) string { return "<ul>\n" + s + "\n</ul>\n" },
 	stListItem:  func(s string) string { return "  <li>" + s + "</li>" },
 	stIde:       func(s string) string { return "<pf-ide>" + s + "</pf-ide>" },
+	stRed:		func(s string) string { return "<red>" + s + "</red>" },
+	stYellow:	func(s string) string { return "<yellow>" + s + "</yellow>" },
+	stGreen:	func(s string) string { return "<green>" + s + "</green>" },
+	stCyan:		func(s string) string { return "<cyan>" + s + "</cyan>" },
+	stBlue:		func(s string) string { return "<blue>" + s + "</blue>" },
+	stPurple:	func(s string) string { return "<purple>" + s + "</purple>" },
 	stCodeBlock: func(s string) string {
 		return "" +
 			`<div class="code-block">

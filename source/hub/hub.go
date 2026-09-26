@@ -791,10 +791,10 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 		}
 		endUnderline := startUnderline + lenUnderline
 		h.WriteString(line[0:startUnderline])
-		h.WriteString(Red(line[startUnderline:endUnderline]))
+		h.WriteString(text.Red(line[startUnderline:endUnderline]))
 		h.WriteString(line[endUnderline:])
 		h.WriteString(strings.Repeat(" ", startUnderline))
-		h.WriteString(Red(strings.Repeat("▔", lenUnderline)))
+		h.WriteString(text.Red(strings.Repeat("▔", lenUnderline)))
 	case "why":
 		h.WriteString("\n")
 		num, _ := strconv.Atoi(args[0])
@@ -1326,14 +1326,14 @@ func ServiceDo(serviceToUse *pf.Service, line string) pf.Value {
 
 var (
 	MARGIN         = 92
-	GREEN_OK       = ("\033[32mOK\033[0m")
-	WAS            = Green("was") + ": "
-	GOT            = Red("got") + ": "
-	TEST_PASSED    = Green("Test passed!") + "\n"
+	GREEN_OK       = text.Green("OK")
+	WAS            = text.Green("was") + ": "
+	GOT            = text.Red("got") + ": "
+	TEST_PASSED    = text.Green("Test passed!") + "\n"
 	BULLET         = "  ▪ "
 	BULLET_SPACING = "    " // I.e. whitespace the same width as BULLET.
-	GOOD_BULLET    = Green("  ▪ ")
-	BROKEN         = Red("  ✖ ")
+	GOOD_BULLET    = text.Green("  ▪ ")
+	BROKEN         = text.Red("  ✖ ")
 	PROMPT         = "→ "
 	INDENT_PROMPT  = "  "
 	ERROR          = text.ERROR
@@ -1347,18 +1347,6 @@ const HELP = "\nUsage: pipefish [-v | --version] [-h | --help]\n" +
 	"  tui           Starts the Pipfish TUI (text user interface).\n" +
 	"  run <file>    Runs a Pipefish script if it has a `main` command.\n" +
 	"  wiki <file>   Returns a description of the file's API in GitHub wiki format.\n\n"
-
-func Red(s string) string {
-	return "\033[31m" + s + "\033[0m"
-}
-
-func Green(s string) string {
-	return "\033[32m" + s + "\033[0m"
-}
-
-func Cyan(s string) string {
-	return "\033[36m" + s + "\033[0m"
-}
 
 func (h *Hub) MakeFilepath(scriptFilepath string) string {
 	doctoredFilepath := strings.Clone(scriptFilepath)

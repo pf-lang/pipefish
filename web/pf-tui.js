@@ -507,7 +507,7 @@ class PipefishTui extends HTMLElement {
         const line =
             document.createElement("div");
 
-        line.textContent = text;
+        line.innerHTML = text;
 
         this.transcript.appendChild(line);
     }
