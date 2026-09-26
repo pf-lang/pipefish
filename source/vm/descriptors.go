@@ -269,7 +269,7 @@ func (vm *Vm) ToString(v values.Value, flavor descriptionFlavor, cpNumber uint32
 		}
 	case values.SUCCESSFUL_VALUE:
 		if flavor == DEFAULT {
-			return text.GREEN + "OK" + text.RESET
+			return text.Green("OK")
 		}
 		if flavor == LITERAL {
 			return "OK"

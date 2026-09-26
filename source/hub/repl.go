@@ -94,7 +94,7 @@ func (h *Hub) Repl() {
 				ch := ReadChar()
 				println(string(ch))
 				if ch == 'n' || ch == 'N' {
-					println(text.Green("OK"))
+					println(GREEN_OK)
 				} else {
 					h.Quit()
 					return

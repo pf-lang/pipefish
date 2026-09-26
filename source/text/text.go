@@ -16,24 +16,8 @@ func Flatten(s string) string {
 	return s
 }
 
-func Cyan(s string) string {
-	return CYAN + s + RESET
-}
-
 func Emph(s string) string {
 	return "`" + s + "`"
-}
-
-func Red(s string) string {
-	return RED + s + RESET
-}
-
-func Green(s string) string {
-	return GREEN + s + RESET
-}
-
-func Yellow(s string) string {
-	return YELLOW + s + RESET
 }
 
 func ErrorFont(s string) string {
@@ -48,13 +32,7 @@ const (
 	RESET_ITALIC           = "\033[23m"
 	RESET_UNDERLINE        = "\033[24m"
 	UNDERLINE              = "\033[4m"
-	RED                    = "\033[31m"
 	BAD_RED                = "\033[38;2;244;71;71m"
-	YELLOW                 = "\033[33m"
-	GREEN                  = "\033[32m"
-	BLUE                   = "\033[34m"
-	PURPLE                 = "\033[35m"
-	CYAN                   = "\033[36m"
 	GRAY                   = "\033[37m"
 	INLINE_CODE_BACKGROUND = "\033[48;2;0;0;64m"
 	WHITE                  = "\033[97m"

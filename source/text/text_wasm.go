@@ -27,5 +27,5 @@ func Purple(s string) string {
 }
 
 func color(s, c string) string {
-	return("span class = \"" + c + "\">" + s + "</class>")
+	return("<span class = \"" + c + "\">" + s + "</span>")
 }

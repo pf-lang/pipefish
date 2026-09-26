@@ -1,3 +1,5 @@
+
+
 package text
 
 import (
@@ -271,6 +273,16 @@ func colorlessLength(s string) int {
 func applyFont(s, font string) string {
 	return font + findResets.ReplaceAllString(s, RESET+font) + RESET
 }
+
+
+const (
+	RED                    = "\033[31m"
+	YELLOW                 = "\033[33m"
+	GREEN                  = "\033[32m"
+	CYAN                   = "\033[36m"
+	BLUE                   = "\033[34m"
+	PURPLE                 = "\033[35m"
+)
 
 var (
 	codeBar            = "  ¦ "
