@@ -10,10 +10,13 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
+	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/parser"
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/token"
+	"github.com/tim-hardcastle/pipefish/source/values"
+	"github.com/tim-hardcastle/pipefish/source/vm"
 )
 
 // This will if necessary compile or recompile the relevant .so files, and will extract from them
@@ -112,4 +115,16 @@ func GetSourceCode(fs filesystem.FileSystem, scriptFilepath string) (string, err
 	sourcebytes = append(sourcebytes, '\n')
 	return string(sourcebytes), nil
 }
+
+func GetDefaultDependencies() *compiler.Dependencies {
+	return &compiler.Dependencies{
+		FileSystem: filesystem.OSFileSystem{},
+		InHandler: nil,
+		OutHandler: vm.MakeSimpleOutHandler(os.Stdout, nil),
+		Environment: values.Map{},
+		ExternalServices: map[string]*compiler.Compiler{},
+		MarkdownRenderer: markdown.NewTerminalRenderer(func(s string) string {return s}, 92).Render,
+	}
+}
+
 

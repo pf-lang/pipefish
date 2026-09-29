@@ -11,13 +11,13 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
-	"src.elv.sh/pkg/persistent/vector"
 	"github.com/tim-hardcastle/pipefish/source/err"
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
+	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/settings"
-	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/token"
 	"github.com/tim-hardcastle/pipefish/source/values"
+	"src.elv.sh/pkg/persistent/vector"
 )
 type Vm struct {
 	// Temporary state: things we change at runtime.
@@ -47,12 +47,10 @@ type Vm struct {
 	Labels                     []string // Array from the number of a field label to its name.
 	ValidationErrors           []*ValidationError
 	Tracking                   []TrackingData // Data needed by the 'trak' opcode to produce the live tracking data.
-	InHandle                   InHandler
-	OutHandle                  OutHandler
 	AbstractTypes              []AbstractTypeInfo
-	ExternalCallHandlers       []ExternalCallHandler // The services declared external, whether on the same hub or a different one.
 	UsefulTypes                UsefulTypes
 	UsefulValues               UsefulValues
+	// TODO --- why isn't this in UsefulTypes?
 	TypeNumberOfUnwrappedError values.ValueType  // What it says. When we unwrap an 'error' to an 'Error' struct, the vm needs to know the number of the struct.
 	StringifyLoReg             uint32            // |
 	StringifyCallTo            uint32            // | These are so the vm knows how to call the stringify function.
@@ -70,9 +68,16 @@ type Vm struct {
 	OutputTo    string            // Gives a filename to dump output to.
 	IndentBy    int               // Indentation to allow us to display the children of a node att a different depth.
 	IsCompiling bool              // So we can optionally only dump the VM during compilation, i.e. when it's doing constant folding.
-	// An interface exposing either the actual file system, or a virtual filesystem if
-	// we're running inside the browswer.
-	FileSystem filesystem.FileSystem
+	
+	// What the VM thinks the outside world looks like.
+	World       World
+}
+type World struct{
+	FileSystem            filesystem.FileSystem
+	InHandle              InHandler
+	OutHandle             OutHandler
+	ExternalCallHandlers  []ExternalCallHandler
+	MarkdownRenderer      func(string)string
 }
 // In general, the VM can't convert from type names to type numbers, because it doesn't
 // need to. And we don't need the whole map of them because only a tiny proportion are
@@ -161,14 +166,14 @@ var nativeTypeNames = []string{"UNDEFINED VALUE", "INT ARRAY", "THUNK", "CREATED
 func BlankVm() *Vm {
 	vm := &Vm{Mem: make([]values.Value, len(CONSTANTS)),
 		logging:           true,
-		InHandle:          &StandardInHandler{"→ ", nil},
 		GoToPipefishTypes: map[reflect.Type]values.ValueType{},
 		GoConverter:       [](func(t uint32, v any) any){},
 		NamespaceInfo:     []map[values.ValueType]string{},
 		FieldLabelsInMem:  make(map[string]uint32),
 		PeekStack:         []map[string]bool{},
 	}
-	vm.OutHandle = &SimpleOutHandler{os.Stdout, vm}
+	vm.World.InHandle = &StandardInHandler{"→ ", nil}
+	vm.World.OutHandle = &SimpleOutHandler{os.Stdout, vm}
 	copy(vm.Mem, CONSTANTS)
 	for _, name := range nativeTypeNames {
 		vm.ConcreteTypeInfo = append(vm.ConcreteTypeInfo, BuiltinType{name: name})
@@ -297,11 +302,11 @@ loop:
 					trackingString := vm.TrackingToString([]TrackingData{newData})
 					switch vm.Mem[staticData.LogToLoc].T {
 					case vm.UsefulTypes.LogTo:
-						mdStr := text.NewMarkdown("", 92, func(s string) string { return s }).Render([]string{trackingString})
+						mdStr := markdown.GetTuiRenderer(92)(trackingString)
 						if vm.Mem[staticData.LogToLoc].V.(int) == 0 {
-							println(strings.TrimLeft(mdStr, "\n"))
+							println(strings.TrimRight(mdStr, "\n")+"\n")
 						} else {
-							vm.OutHandle.Write(mdStr)
+							vm.World.OutHandle.Write(strings.TrimRight(mdStr, "\n")+"\n")
 						}
 					case values.STRING:
 						filename := vm.Mem[staticData.LogToLoc].V.(string)
@@ -809,7 +814,7 @@ loop:
 					buf.WriteString(remainingNamespace)
 					buf.WriteString(name)
 				}
-				vm.Mem[args[0]] = vm.ExternalCallHandlers[externalOrdinal].Evaluate(buf.String())
+				vm.Mem[args[0]] = vm.World.ExternalCallHandlers[externalOrdinal].Evaluate(buf.String())
 			case Flpp: // Pop peek flags ()
 				vm.PopPeeks()
 			case Flps: // Push peek flags (mem)
@@ -826,7 +831,7 @@ loop:
 					vm.Mem[args[0]] = values.Value{values.FLOAT, i}
 				}
 			case Gfsy: // Get file system (dst mem)
-				vm.Mem[args[0]] = values.Value{vm.Mem[args[1]].V.(values.AbstractType).Types[0], vm.FileSystem}
+				vm.Mem[args[0]] = values.Value{vm.Mem[args[1]].V.(values.AbstractType).Types[0], vm.World.FileSystem}
 			case Gofn: // Call Go function (dst mem gfn tup)
 				// Operands are :
 				//     m#1 : contains an error which we will doctor before (if necessary) returning it.
@@ -964,14 +969,14 @@ loop:
 			case Inpt: // Input from keyboard (dst mem mem)
 				// v#1 is of type `terminal.Keyboard` with one field consisting of the prompt. #v2 is a 
 				// boolean saying whether the input should be masked for privacy.
-				temp := vm.InHandle
+				temp := vm.World.InHandle
 				if vm.Mem[args[2]].V.(bool) {
-					vm.InHandle = &MaskedInHandler{vm.Mem[args[1]].V.([]values.Value)[0].V.(string), cancel}
+					vm.World.InHandle = &MaskedInHandler{vm.Mem[args[1]].V.([]values.Value)[0].V.(string), cancel}
 				} else {
-					vm.InHandle = &StandardInHandler{vm.Mem[args[1]].V.([]values.Value)[0].V.(string), cancel}
+					vm.World.InHandle = &StandardInHandler{vm.Mem[args[1]].V.([]values.Value)[0].V.(string), cancel}
 				}
-				response := vm.InHandle.Get()
-				vm.InHandle = temp
+				response := vm.World.InHandle.Get()
+				vm.World.InHandle = temp
 				vm.Mem[vm.Mem[args[0]].V.(uint32)] = values.Value{values.STRING, response}
 			case Inte: // Integer from enum (dst mem)
 				vm.Mem[args[0]] = values.Value{values.INT, vm.Mem[args[1]].V.(int)}
@@ -1408,7 +1413,7 @@ loop:
 			case Notb: // Binary not (dst mem)
 				vm.Mem[args[0]] = values.Value{values.BOOL, !vm.Mem[args[1]].V.(bool)}
 			case Outp: // Post to output (mem)
-				vm.OutHandle.Out(vm.Mem[args[0]])
+				vm.World.OutHandle.Out(vm.Mem[args[0]])
 				vm.PostHappened = true
 			case Outt: // Post to terminal (mem)
 				if vm.Mem[vm.UsefulValues.OutputAs].V.(int) == 0 {

@@ -26,12 +26,12 @@ import (
 // when it uses imports or external services. Hence it will in fact have parsed *everything*
 // by the time it hands back control to initializer.go.
 
-func (iz *Initializer) ParseEverythingFromFilePath(mc *vm.Vm, cpb *parser.CommonParserBindle, ccb *compiler.CommonCompilerBindle, scriptFilepath, namespacePath string) (*compiler.Compiler, error) {
-	sourcecode, e := GetSourceCode(mc.FileSystem, scriptFilepath)
+func (iz *Initializer) ParseEverythingFromFilePath(vm *vm.Vm, cpb *parser.CommonParserBindle, ccb *compiler.CommonCompilerBindle, scriptFilepath, namespacePath string) (*compiler.Compiler, error) {
+	sourcecode, e := GetSourceCode(vm.World.FileSystem, scriptFilepath)
 	if e != nil {
 		return nil, e
 	}
-	return iz.ParseEverythingFromSourcecode(mc, cpb, ccb, scriptFilepath, sourcecode, namespacePath), nil
+	return iz.ParseEverythingFromSourcecode(vm, cpb, ccb, scriptFilepath, sourcecode, namespacePath), nil
 }
 
 // This is broken into separate named steps basically so that I can in fact give the steps names.
@@ -230,8 +230,8 @@ func (iz *Initializer) addToNamespace(thingsToImport []tokenizedCode) {
 		source := pathTok.Source
 		_, path = TweakNameAndPath("", path, source)
 		
-		if !settings.ThingsToIgnore.Contains(pathTok.Literal) && iz.cp.Vm.FileSystem != nil {
-			iz.cp.Sources[path] = iz.cp.Vm.FileSystem.ModTime(path).UnixMilli()
+		if !settings.ThingsToIgnore.Contains(pathTok.Literal) && iz.cp.Vm.World.FileSystem != nil {
+			iz.cp.Sources[path] = iz.cp.Vm.World.FileSystem.ModTime(path).UnixMilli()
 		}
 		if dec.getDeclarationType() == includeDeclaration {
 			iz.inclusions = iz.inclusions.Add(path)
@@ -243,7 +243,7 @@ func (iz *Initializer) addToNamespace(thingsToImport []tokenizedCode) {
 			libBytes, _ := folder.ReadFile(filepath.ToSlash(path))
 			libDat = string(libBytes)
 		} else {
-			libDat, e = GetSourceCode(iz.cp.Vm.FileSystem, path)
+			libDat, e = GetSourceCode(iz.cp.Vm.World.FileSystem, path)
 			if e != nil && !settings.ThingsToIgnore.Contains(pathTok.Literal) {
 				iz.throw("init/null/path", &pathTok, pathTok.Literal, e.Error())
 				continue
@@ -318,7 +318,7 @@ func (iz *Initializer) initializeExternals(startAt int) {
 		dec.name.Literal = name
 		dec.path.Literal = path
 		if path == "" { // Then this will work only if there's already an instance of a service of that name running on the hub.
-			externalCP, ok := iz.Common.serviceCompilers[name]
+			externalCP, ok := iz.cp.Common.Dependencies.ExternalServices[name]
 			if !ok {
 				iz.throw("init/external/exist", &dec.name)
 				return
@@ -355,7 +355,7 @@ func (iz *Initializer) initializeExternals(startAt int) {
 			continue
 		}
 		// Otherwise we have a path for which the Tweak function will have inferred a name if one was not supplied.
-		hubServiceCp, ok := iz.Common.serviceCompilers[name] // If the service already exists, then we just need to check that it uses the same source file.
+		hubServiceCp, ok := iz.cp.Common.Dependencies.ExternalServices[name] // If the service already exists, then we just need to check that it uses the same source file.
 		if ok {
 			if hubServiceCp.ScriptFilepath != path {
 				iz.throw("init/external/conflict", &dec.path, hubServiceCp.ScriptFilepath)
@@ -365,19 +365,19 @@ func (iz *Initializer) initializeExternals(startAt int) {
 			continue // Either we've thrown an error or we don't need to do anything.
 		}
 		// Otherwise we need to start up the service, add it to the hub, and then declare it as external.
-		newServiceCp, e := StartCompilerFromFilepath(path, iz.Common.serviceCompilers, iz.Common.hubStore, iz.cp.Vm.FileSystem)
+		newServiceCp, e := StartCompilerFromFilepath(path, iz.cp.Common.Dependencies)
 		if e != nil { // Then we couldn't open the file.
 			iz.throw("init/external/file", &dec.path, path, e.Error())
 			return
 		}
-		iz.Common.serviceCompilers[name] = newServiceCp
+		iz.cp.Common.Dependencies.ExternalServices[name] = newServiceCp
 		iz.addExternalOnSameHub(path, name)
 	}
 }
 
 // Functions auxiliary to the above.
 func (iz *Initializer) addExternalOnSameHub(path, name string) {
-	hubService := iz.Common.serviceCompilers[name]
+	hubService := iz.cp.Common.Dependencies.ExternalServices[name]
 	ev := func(line string) values.Value {
 		exVal := hubService.Do(line)
 		serialize := hubService.Vm.Literal(exVal, 0)
@@ -402,9 +402,9 @@ func (iz *Initializer) addHttpService(path, name, username, password string) {
 }
 
 func (iz *Initializer) addAnyExternalService(handlerForService vm.ExternalCallHandler, path, name string) {
-	externalServiceOrdinal := uint32(len(iz.cp.Vm.ExternalCallHandlers))
+	externalServiceOrdinal := uint32(len(iz.cp.Vm.World.ExternalCallHandlers))
 	iz.cp.CallHandlerNumbersByName[name] = externalServiceOrdinal
-	iz.cp.Vm.ExternalCallHandlers = append(iz.cp.Vm.ExternalCallHandlers, handlerForService)
+	iz.cp.Vm.World.ExternalCallHandlers = append(iz.cp.Vm.World.ExternalCallHandlers, handlerForService)
 	serializedAPI := handlerForService.GetAPI()
 	sourcecode := iz.SerializedAPIToDeclarations(serializedAPI, externalServiceOrdinal) // This supplies us with a stub that know how to call the external servie.
 	if settings.SHOW_EXTERNAL_STUBS {

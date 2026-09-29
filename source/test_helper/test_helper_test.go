@@ -45,7 +45,7 @@ func TestFunctionChunking(t *testing.T) {
 }
 func TestHighlighter(t *testing.T) {
 	tests := []test_helper.TestItem{
-		{`Type`, `[38;2;78;201;176mType[0m`},
+		{`Type`, "\x1b[38;2;78;201;176mType\x1b[0m"},
 	}
 	test_helper.RunTest(t, "highlighter_test.pf", tests, test_helper.TestHighlighter)
 }
@@ -84,7 +84,7 @@ func TestRbam(t *testing.T) {
 	test := []test_helper.UserItem{
 		{``, ``, `hub config admin "PfAdmin", "Norma", "Mortenson", "marilyn@hollywood.org", "password123"`, "You are logged on as \x1b[36mPfAdmin\x1b[39m."},
 		{`PfAdmin`, `password123`, `hub nuke admin`, "OK"},
-		{``, ``, `hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{``, ``, `hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunUserTest(t, "rbam", test)
 }

@@ -12,7 +12,6 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/err"
-	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/hub"
 	"github.com/tim-hardcastle/pipefish/source/initializer"
 	"github.com/tim-hardcastle/pipefish/source/parser"
@@ -46,15 +45,15 @@ func RunTest(t *testing.T, filename string, tests []TestItem, F func(cp *compile
 		var cp *compiler.Compiler
 		switch filename {
 		case "":
-			cp, _ = initializer.StartCompilerFromFilepath(filename, map[string]*compiler.Compiler{}, values.Map{}, filesystem.OSFileSystem{})
+			cp, _ = initializer.StartCompilerFromFilepath(filename, initializer.GetDefaultDependencies())
 		case "test initialization errors":
 			cp, _ = initializer.StartCompilerFromFilepath(filepath.Join(wd, "../compiler/test-files/initialization-error-tests/"+
-				text.Flatten(test.Input)+".pf"), map[string]*compiler.Compiler{}, values.Map{}, filesystem.OSFileSystem{})
+				text.Flatten(test.Input)+".pf"), initializer.GetDefaultDependencies())
 		case "test compiler errors":
 			cp, _ = initializer.StartCompilerFromFilepath(filepath.Join(wd, "../compiler/test-files/compiler-error-tests/"+
-				text.Flatten(test.Input)+".pf"), map[string]*compiler.Compiler{}, values.Map{}, filesystem.OSFileSystem{})
+				text.Flatten(test.Input)+".pf"), initializer.GetDefaultDependencies())
 		default:
-			cp, _ = initializer.StartCompilerFromFilepath(filepath.Join(wd, "../compiler/test-files/", filename), map[string]*compiler.Compiler{}, values.Map{}, filesystem.OSFileSystem{})
+			cp, _ = initializer.StartCompilerFromFilepath(filepath.Join(wd, "../compiler/test-files/", filename), initializer.GetDefaultDependencies())
 		}
 		got, e := F(cp, test.Input)
 		if e != nil {
@@ -63,7 +62,7 @@ func RunTest(t *testing.T, filename string, tests []TestItem, F func(cp *compile
 			println("There were errors parsing the line: \n" + r + "\n")
 		}
 		if !(test.Want == got) {
-			t.Fatalf("Test failed with input %s \nExp :\n%s\nGot :\n%s", test.Input, test.Want, got)
+			t.Fatalf("Test failed with input %s \nExp :\n%s\nGot :\n%s", test.Input, strconv.Quote(test.Want), strconv.Quote(got))
 		}
 	}
 }
@@ -71,8 +70,8 @@ func RunTest(t *testing.T, filename string, tests []TestItem, F func(cp *compile
 // NOTE: this is here to test some internal workings of the initializer. It only initializes
 // a blank service.
 func RunInitializerTest(t *testing.T, tests []TestItem, F func(iz *initializer.Initializer, s string) string) {
-	iz := initializer.NewInitializer(initializer.NewCommonInitializerBindle(values.Map{}, map[string]*compiler.Compiler{}))
-	iz.ParseEverythingFromSourcecode(vm.BlankVm(), parser.NewCommonParserBindle(), compiler.NewCommonCompilerBindle(), "", "", "")
+	iz := initializer.NewInitializer(initializer.NewCommonInitializerBindle())
+	iz.ParseEverythingFromSourcecode(vm.BlankVm(), parser.NewCommonParserBindle(), compiler.NewCommonCompilerBindle(initializer.GetDefaultDependencies()), "", "", "")
 	for _, test := range tests {
 		if settings.SHOW_TESTS {
 			println(text.BULLET + "Running test " + text.Emph(test.Input))
@@ -116,7 +115,7 @@ func TestOutput(cp *compiler.Compiler, s string) (string, error) {
 	if cp.P.Common.IsBroken {
 		return cp.P.Common.Errors[0].ErrorId, errors.New(cp.P.Common.Errors[0].Message)
 	}
-	cp.Vm.OutHandle = vm.MakeCapturingOutHandler(cp.Vm)
+	cp.Vm.World.OutHandle = vm.MakeCapturingOutHandler(cp.Vm)
 	ok := cp.Do(s)
 	if ok.T == values.ERROR {
 		return "", errors.New("runtime error with code " + ok.V.(*err.Error).ErrorId)
@@ -124,7 +123,7 @@ func TestOutput(cp *compiler.Compiler, s string) (string, error) {
 	if cp.ErrorsExist() {
 		return "", errors.New("failed to compile with code " + cp.P.Common.Errors[0].ErrorId)
 	}
-	return text.StripColors(cp.Vm.OutHandle.(*vm.CapturingOutHandler).Dump()), nil
+	return text.StripColors(cp.Vm.World.OutHandle.(*vm.CapturingOutHandler).Dump()), nil
 }
 
 // Tests for the error in a line of code, given successful compilation of the `_test.pf` file.`
@@ -207,25 +206,25 @@ func TestExternalOrImportChunking(iz *initializer.Initializer, s string) string 
 	return initializer.SummaryString(ty)
 }
 
-var Foo8Result = "\n  ▪ We called function foo (defined at line 13) with i = 8. \n" +
+var Foo8Result = "  ▪ We called function foo (defined at line 13) with i = 8.\n" +
 	"  ▪ At line 14 we evaluated the condition i mod 2 == 0. \n" +
-	"  ▪ The condition succeeded. \n" +
-	"  ▪ At line 15 function foo returned \"even\". "
+	"  ▪ The condition succeeded.\n" +
+	"  ▪ At line 15 function foo returned \"even\".\n"
 
-var Foo13Result = "\n  ▪ We called function foo (defined at line 13) with i = 13. \n" +
+var Foo13Result = "  ▪ We called function foo (defined at line 13) with i = 13.\n" +
 	"  ▪ At line 14 we evaluated the condition i mod 2 == 0. \n" +
-	"  ▪ The condition failed. \n" +
-	"  ▪ At line 16 we took the else branch. \n" +
-	"  ▪ At line 17 function foo returned \"odd\". "
+	"  ▪ The condition failed.\n" +
+	"  ▪ At line 16 we took the else branch.\n" +
+	"  ▪ At line 17 function foo returned \"odd\".\n"
 
-var Qux8Result = "\n  ▪ Log at line 7 : We're here. \n" +
-	"  ▪ Log at line 8 : We test to see if i (8) is even, which is true. \n" +
-	"  ▪ Log at line 9 : We return \"even\", because 8 is even. "
+var Qux8Result = "  ▪ Log at line 7 : We're here.\n" +
+	"  ▪ Log at line 8 : We test to see if i (8) is even, which is true.\n" +
+	"  ▪ Log at line 9 : We return \"even\", because 8 is even.\n"
 
-var Qux13Result = "\n  ▪ Log at line 7 : We're here. \n" +
-	"  ▪ Log at line 8 : We test to see if i (13) is even, which is false. \n" +
-	"  ▪ Log at line 10 : Guess we're taking the 'else' branch. \n" +
-	"  ▪ Log at line 11 : And we return \"odd\". "
+var Qux13Result = "  ▪ Log at line 7 : We're here.\n" +
+	"  ▪ Log at line 8 : We test to see if i (13) is even, which is false.\n" +
+	"  ▪ Log at line 10 : Guess we're taking the 'else' branch.\n" +
+	"  ▪ Log at line 11 : And we return \"odd\".\n"
 
 var LogToFileResult = `- Log at line 7 : We're here.
 - Log at line 8 : We test to see if i (3) is even, which is false.

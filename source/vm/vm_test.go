@@ -200,14 +200,14 @@ func TestCorners(t *testing.T) {
 	}
 	test_helper.RunTest(t, "corners_test.pf", tests, test_helper.TestValues)
 }
-func TestDump(t *testing.T) { 
+func TestDump(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/dump.pf"`, `Starting script [36m"dump.pf"[39m as service [36m"dump"[39m.`},
+		{`hub run "../hub/test-files/dump.pf"`, "Starting script \x1b[36m\"dump.pf\"\x1b[39m as service \x1b[36m\"dump\"\x1b[39m."},
 		{`hub dump "big"`, "# Function dump of `big`\n\n## Code dump for function `big` with sig int\n\n@103 : asgm m293 <- m291  // Assign to memory.\n@104 : gtei m292 <- m293 m295  // Int comparison with >=.\n@105 : asgm m296 <- m292  // Assign to memory.\n@106 : qtru m296 @109  // Test true.\n@107 : asgm m298 <- m297  // Assign to memory.\n@108 : jmp @110  // Jump.\n@109 : asgm m298 <- m3  // Assign to memory.\n@110 : qsat m298 @113  // Test not `UNSAT`.\n@111 : asgm m300 <- m298  // Assign to memory.\n@112 : jmp @114  // Jump.\n@113 : asgm m300 <- m299  // Assign to memory.\n@114 : ret  // Return."},
-		{`hub dump m "big"`, "# Function dump of `big`\n\n## Code dump for function `big` with sig int\n\n@103 : asgm m293 <- m291  // Assign to memory.\n@104 : gtei m292 <- m293 m295  // Int comparison with >=.\n@105 : asgm m296 <- m292  // Assign to memory.\n@106 : qtru m296 @109  // Test true.\n@107 : asgm m298 <- m297  // Assign to memory.\n@108 : jmp @110  // Jump.\n@109 : asgm m298 <- m3  // Assign to memory.\n@110 : qsat m298 @113  // Test not `UNSAT`.\n@111 : asgm m300 <- m298  // Assign to memory.\n@112 : jmp @114  // Jump.\n@113 : asgm m300 <- m299  // Assign to memory.\n@114 : ret  // Return.\n\n### Memory dump for function `big` with sig int`\n\nm291 : UNDEFINED VALUE::UNDEFINED VALUE!\nm292 : error::\x1b[31mError\x1b[39m: something unexpected has gone wrong at line \x1b[33m4:6-8\x1b[39m of \x1b[36m\"../hub/test-files/dump.pf\"\x1b[39m. \nm293 : UNDEFINED VALUE::UNDEFINED VALUE!\nm294 : BLING::>=\nm295 : int::100\nm296 : UNDEFINED VALUE::UNDEFINED VALUE!\nm297 : string::\"big\"\nm298 : UNDEFINED VALUE::UNDEFINED VALUE!\nm299 : string::\"small\"\nm300 : UNDEFINED VALUE::UNDEFINED VALUE!"},
+		{`hub dump m "big"`, "# Function dump of `big`\n\n## Code dump for function `big` with sig int\n\n@103 : asgm m293 <- m291  // Assign to memory.\n@104 : gtei m292 <- m293 m295  // Int comparison with >=.\n@105 : asgm m296 <- m292  // Assign to memory.\n@106 : qtru m296 @109  // Test true.\n@107 : asgm m298 <- m297  // Assign to memory.\n@108 : jmp @110  // Jump.\n@109 : asgm m298 <- m3  // Assign to memory.\n@110 : qsat m298 @113  // Test not `UNSAT`.\n@111 : asgm m300 <- m298  // Assign to memory.\n@112 : jmp @114  // Jump.\n@113 : asgm m300 <- m299  // Assign to memory.\n@114 : ret  // Return.\n\n### Memory dump for function `big` with sig int`\n\nm291 : UNDEFINED VALUE::UNDEFINED VALUE!\nm292 : error::\x1b[31mError\x1b[39m: something unexpected has gone wrong at line \x1b[33m4:6-8\x1b[39m of \x1b[36m\"../hub/test-files/dump.pf\"\x1b[39m.\n\n\nm293 : UNDEFINED VALUE::UNDEFINED VALUE!\nm294 : BLING::>=\nm295 : int::100\nm296 : UNDEFINED VALUE::UNDEFINED VALUE!\nm297 : string::\"big\"\nm298 : UNDEFINED VALUE::UNDEFINED VALUE!\nm299 : string::\"small\"\nm300 : UNDEFINED VALUE::UNDEFINED VALUE!"},
 		{`hub halt "dump"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
@@ -441,13 +441,13 @@ func TestHardwiredOps(t *testing.T) {
 func TestHttp(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub http`, "\x1b[32mOK\x1b[0m"},
-		{`hub run "../hub/test-files/server.pf"`, `Starting script [36m"server.pf"[39m as service [36m"server"[39m.`},
-		{`hub run "../hub/test-files/client.pf"`, `Starting script [36m"client.pf"[39m as service [36m"client"[39m.`},
+		{`hub http`, "\x1b[32mOK\x1b[39m"},
+		{`hub run "../hub/test-files/server.pf"`, "Starting script \x1b[36m\"server.pf\"\x1b[39m as service \x1b[36m\"server\"\x1b[39m."},
+		{`hub run "../hub/test-files/client.pf"`, "Starting script \x1b[36m\"client.pf\"\x1b[39m as service \x1b[36m\"client\"\x1b[39m."},
 		{`twice 2`, "4"},
 		{`hub halt "client"`, `OK`},
 		{`hub halt "server"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
@@ -666,7 +666,7 @@ func TestLiterals(t *testing.T) {
 func TestLog(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/log.pf"`, `Starting script [36m"log.pf"[39m as service [36m"log"[39m.`},
+		{`hub run "../hub/test-files/log.pf"`, "Starting script \x1b[36m\"log.pf\"\x1b[39m as service \x1b[36m\"log\"\x1b[39m."},
 		{`big 6`, `"small"`},
 		{`hub log`, "\x1b[0m  ▪ Log at line 8 : Called \x1b[0m\x1b[48;2;0;0;64m\x1b[97mbig\x1b[0m. \n\x1b[0m  ▪ At line 9 we evaluated the condition \x1b[0m\x1b[48;2;0;0;64m\x1b[97mi >= 100\x1b[0m. The condition failed. \n\x1b[0m  ▪ At line 11 we took the \x1b[0m\x1b[48;2;0;0;64m\x1b[97melse\x1b[0m branch, so at line 12 function \x1b[0m\x1b[48;2;0;0;64m\x1b[97mbig\x1b[0m returned \x1b[0m\x1b[48;2;0;0;64m\x1b[97m\"small\"\x1b[0m."},
 		{`find(["fee", "fie", "fo", "fum"], "fie")`, `1`},
@@ -674,7 +674,7 @@ func TestLog(t *testing.T) {
 		{`add [7, 8]`, `15`},
 		{`hub log`, "\x1b[0m  ▪ We entered the loop at line 22 with \x1b[0m\x1b[48;2;0;0;64m\x1b[97ma\x1b[0m = \x1b[0m\x1b[48;2;0;0;64m\x1b[97m15\x1b[0m and \x1b[0m\x1b[48;2;0;0;64m\x1b[97mel\x1b[0m = \x1b[0m\x1b[48;2;0;0;64m\x1b[97m8\x1b[0m. \n\x1b[0m  ▪ At line 23 the body of the \x1b[0m\x1b[48;2;0;0;64m\x1b[97mfor\x1b[0m loop evaluated to \x1b[0m\x1b[48;2;0;0;64m\x1b[97m7\x1b[0m. \n\x1b[0m  ▪ We entered the loop at line 22 with \x1b[0m\x1b[48;2;0;0;64m\x1b[97ma\x1b[0m = \x1b[0m\x1b[48;2;0;0;64m\x1b[97m15\x1b[0m and \x1b[0m\x1b[48;2;0;0;64m\x1b[97mel\x1b[0m = \x1b[0m\x1b[48;2;0;0;64m\x1b[97m8\x1b[0m. \n\x1b[0m  ▪ At line 23 the body of the \x1b[0m\x1b[48;2;0;0;64m\x1b[97mfor\x1b[0m loop evaluated to \x1b[0m\x1b[48;2;0;0;64m\x1b[97m15\x1b[0m."},
 		{`hub halt "log"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }

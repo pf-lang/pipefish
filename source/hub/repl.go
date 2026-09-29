@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/lmorg/readline/v4"
+	"github.com/tim-hardcastle/pipefish/source/pf"
 	"github.com/tim-hardcastle/pipefish/source/text"
 	"golang.org/x/term"
 )
@@ -122,7 +123,7 @@ func (h *Hub) Repl() {
 		}
 		input = strings.TrimSpace(input)
 		sv := h.Services[h.CurrentServiceName()]
-		sv.SetOutHandler(sv.MakeTerminalOutHandler())
+		sv.Update(pf.Dependencies{OutHandler: sv.MakeTerminalOutHandler()})
 		h.Do(input, h.TerminalUsername, h.TerminalPassword, h.CurrentServiceName(), false)
 	}
 }

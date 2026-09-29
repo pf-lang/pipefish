@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/tim-hardcastle/pipefish/source/err"
+	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/token"
 	"github.com/tim-hardcastle/pipefish/source/values"
@@ -89,19 +90,19 @@ func (vm *Vm) ToString(v values.Value, flavor descriptionFlavor, cpNumber uint32
 		buf.WriteString(typeInfo.GetName(DEFAULT))
 		if flavor == LITERAL {
 			buf.WriteString("(")
-		var sep string
-		vals := v.V.([]values.Value)
-		for _, val := range vals { 
-			fmt.Fprintf(&buf, "%s%s", sep, vm.StringifyValue(val, flavor, cpNumber))
-			sep = ", "
-		}
+			var sep string
+			vals := v.V.([]values.Value)
+			for _, val := range vals {
+				fmt.Fprintf(&buf, "%s%s", sep, vm.StringifyValue(val, flavor, cpNumber))
+				sep = ", "
+			}
 			buf.WriteByte(')')
 			return buf.String()
 		}
 		buf.WriteString(" with (")
 		var sep string
 		vals := v.V.([]values.Value)
-		for i, lb := range typeInfo.(StructType).LabelNumbers { 
+		for i, lb := range typeInfo.(StructType).LabelNumbers {
 			fmt.Fprintf(&buf, "%s%s::%s", sep, vm.Labels[lb], vm.StringifyValue(vals[i], flavor, cpNumber))
 			sep = ", "
 		}
@@ -183,8 +184,7 @@ func (vm *Vm) ToString(v values.Value, flavor descriptionFlavor, cpNumber uint32
 		if ob.ErrorId != "vm/user" {
 			ob = err.CreateErr(ob.ErrorId, ob.Token, ob.Args...)
 		}
-		return text.NewMarkdown("", 92, func(s string) string { return s }).Render(
-			[]string{text.RT_ERROR + ob.Message + err.DescribePos(ob.Token) + "."})
+		return markdown.GetTuiRenderer(92)(text.Red("Error") + ": " + ob.Message + err.DescribePos(ob.Token) + ".")
 	case values.FLOAT:
 		f := v.V.(float64)
 		if f == math.Trunc(f) {

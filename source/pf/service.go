@@ -5,7 +5,6 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
-	"database/sql"
 	"errors"
 	"fmt"
 	"io"
@@ -29,48 +28,122 @@ import (
 
 type Service struct {
 	cp             *compiler.Compiler
-	localExternals map[string]*Service
-	db             *sql.DB
-	fs             filesystem.FileSystem
+	dependencies   Dependencies
+}
+
+type FileSystem = filesystem.FileSystem
+
+type Dependencies = struct{
+	// This is the file system used both by the runtime and by the compiler: by the runtime via
+	// the `files` standard library, and by the compiler to locate dependencies.
+	FileSystem            FileSystem  
+
+	// Where `get x from Terminal("prompt")` will get input from.         
+	InHandler             InHandler  
+
+	// Where `post x` / `post x to Output()` will post to.           
+	OutHandler            OutHandler    
+
+	// Where `post x to Terminal()` will post to.   
+	// Terminal              ***  
+
+	// The contents of `$_env`.
+	Environment           Map      
+
+	// Map of names to services, to be compiled as external services with the names as namespaces.
+	ExternalServices      map[string]*Service
+
+	// A function which knows how to render markdown in the TUI of the service. This is going to 
+	// be different according to whether it's running in a Linux terminal and we're using the 
+	// terminal control codes; or running in the browser and using HTML: or other cases not yet
+	// encountered.
+	MarkdownRenderer      func(string)string 
+}
+
+func (sv *Service) Inject(d Dependencies) *Service {
+	sv.dependencies = d
+	if sv.cp != nil {
+		sv.cp.Common.Dependencies = convertDependencies(sv.dependencies)
+		sv.cp.InjectDependencies()
+	}
+	return sv
+}
+
+func (sv *Service) Update(d Dependencies) *Service {
+	result := sv.dependencies
+	if d.Environment.Len() != 0 {
+		result.Environment = d.Environment
+	}
+	if len(d.ExternalServices) != 0 {
+		result.ExternalServices = d.ExternalServices
+	} 
+	if d.FileSystem != nil {
+		result.FileSystem = d.FileSystem
+	}
+	if d.InHandler != nil {
+		result.InHandler = d.InHandler
+	}
+	if d.MarkdownRenderer != nil {
+		result.MarkdownRenderer = d.MarkdownRenderer
+	}
+	if d.OutHandler != nil {
+		result.OutHandler = d.OutHandler
+	}
+	sv.dependencies = result
+	if sv.cp != nil {
+		sv.cp.Common.Dependencies = convertDependencies(sv.dependencies)
+		sv.cp.InjectDependencies()
+	}
+	return sv
+}
+
+func convertDependencies(d Dependencies) *compiler.Dependencies {
+	compilerMap := map[string]*compiler.Compiler{}
+	for k, v := range d.ExternalServices {
+		compilerMap[k] = v.cp
+	}
+	return &compiler.Dependencies{
+		FileSystem:       d.FileSystem,
+		InHandler:        d.InHandler,
+		OutHandler:       d.OutHandler,
+		Environment:      d.Environment,
+		ExternalServices: compilerMap,
+		MarkdownRenderer: d.MarkdownRenderer,
+	}
 }
 
 // Returns a new service.
-func NewService(fs filesystem.FileSystem) *Service {
-	return &Service{cp: nil,
-		localExternals: make(map[string]*Service),
-		db:             nil,
-		fs:             fs,         
+func NewService() *Service {
+	return &Service{
+		cp: nil,
+		dependencies: getDefaultDependencies(),         
+	}
+}
+
+func getDefaultDependencies() Dependencies {
+	d := initializer.GetDefaultDependencies()
+	return Dependencies{
+		FileSystem:       d.FileSystem,
+		InHandler:        d.InHandler,
+		OutHandler:       d.OutHandler,
+		Environment:      d.Environment,
+		ExternalServices: map[string]*Service{},
+		MarkdownRenderer: d.MarkdownRenderer,
 	}
 }
 
 // Initializes the service with the source code supplied in the file indicated by the filepath.
 func (sv *Service) InitializeFromFilepath(scriptFilepath string) error {
-	sourcecode, e := initializer.GetSourceCode(sv.fs, scriptFilepath)
+	sourcecode, e := initializer.GetSourceCode(sv.dependencies.FileSystem, scriptFilepath)
 	if e != nil {
 		return e
 	}
-	return sv.initialize(scriptFilepath, sourcecode, values.Map{})
+	return sv.initialize(scriptFilepath, sourcecode)
 }
 
 // Initializes the service with the source code supplied in the string.
 func (sv *Service) InitializeFromCode(code string) error {
-	return sv.initialize("InitializeFromCode", code, values.Map{})
-}
-
-// The same as the previous two functions, except that we pass in a map of values to initialize
-// $_env.
-// Initializes the service with the source code supplied in the string.
-func (sv *Service) InitializeFromCodeWithStore(code string, store Map) error {
-	return sv.initialize("InitializeFromCode", code, store)
-}
-
-// Initializes the service with the source code supplied in the file indicated by the filepath.
-func (sv *Service) InitializeFromFilepathWithStore(scriptFilepath string, store Map) error {
-	sourcecode, e := initializer.GetSourceCode(sv.fs, scriptFilepath)
-	if e != nil {
-		return e
-	}
-	return sv.initialize(initializer.MakeFilepath(scriptFilepath), sourcecode, store)
+	return sv.initialize("main.pf", code)
 }
 
 // Initializes the service on behalf of both the previous methods. As the
@@ -78,16 +151,8 @@ func (sv *Service) InitializeFromFilepathWithStore(scriptFilepath string, store 
 // service have to be supplied as raw compilers. We pass them in, and then we
 // yoink them out at the end because the service might have started up a new
 // external service.
-func (sv *Service) initialize(scriptFilepath, sourcecode string, store Map) error {
-	compilerMap := make(map[string]*compiler.Compiler)
-	for k, v := range sv.localExternals {
-		compilerMap[k] = v.cp
-	}
-	cp := initializer.StartCompiler(scriptFilepath, sourcecode, compilerMap, store, sv.fs)
-	sv.cp = cp
-	for k, v := range compilerMap {
-		sv.localExternals[k] = &Service{v, sv.localExternals, sv.db, v.Vm.FileSystem}
-	}
+func (sv *Service) initialize(scriptFilepath, sourcecode string) error {
+	sv.cp = initializer.StartCompiler(scriptFilepath, sourcecode, convertDependencies(sv.dependencies))
 	if sv.IsBroken() {
 		return errors.New("compilation error")
 	}
@@ -199,40 +264,7 @@ func MakeTerminalInHandler(prompt string, cancel chan os.Signal) *TerminalInHand
 
 // Outputs a value via the outhandler.
 func (sv *Service) Output(v Value) {
-	sv.cp.Vm.OutHandle.Out(v)
-}
-
-// Makes other services visible to the service, as though they were running
-// on the same hub: their `external` declarations can then allow them to use one
-// another as external services.
-func (sv *Service) SetLocalExternalServices(svs map[string]*Service) {
-	sv.localExternals = svs
-}
-
-// Sets an InHandler, i.e. the thing that decides what happens when you do
-// `get x from Input()`.
-func (sv *Service) SetInHandler(in InHandler) error {
-	if sv.cp == nil {
-		return errors.New("service is uninitialized")
-	}
-	if sv.IsBroken() {
-		return errors.New("SetInhandler: service is broken")
-	}
-	sv.cp.Vm.InHandle = in
-	return nil
-}
-
-// Sets an OutHandler, i.e. the thing that decides what happens when you do
-// `post x to Output()`.
-func (sv *Service) SetOutHandler(out vm.OutHandler) error {
-	if sv.cp == nil {
-		return errors.New("service is uninitialized")
-	}
-	if sv.IsBroken() {
-		return errors.New("SetOutHandler: service is broken")
-	}
-	sv.cp.Vm.OutHandle = out
-	return nil
+	sv.cp.Vm.World.OutHandle.Out(v)
 }
 
 func (sv *Service) Dump() (string, error) {
@@ -240,9 +272,9 @@ func (sv *Service) Dump() (string, error) {
 		return "", errors.New("service is uninitialized")
 	}
 	if sv.IsBroken() {
-		return "", errors.New("SetOutHandler: service is broken")
+		return "", errors.New("service is broken")
 	}
-	if oH, ok := sv.cp.Vm.OutHandle.(*vm.CapturingOutHandler); ok {
+	if oH, ok := sv.cp.Vm.World.OutHandle.(*vm.CapturingOutHandler); ok {
 		return oH.Dump(), nil
 	} else {
 		return "", errors.New("wrong OutHandler")
@@ -310,10 +342,6 @@ func (sv *Service) DumpCode(functionName string, showMemory bool) string {
 	return sv.cp.DumpFunction(functionName, showMemory)
 }
 
-func(sv *Service) SetFileSystem(f filesystem.FileSystem) {
-	sv.fs = f
-}
-
 // Sets the value of a global variable given its name. Unlike using `Do` for the
 // same purpose, this can set the value of private variables.
 func (sv *Service) SetVariable(vname string, ty values.ValueType, v any) error {
@@ -328,17 +356,6 @@ func (sv *Service) SetVariable(vname string, ty values.ValueType, v any) error {
 		return errors.New("variable does not exist")
 	}
 	sv.cp.Vm.Mem[sv.cp.GlobalVars.Data[vname].MLoc] = values.Value{ty, v}
-	return nil
-}
-
-func (sv *Service) SetEnv(env values.Map) error {
-	if sv.cp == nil {
-		return errors.New("service is uninitialized")
-	}
-	if sv.IsBroken() {
-		return errors.New("SetEnv: service is broken")
-	}
-	sv.cp.SetEnv(env)
 	return nil
 }
 

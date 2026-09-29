@@ -11,8 +11,11 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
+	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/parser"
 	"github.com/tim-hardcastle/pipefish/source/token"
+	"github.com/tim-hardcastle/pipefish/source/values"
+	"github.com/tim-hardcastle/pipefish/source/vm"
 )
 
 var wasmGoPackages map[string]WasmGoPackage
@@ -169,5 +172,16 @@ func init() {
 
 	if err != nil {
 		panic(err)
+	}
+}
+
+func GetDefaultDependencies() *compiler.Dependencies {
+	return &compiler.Dependencies{
+		FileSystem: &filesystem.VFS{},
+		InHandler: nil,
+		OutHandler: vm.MakeSimpleOutHandler(os.Stdout, nil),
+		Environment: values.Map{},
+		ExternalServices: map[string]*compiler.Compiler{},
+		MarkdownRenderer: markdown.GetTuiRenderer(92),
 	}
 }

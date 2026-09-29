@@ -145,15 +145,15 @@ func DescribePos(token *token.Token) string {
 		return ""
 	}
 	if prettySource != "REPL input" {
-		prettySource = "<C>\"" + prettySource + "\"</>"
+		prettySource = text.Cyan("\"" + prettySource + "\"")
 	}
 	if token.Line > 0 {
 		result := strconv.Itoa(token.Line) + ":" + strconv.Itoa(token.ChStart)
 		if token.ChStart != token.ChEnd {
 			result = result + "-" + strconv.Itoa(token.ChEnd)
 		}
-		result = " at line <Y>" + result + "</> "
-		return result + "of " + prettySource + ""
+		result = " at line " + text.Yellow(result)
+		return result + " of " + prettySource + ""
 	}
 	return " in " + prettySource + ""
 }

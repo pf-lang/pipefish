@@ -8,12 +8,6 @@ import (
 	"github.com/tim-hardcastle/pipefish/source/text"
 )
 
-var mdToHtml = NewHtmlRenderer()
-
-func RenderMdAsHtml(text string) string {
-	return mdToHtml.Render(text)
-}
-
 type Renderer struct {
 	RenderAst func(mdNode) string
 }
@@ -22,12 +16,8 @@ func NewAstRenderer() Renderer {
 	return NewRenderer(PpAst)
 }
 
-func NewHtmlRenderer() Renderer {
-	return NewRenderer(MakeRenderFunction(html, htmlHighlighter))
-}
-
-func NewTerminalRenderer(highlighter func(string) string) Renderer {
-	return NewRenderer(MakeRenderFunction(getTerminalRenderer(92), highlighter))
+func Iota(s string) string {
+	return s
 }
 
 func NewRenderer(fn func(mdNode) string) Renderer {
@@ -182,62 +172,38 @@ const (
 	stPurple
 )
 
-var html = map[mdStyle]func(string) string{
-	stParagraph: func(s string) string { return "<p>" + s + "</p>\n" },
-	stBold:      func(s string) string { return "<b>" + s + "</b>" },
-	stItalic:    func(s string) string { return "<i>" + s + "</i>" },
-	stInline:    func(s string) string { return "<code>" + s + "</code>" },
-	stList:      func(s string) string { return "<ul>\n" + s + "\n</ul>\n" },
-	stListItem:  func(s string) string { return "  <li>" + s + "</li>" },
-	stIde:       func(s string) string { return "<pf-ide>" + s + "</pf-ide>" },
-	stRed:		func(s string) string { return "<red>" + s + "</red>" },
-	stYellow:	func(s string) string { return "<yellow>" + s + "</yellow>" },
-	stGreen:	func(s string) string { return "<green>" + s + "</green>" },
-	stCyan:		func(s string) string { return "<cyan>" + s + "</cyan>" },
-	stBlue:		func(s string) string { return "<blue>" + s + "</blue>" },
-	stPurple:	func(s string) string { return "<purple>" + s + "</purple>" },
-	stCodeBlock: func(s string) string {
-		return "" +
-			`<div class="code-block">
-<div class="code-header">
-<span class="code-language">Pipefish</span>
-<button class="code-copy" type="button">Copy</button>
-</div>
-<pre><code class="language-pipefish">` + s + `</code></pre>
-</div>
-`
-	},
-	stTuiBlock: func(s string) string {
-		return "" +
-			`<div class="code-block">
-<div class="code-header">
-<span class="code-language">TUI</span>
-</div>
-<pre><code class="language-pipefish">` + s + `</code></pre>
-</div>
-`
-	},
-	// By convention the major divisions in the document are h2 and the lower divisions are h3
-	// and nothing else counts for the purposes of making the table of contents.
-	stH1: func(s string) string { return "<h1>" + s + "</h1>\n" },
-	stH2: func(s string) string { return "<h2 id=\"" + text.Hyphenate(s) + "\">" + s + "</h2>\n" },
-	stH3: func(s string) string { return "<h3 id=\"" + text.Hyphenate(s) + "\">" + s + "</h3>\n" },
-	stH4: func(s string) string { return "<h4>" + s + "</h4>\n" },
+var defaultSettings = map[mdStyle]func(string) string{
+	stParagraph:text.Paragraph,
+	stBold:     text.Bold,
+	stItalic:   text.Italic,
+	stInline:   text.InlineCode,
+	stRed:		text.Red,
+	stYellow:	text.Yellow,
+	stGreen:	text.Green,
+	stCyan:		text.Cyan,
+	stBlue:		text.Blue,
+	stPurple:	text.Purple,
+	stList:     text.List,
+	stListItem: text.ListItem,
 }
 
 func getTerminalRenderer(width int) map[mdStyle]func(string) string {
-	return map[mdStyle]func(s string) string{
-		stBold:   func(s string) string { return text.BOLD + s + text.RESET_BOLD },
-		stItalic: func(s string) string { return text.ITALIC + s + text.RESET_ITALIC },
-		stInline: func(s string) string {
-			return text.INLINE_CODE_BACKGROUND + text.WHITE + s +
-				text.RESET_BACKGROUND + text.RESET_FOREGROUND
-		},
-		stList:     func(s string) string { return "<ul>\n" + s + "\n</ul>" },
-		stListItem: func(s string) string { return "  <li>" + s + "</li>" },
-		stH1:       func(s string) string { return "<h1>" + s + "</h1>" },
-		stH2:       func(s string) string { return "<h2>" + s + "</h2>" },
-		stH3:       func(s string) string { return "<h3>" + s + "</h3>" },
-		stH4:       func(s string) string { return "<h4>" + s + "</h4>" },
+	terminalSettings := map[mdStyle]func(s string) string{
+		stH1: text.H1WithWidth(width),
+		stH2: text.H2WithWidth(width),
+		stH3: text.H3WithWidth(width),
+		stH4: text.H4WithWidth(width), 
 	}
+	return merge(defaultSettings, terminalSettings)
+}
+
+
+func merge(maps ...map[mdStyle]func(string) string) map[mdStyle]func(string) string {
+	merged := map[mdStyle]func(string) string{}
+	for _, M := range maps {
+		for k, v := range M {
+			merged[k] = v
+		}
+	}
+	return merged
 }

@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/tim-hardcastle/pipefish/source/settings"
-	"github.com/tim-hardcastle/pipefish/source/values"
 )
 
 type wasmGoPackageInfo struct {
@@ -28,10 +27,10 @@ func GenerateWasmGoFromSource(
 	settings.PipefishHomeDirectory = "."
 
 	iz := NewInitializer(
-		NewCommonInitializerBindle(values.Map{}, nil),
+		NewCommonInitializerBindle(),
 	)
 
-	iz.prepareForCompilation(scriptFilepath, sourcecode, nil)
+	iz.prepareForCompilation(scriptFilepath, sourcecode, GetDefaultDependencies())
 
 	if iz.errorsExist() {
 		return fmt.Errorf(
@@ -175,10 +174,10 @@ func GenerateWasmGoStandardLibraries(
 		}
 
 		iz := NewInitializer(
-			NewCommonInitializerBindle(values.Map{}, nil),
+			NewCommonInitializerBindle(),
 		)
 
-		iz.prepareForCompilation(source, string(sourcecode), nil)
+		iz.prepareForCompilation(source, string(sourcecode), GetDefaultDependencies())
 
 		if iz.errorsExist() {
 			return fmt.Errorf(

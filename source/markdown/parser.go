@@ -41,7 +41,7 @@ mainloop:
 			newMode = mdUnassigned
 		case text.Head(line, "#"):
 			newMode = mdGettingHeading
-		case text.Head(line, "* "):
+		case text.Head(line, "* ") || text.Head(line, "- ") || text.Head(line, "+ "):
 			newMode = mdGettingList
 		case text.Head(line, "> "):
 			newMode = mdGettingQuote

@@ -17,10 +17,10 @@ import (
 func TestApi(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/foo.pf"`, `Starting script [36m"foo.pf"[39m as service [36m"foo"[39m.`},
-		{`hub api`, "\x1b[1m\x1b[3m≡≡≡≡ foo ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡\n\x1b[0m\n\x1b[1m════ Functions ════════════════════════════════════════════════════════════════════════════\n\x1b[0m\n\x1b[36m•\x1b[0m foo\x1b[38;2;255;215;0m(\x1b[0mx \x1b[38;2;78;201;176many?\x1b[0m\x1b[38;2;255;215;0m)\x1b[0m"},
+		{`hub run "../hub/test-files/foo.pf"`, "Starting script \x1b[36m\"foo.pf\"\x1b[39m as service \x1b[36m\"foo\"\x1b[39m."},
+		{`hub api`, "\x1b[1m\x1b[3m≡≡≡≡ foo ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡\n\x1b[0m\n\x1b[1m════ Functions ════════════════════════════════════════════════════════════════════════════\n\x1b[0m\n\x1b[36m•\x1b[39m foo\x1b[38;2;255;215;0m(\x1b[0mx \x1b[38;2;78;201;176many?\x1b[0m\x1b[38;2;255;215;0m)\x1b[0m"},
 		{`hub halt "foo"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
@@ -28,9 +28,9 @@ func TestApi(t *testing.T) {
 func TestBrokenService(t *testing.T) { // We want to make sure that if the service is broken, queries get handed off to the empty service.
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/broken.pf"`, "Starting script \x1b[36m\"broken.pf\"\x1b[39m as service \x1b[36m\"broken\"\x1b[39m. \n[0] \x1b[31mError\x1b[39m: unexpected occurrence of \x1b[0m\x1b[48;2;0;0;64m\x1b[97mfnurgle\x1b[0m without a headword at line \x1b[33m1:0-7\x1b[39m of \x1b[36m\"../hub/\x1b[0m\n\x1b[33m\x1b[39m\x1b[36mtest-files/broken.pf\"\x1b[39m."},
+		{`hub run "../hub/test-files/broken.pf"`, "Starting script \x1b[36m\"broken.pf\"\x1b[39m as service \x1b[36m\"broken\"\x1b[39m. \n[0] \x1b[31mError\x1b[39m: unexpected occurrence of \x1b[0m\x1b[48;2;0;0;64m\x1b[97mfnurgle\x1b[0m without a headword at line \x1b[33m1:0-7\x1b[39m of \x1b[36m\"../hub/\x1b[0m\ntest-files/broken.pf\"\x1b[39m."},
 		{`hub halt "broken"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
@@ -56,31 +56,32 @@ func TestCli(t *testing.T) {
 	}
 }
 
-func TestDump(t *testing.T) { 
+func TestDump(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/dump.pf"`, `Starting script [36m"dump.pf"[39m as service [36m"dump"[39m.`},
+		{`hub run "../hub/test-files/dump.pf"`, "Starting script \x1b[36m\"dump.pf\"\x1b[39m as service \x1b[36m\"dump\"\x1b[39m."},
 		{`hub dump "big"`, "# Function dump of `big`\n\n## Code dump for function `big` with sig int\n\n@103 : asgm m293 <- m291  // Assign to memory.\n@104 : gtei m292 <- m293 m295  // Int comparison with >=.\n@105 : asgm m296 <- m292  // Assign to memory.\n@106 : qtru m296 @109  // Test true.\n@107 : asgm m298 <- m297  // Assign to memory.\n@108 : jmp @110  // Jump.\n@109 : asgm m298 <- m3  // Assign to memory.\n@110 : qsat m298 @113  // Test not `UNSAT`.\n@111 : asgm m300 <- m298  // Assign to memory.\n@112 : jmp @114  // Jump.\n@113 : asgm m300 <- m299  // Assign to memory.\n@114 : ret  // Return."},
-		{`hub dump m "big"`, "# Function dump of `big`\n\n## Code dump for function `big` with sig int\n\n@103 : asgm m293 <- m291  // Assign to memory.\n@104 : gtei m292 <- m293 m295  // Int comparison with >=.\n@105 : asgm m296 <- m292  // Assign to memory.\n@106 : qtru m296 @109  // Test true.\n@107 : asgm m298 <- m297  // Assign to memory.\n@108 : jmp @110  // Jump.\n@109 : asgm m298 <- m3  // Assign to memory.\n@110 : qsat m298 @113  // Test not `UNSAT`.\n@111 : asgm m300 <- m298  // Assign to memory.\n@112 : jmp @114  // Jump.\n@113 : asgm m300 <- m299  // Assign to memory.\n@114 : ret  // Return.\n\n### Memory dump for function `big` with sig int`\n\nm291 : UNDEFINED VALUE::UNDEFINED VALUE!\nm292 : error::\x1b[31mError\x1b[39m: something unexpected has gone wrong at line \x1b[33m4:6-8\x1b[39m of \x1b[36m\"../hub/test-files/dump.pf\"\x1b[39m. \nm293 : UNDEFINED VALUE::UNDEFINED VALUE!\nm294 : BLING::>=\nm295 : int::100\nm296 : UNDEFINED VALUE::UNDEFINED VALUE!\nm297 : string::\"big\"\nm298 : UNDEFINED VALUE::UNDEFINED VALUE!\nm299 : string::\"small\"\nm300 : UNDEFINED VALUE::UNDEFINED VALUE!"},
+		{`hub dump m "big"`, "# Function dump of `big`\n\n## Code dump for function `big` with sig int\n\n@103 : asgm m293 <- m291  // Assign to memory.\n@104 : gtei m292 <- m293 m295  // Int comparison with >=.\n@105 : asgm m296 <- m292  // Assign to memory.\n@106 : qtru m296 @109  // Test true.\n@107 : asgm m298 <- m297  // Assign to memory.\n@108 : jmp @110  // Jump.\n@109 : asgm m298 <- m3  // Assign to memory.\n@110 : qsat m298 @113  // Test not `UNSAT`.\n@111 : asgm m300 <- m298  // Assign to memory.\n@112 : jmp @114  // Jump.\n@113 : asgm m300 <- m299  // Assign to memory.\n@114 : ret  // Return.\n\n### Memory dump for function `big` with sig int`\n\nm291 : UNDEFINED VALUE::UNDEFINED VALUE!\nm292 : error::\x1b[31mError\x1b[39m: something unexpected has gone wrong at line \x1b[33m4:6-8\x1b[39m of \x1b[36m\"../hub/test-files/dump.pf\"\x1b[39m.\n\n\nm293 : UNDEFINED VALUE::UNDEFINED VALUE!\nm294 : BLING::>=\nm295 : int::100\nm296 : UNDEFINED VALUE::UNDEFINED VALUE!\nm297 : string::\"big\"\nm298 : UNDEFINED VALUE::UNDEFINED VALUE!\nm299 : string::\"small\"\nm300 : UNDEFINED VALUE::UNDEFINED VALUE!"},
 		{`hub halt "dump"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
+
 
 func TestEnv(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
 		{`hub env "foo"::42`, `OK`},
 		{`hub env key "", "Default key for testing."`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 
 	testB := []test_helper.TestItem{
 		{`hub delete env "foo"`, `OK`},
 		{`hub nuke env`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", testB)
 }
@@ -88,9 +89,9 @@ func TestEnv(t *testing.T) {
 func TestErrors(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{"2 +", "[0] [31mError[39m: can't parse end of line as a prefix at line [33m1:3[39m of REPL input."},
+		{"2 +", "[0] \x1b[31mError\x1b[39m: can't parse end of line as a prefix at line \x1b[33m1:3\x1b[39m of REPL input."},
 		{`hub why 0`, "\x1b[31mError\x1b[39m: can't parse end of line as a prefix. \n\nYou've put end of line in such a position that it looks like you want it to function as a \x1b[0m\nprefix, but it isn't one. \n\n                                                      Error has reference \x1b[0m\x1b[48;2;0;0;64m\x1b[97m\"parse/prefix\"\x1b[0m."},
-		{`hub where 0`, "2 +\x1b[31m\n\x1b[0m   \x1b[31m▔\x1b[0m"},
+		{`hub where 0`, "2 +\x1b[31m\n\x1b[39m   \x1b[31m▔\x1b[39m"},
 		{`hub errors`, "[0] \x1b[31mError\x1b[39m: can't parse end of line as a prefix at line \x1b[33m1:3\x1b[39m of REPL input."},
 	}
 	test_helper.RunHubTest(t, "default", test)
@@ -99,13 +100,13 @@ func TestErrors(t *testing.T) {
 func TestHttp(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub http`, "\x1b[32mOK\x1b[0m"},
-		{`hub run "../hub/test-files/server.pf"`, `Starting script [36m"server.pf"[39m as service [36m"server"[39m.`},
-		{`hub run "../hub/test-files/client.pf"`, `Starting script [36m"client.pf"[39m as service [36m"client"[39m.`},
+		{`hub http`, "\x1b[32mOK\x1b[39m"},
+		{`hub run "../hub/test-files/server.pf"`, "Starting script \x1b[36m\"server.pf\"\x1b[39m as service \x1b[36m\"server\"\x1b[39m."},
+		{`hub run "../hub/test-files/client.pf"`, "Starting script \x1b[36m\"client.pf\"\x1b[39m as service \x1b[36m\"client\"\x1b[39m."},
 		{`twice 2`, "4"},
 		{`hub halt "client"`, `OK`},
 		{`hub halt "server"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
@@ -113,11 +114,11 @@ func TestHttp(t *testing.T) {
 func TestLog(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/log.pf"`, `Starting script [36m"log.pf"[39m as service [36m"log"[39m.`},
+		{`hub run "../hub/test-files/log.pf"`, "Starting script \x1b[36m\"log.pf\"\x1b[39m as service \x1b[36m\"log\"\x1b[39m."},
 		{`big 6`, `"small"`},
 		{`hub log`, "\x1b[0m  ▪ Log at line 8 : Called \x1b[0m\x1b[48;2;0;0;64m\x1b[97mbig\x1b[0m. \n\x1b[0m  ▪ At line 9 we evaluated the condition \x1b[0m\x1b[48;2;0;0;64m\x1b[97mi >= 100\x1b[0m. The condition failed. \n\x1b[0m  ▪ At line 11 we took the \x1b[0m\x1b[48;2;0;0;64m\x1b[97melse\x1b[0m branch, so at line 12 function \x1b[0m\x1b[48;2;0;0;64m\x1b[97mbig\x1b[0m returned \x1b[0m\x1b[48;2;0;0;64m\x1b[97m\"small\"\x1b[0m."},
 		{`hub halt "log"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
@@ -126,9 +127,9 @@ func TestRbam(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.UserItem{
 		{``, ``, `hub config admin "mmadmin", "Norma", "Mortenson", "marilyn@hollywood.org", "password123"`, "You are logged on as \x1b[36mmmadmin\x1b[39m."},
-		{`mmadmin`, `password123`, `hub run "../hub/test-files/foo.pf"`, `Starting script [36m"foo.pf"[39m as service [36m"foo"[39m.`},
+		{`mmadmin`, `password123`, `hub run "../hub/test-files/foo.pf"`, "Starting script \x1b[36m\"foo.pf\"\x1b[39m as service \x1b[36m\"foo\"\x1b[39m."},
 		{`mmadmin`, `password123`, `hub let "Users" use "foo"`, `OK`},
-		{`mmadmin`, `password123`, `hub services`, "The hub is running the following services:\n\n[32m  ▪ [0mService [36m\"foo\"[39m running script [36m\"foo.pf\"[39m."},
+		{`mmadmin`, `password123`, `hub services`, "The hub is running the following services:\n\n\x1b[32m  ▪ \x1b[39mService \x1b[36m\"foo\"\x1b[39m running script \x1b[36m\"foo.pf\"\x1b[39m."},
 		{`mmadmin`, `password123`, `foo 2`, `4`},
 		{`mmadmin`, `password123`, `hub sign off`, "\x1b[32mOK\x1b[39m\n\n┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈\n\nThis is an administered hub and you aren't logged on. Please use either \x1b[0m\x1b[48;2;0;0;64m\x1b[97mhub register\x1b[0m to \x1b[0m\nregister as a guest; \x1b[0m\x1b[48;2;0;0;64m\x1b[97mhub forgot password(username, email string)\x1b[0m to replace your password; \x1b[0m\nor \x1b[0m\x1b[48;2;0;0;64m\x1b[97mhub sign on\x1b[0m to sign on if you're trying to use the hub on the terminal it's running on \x1b[0m\nand you're already registered with this hub."},
 		{``, ``, `hub register "jdean", "James", "Dean", "rebel@hollywood.org", "password456"`, "You are logged on as \x1b[36mjdean\x1b[39m."},
@@ -170,7 +171,7 @@ func TestRbam(t *testing.T) {
 		{`mmadmin`, `password123`, `hub uncreate group "Superusers"`, "OK"},
 		{`mmadmin`, `password123`, `hub unregister "jdean"`, "OK"},
 		{`mmadmin`, `password789`, `hub nuke admin`, "OK"},
-		{``, ``, `hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{``, ``, `hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunUserTest(t, "rbam", test)
 }
@@ -180,11 +181,11 @@ func TestServices(t *testing.T) {
 	test := []test_helper.TestItem{
 		{"2 + 2", "4"},
 		{`hub services`, `No services are running on this hub.`},
-		{`hub run "../hub/test-files/foo.pf"`, `Starting script [36m"foo.pf"[39m as service [36m"foo"[39m.`},
+		{`hub run "../hub/test-files/foo.pf"`, "Starting script \x1b[36m\"foo.pf\"\x1b[39m as service \x1b[36m\"foo\"\x1b[39m."},
 		{`hub reset`, "Restarting script \x1b[36m\"../hub/test-files/foo.pf\"\x1b[39m as service \x1b[36m\"foo\"\x1b[39m."},
-		{`hub services`, "The hub is running the following services:\n\n[32m  ▪ [0mService [36m\"foo\"[39m running script [36m\"foo.pf\"[39m."},
+		{`hub services`, "The hub is running the following services:\n\n\x1b[32m  ▪ \x1b[39mService \x1b[36m\"foo\"\x1b[39m running script \x1b[36m\"foo.pf\"\x1b[39m."},
 		{`foo 2`, `4`},
-		{`hub run "../hub/test-files/bar.pf"`, `Starting script [36m"bar.pf"[39m as service [36m"bar"[39m.`},
+		{`hub run "../hub/test-files/bar.pf"`, "Starting script \x1b[36m\"bar.pf\"\x1b[39m as service \x1b[36m\"bar\"\x1b[39m."},
 		{`bar 2`, `6`},
 		{`hub switch "foo"`, `OK`},
 		{`foo 2`, `4`},
@@ -193,7 +194,7 @@ func TestServices(t *testing.T) {
 		{`hub switch "qux"`, "\x1b[31mHub error\x1b[39m: service \x1b[36mqux\x1b[39m is not initialized."},
 		{`hub halt "foo"`, `OK`},
 		{`hub halt "bar"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
@@ -202,7 +203,7 @@ func TestShell(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
 		{`$ echo "Hello!"`, "Hello!"},
-		{"$ return 0", "\x1b[32mOK\x1b[0m"},
+		{"$ return 0", "\x1b[32mOK\x1b[39m"},
 		{"$ return 42", "\x1b[31mHub error\x1b[39m: exit status 42"},
 	}
 	test_helper.RunHubTest(t, "default", test)
@@ -211,11 +212,11 @@ func TestShell(t *testing.T) {
 func TestTrace(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/trace.pf"`, "Starting script [36m\"trace.pf\"[39m as service [36m\"trace\"[39m."},
+		{`hub run "../hub/test-files/trace.pf"`, "Starting script \x1b[36m\"trace.pf\"\x1b[39m as service \x1b[36m\"trace\"\x1b[39m."},
 		{"foo 0", "[0] \x1b[31mError\x1b[39m: division by zero at line \x1b[33m4:7-10\x1b[39m of \x1b[36m\"../hub/test-files/trace.pf\"\x1b[39m."},
-		{"hub trace", "\x1b[31mError\x1b[39m: division by zero \nFrom: \x1b[0m\x1b[48;2;0;0;64m\x1b[97mfoo\x1b[0m at line \x1b[33m1:0-3\x1b[39m of REPL input. From: \x1b[0m\x1b[48;2;0;0;64m\x1b[97mdiv\x1b[0m at line \x1b[33m4:7-10\x1b[39m of \x1b[36m\"../hub/test-files/\x1b[0m\n\x1b[33m\x1b[39m\x1b[36mtrace.pf\"\x1b[39m. From: \x1b[0m\x1b[48;2;0;0;64m\x1b[97mdiv\x1b[0m at line \x1b[33m4:7-10\x1b[39m of \x1b[36m\"../hub/test-files/trace.pf\"\x1b[39m."},
+		{"hub trace", "\x1b[31mError\x1b[39m: division by zero \nFrom: \x1b[0m\x1b[48;2;0;0;64m\x1b[97mfoo\x1b[0m at line \x1b[33m1:0-3\x1b[39m of REPL input. From: \x1b[0m\x1b[48;2;0;0;64m\x1b[97mdiv\x1b[0m at line \x1b[33m4:7-10\x1b[39m of \x1b[36m\"../hub/test-files/\x1b[0m\ntrace.pf\"\x1b[39m. From: \x1b[0m\x1b[48;2;0;0;64m\x1b[97mdiv\x1b[0m at line \x1b[33m4:7-10\x1b[39m of \x1b[36m\"../hub/test-files/trace.pf\"\x1b[39m."},
 		{`hub halt "trace"`, "OK"},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
@@ -223,14 +224,14 @@ func TestTrace(t *testing.T) {
 func TestValues(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/vals.pf"`, "Starting script [36m\"vals.pf\"[39m as service [36m\"vals\"[39m."},
+		{`hub run "../hub/test-files/vals.pf"`, "Starting script \x1b[36m\"vals.pf\"\x1b[39m as service \x1b[36m\"vals\"\x1b[39m."},
 		{`hub values`, "\x1b[31mHub error\x1b[39m: there are no recent errors."},
 		{`flibble`, "[0] \x1b[31mError\x1b[39m: identifier \x1b[0m\x1b[48;2;0;0;64m\x1b[97mflibble\x1b[0m is undeclared at line \x1b[33m1:0-7\x1b[39m of REPL input."},
 		{`hub values`, "\x1b[31mHub error\x1b[39m: no values were passed."},
 		{`"foo"[three]`, "[0] \x1b[31mError\x1b[39m: index \x1b[0m\x1b[48;2;0;0;64m\x1b[97m3\x1b[0m is out of range 0::3 at line \x1b[33m1:5-6\x1b[39m of REPL input. \n\nValues are available with \x1b[0m\x1b[48;2;0;0;64m\x1b[97mhub values\x1b[0m."},
 		{`hub values`, "Values passed were:\n\n  ▪ \"foo\"\n  ▪ 3"},
 		{`hub halt "vals"`, "OK"},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }

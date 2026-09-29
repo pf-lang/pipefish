@@ -43,13 +43,12 @@ func compile(this js.Value, args []js.Value) any {
 		return err.Error()
 	}
 
-	service = pf.NewService(fs)
-	service.SetFileSystem(fs)
+	service = pf.NewService().Update(pf.Dependencies{FileSystem: fs})
 
 	if err := service.InitializeFromCode(string(main)); err != nil {
 		return err.Error()
 	}
-	service.SetOutHandler(service.MakeCapturingOutHandler())
+	service.Update(pf.Dependencies{OutHandler: service.MakeCapturingOutHandler()})
 	return nil
 }
 
@@ -73,7 +72,7 @@ func compileMain(this js.Value, args []js.Value) any {
 	if err := service.InitializeFromCode(string(main)); err != nil {
 		return err.Error()
 	}
-	service.SetOutHandler(service.MakeCapturingOutHandler())
+	service.Update(pf.Dependencies{OutHandler: service.MakeCapturingOutHandler()})
 	return nil
 }
 
@@ -89,8 +88,6 @@ func do(this js.Value, args []js.Value) any {
 
 	return service.ToString(result)
 }
-
-
 
 func main() {
 	initializer.RegisterWasmGoPackages(registry.Packages)
@@ -123,7 +120,7 @@ func main() {
 			this js.Value,
 			args []js.Value,
 		) interface{} {
-			return markdown.RenderMdAsHtml(
+			return markdown.RenderMdAsBookHtml(
 				args[0].String(),
 			)
 		}),

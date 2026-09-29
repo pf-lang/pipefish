@@ -12,6 +12,7 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/dtypes"
 	"github.com/tim-hardcastle/pipefish/source/err"
+	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/parser"
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
@@ -89,6 +90,33 @@ func NewCompiler(p *parser.Parser, ccb *CommonCompilerBindle) *Compiler {
 	return newC
 }
 
+type Dependencies struct{
+	// This is the file system used both by the runtime and by the compiler: by the runtime via
+	// the `files` standard library, and by the compiler to locate dependencies.
+	FileSystem            filesystem.FileSystem  
+
+	// Where `get x from Terminal("prompt")` will get input from.         
+	InHandler             vm.InHandler  
+
+	// Where `post x` / `post x to Output()` will post to.           
+	OutHandler            vm.OutHandler    
+
+	// Where `post x to Terminal()` will post to.   
+	// Terminal              ***  
+
+	// The contents of `$_env`.
+	Environment           values.Map      
+
+	// Map of names to services, to be compiled as external services with the names as namespaces.
+	ExternalServices      map[string]*Compiler
+
+	// A function which knows how to render markdown in the TUI of the service. This is going to 
+	// be different according to whether it's running in a Linux terminal and we're using the 
+	// terminal control codes; or running in the browser and using HTML: or other cases not yet
+	// encountered.
+	MarkdownRenderer      func(string)string 
+}
+
 func (cp *Compiler) AddRecursionRelation(x, y uint32) {
 	if _, ok := cp.RecurringFunctions[x]; !ok {
 		cp.RecurringFunctions[x] = dtypes.SetOf(x, y)
@@ -111,9 +139,10 @@ type CommonCompilerBindle struct {
 	LabelIsPrivate           []bool
 	AbstractTypesByName      TypeSys
 	CompilerCount            uint32
+	Dependencies             *Dependencies
 }
 
-func NewCommonCompilerBindle() *CommonCompilerBindle {
+func NewCommonCompilerBindle(d *Dependencies) *CommonCompilerBindle {
 	newBindle := &CommonCompilerBindle{
 		SharedTypenameToTypeList: map[string]AlternateType{
 			// TODO --- why can't we define one in terms of the other?
@@ -123,6 +152,7 @@ func NewCommonCompilerBindle() *CommonCompilerBindle {
 		AnyTuple:            AlternateType{},
 		CodeGeneratingTypes: (make(dtypes.Set[values.ValueType])).Add(values.FUNC),
 		AbstractTypesByName: NewCommonTypeMap(),
+		Dependencies:        d,
 	}
 	for _, name := range AbstractTypesOtherThanAny {
 		newBindle.SharedTypenameToTypeList[name] = AltType()
@@ -138,6 +168,18 @@ func NewCommonCompilerBindle() *CommonCompilerBindle {
 	newBindle.SharedTypenameToTypeList["tuple"] = newBindle.AnyTuple
 	newBindle.IsRangeable = altType(values.INT, values.TUPLE, values.STRING, values.TYPE, values.PAIR, values.LIST, values.MAP, values.SET, values.SNIPPET)
 	return newBindle
+}
+
+func (cp *Compiler) InjectDependencies() {
+	switch out := cp.Common.Dependencies.OutHandler.(type) {
+	case *vm.SimpleOutHandler:
+		out.Vm = cp.Vm
+	}
+	cp.Vm.World.InHandle = cp.Common.Dependencies.InHandler
+	cp.Vm.World.OutHandle = cp.Common.Dependencies.OutHandler
+	cp.Vm.World.FileSystem = cp.Common.Dependencies.FileSystem
+	cp.Vm.World.MarkdownRenderer = cp.Common.Dependencies.MarkdownRenderer
+	cp.SetEnv(cp.Common.Dependencies.Environment)
 }
 
 func (ccb *CommonCompilerBindle) IsInfalliblyRangeable() AlternateType {
@@ -3241,6 +3283,12 @@ func (cp *Compiler) SetEnv(env values.Map) {
 	for _, child := range cp.Modules {
 		child.SetEnv(env)
 	}
-	hubStore, _ := cp.GlobalVars.GetVar("$_env")
-	cp.Vm.Mem[hubStore.MLoc].V = env
+	envVar, _ := cp.GlobalVars.GetVar("$_env")
+	if envVar == nil                   {
+		dummyTok := token.Token{}
+		cp.Reserve(values.MAP, env, &dummyTok)
+		cp.AddThatAsVariable(cp.GlobalVars, "$_env", GLOBAL_VARIABLE_PUBLIC, AltType(values.MAP), &dummyTok)
+		return
+	}
+	cp.Vm.Mem[envVar.MLoc].V = env
 }

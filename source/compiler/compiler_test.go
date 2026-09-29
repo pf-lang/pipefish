@@ -23,10 +23,10 @@ func TestAlias(t *testing.T) {
 func TestApi(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/foo.pf"`, `Starting script [36m"foo.pf"[39m as service [36m"foo"[39m.`},
-		{`hub api`, "\x1b[1m\x1b[3m≡≡≡≡ foo ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡\n\x1b[0m\n\x1b[1m════ Functions ════════════════════════════════════════════════════════════════════════════\n\x1b[0m\n\x1b[36m•\x1b[0m foo\x1b[38;2;255;215;0m(\x1b[0mx \x1b[38;2;78;201;176many?\x1b[0m\x1b[38;2;255;215;0m)\x1b[0m"},
+		{`hub run "../hub/test-files/foo.pf"`, "Starting script \x1b[36m\"foo.pf\"\x1b[39m as service \x1b[36m\"foo\"\x1b[39m."},
+		{`hub api`, "\x1b[1m\x1b[3m≡≡≡≡ foo ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡\n\x1b[0m\n\x1b[1m════ Functions ════════════════════════════════════════════════════════════════════════════\n\x1b[0m\n\x1b[36m•\x1b[39m foo\x1b[38;2;255;215;0m(\x1b[0mx \x1b[38;2;78;201;176many?\x1b[0m\x1b[38;2;255;215;0m)\x1b[0m"},
 		{`hub halt "foo"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
@@ -235,11 +235,11 @@ func TestCorners(t *testing.T) {
 func TestDump(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/dump.pf"`, `Starting script [36m"dump.pf"[39m as service [36m"dump"[39m.`},
+		{`hub run "../hub/test-files/dump.pf"`, "Starting script \x1b[36m\"dump.pf\"\x1b[39m as service \x1b[36m\"dump\"\x1b[39m."},
 		{`hub dump "big"`, "# Function dump of `big`\n\n## Code dump for function `big` with sig int\n\n@103 : asgm m293 <- m291  // Assign to memory.\n@104 : gtei m292 <- m293 m295  // Int comparison with >=.\n@105 : asgm m296 <- m292  // Assign to memory.\n@106 : qtru m296 @109  // Test true.\n@107 : asgm m298 <- m297  // Assign to memory.\n@108 : jmp @110  // Jump.\n@109 : asgm m298 <- m3  // Assign to memory.\n@110 : qsat m298 @113  // Test not `UNSAT`.\n@111 : asgm m300 <- m298  // Assign to memory.\n@112 : jmp @114  // Jump.\n@113 : asgm m300 <- m299  // Assign to memory.\n@114 : ret  // Return."},
-		{`hub dump m "big"`, "# Function dump of `big`\n\n## Code dump for function `big` with sig int\n\n@103 : asgm m293 <- m291  // Assign to memory.\n@104 : gtei m292 <- m293 m295  // Int comparison with >=.\n@105 : asgm m296 <- m292  // Assign to memory.\n@106 : qtru m296 @109  // Test true.\n@107 : asgm m298 <- m297  // Assign to memory.\n@108 : jmp @110  // Jump.\n@109 : asgm m298 <- m3  // Assign to memory.\n@110 : qsat m298 @113  // Test not `UNSAT`.\n@111 : asgm m300 <- m298  // Assign to memory.\n@112 : jmp @114  // Jump.\n@113 : asgm m300 <- m299  // Assign to memory.\n@114 : ret  // Return.\n\n### Memory dump for function `big` with sig int`\n\nm291 : UNDEFINED VALUE::UNDEFINED VALUE!\nm292 : error::\x1b[31mError\x1b[39m: something unexpected has gone wrong at line \x1b[33m4:6-8\x1b[39m of \x1b[36m\"../hub/test-files/dump.pf\"\x1b[39m. \nm293 : UNDEFINED VALUE::UNDEFINED VALUE!\nm294 : BLING::>=\nm295 : int::100\nm296 : UNDEFINED VALUE::UNDEFINED VALUE!\nm297 : string::\"big\"\nm298 : UNDEFINED VALUE::UNDEFINED VALUE!\nm299 : string::\"small\"\nm300 : UNDEFINED VALUE::UNDEFINED VALUE!"},
+		{`hub dump m "big"`, "# Function dump of `big`\n\n## Code dump for function `big` with sig int\n\n@103 : asgm m293 <- m291  // Assign to memory.\n@104 : gtei m292 <- m293 m295  // Int comparison with >=.\n@105 : asgm m296 <- m292  // Assign to memory.\n@106 : qtru m296 @109  // Test true.\n@107 : asgm m298 <- m297  // Assign to memory.\n@108 : jmp @110  // Jump.\n@109 : asgm m298 <- m3  // Assign to memory.\n@110 : qsat m298 @113  // Test not `UNSAT`.\n@111 : asgm m300 <- m298  // Assign to memory.\n@112 : jmp @114  // Jump.\n@113 : asgm m300 <- m299  // Assign to memory.\n@114 : ret  // Return.\n\n### Memory dump for function `big` with sig int`\n\nm291 : UNDEFINED VALUE::UNDEFINED VALUE!\nm292 : error::\x1b[31mError\x1b[39m: something unexpected has gone wrong at line \x1b[33m4:6-8\x1b[39m of \x1b[36m\"../hub/test-files/dump.pf\"\x1b[39m.\n\n\nm293 : UNDEFINED VALUE::UNDEFINED VALUE!\nm294 : BLING::>=\nm295 : int::100\nm296 : UNDEFINED VALUE::UNDEFINED VALUE!\nm297 : string::\"big\"\nm298 : UNDEFINED VALUE::UNDEFINED VALUE!\nm299 : string::\"small\"\nm300 : UNDEFINED VALUE::UNDEFINED VALUE!"},
 		{`hub halt "dump"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }
@@ -545,25 +545,25 @@ func TestGocode(t *testing.T) {
 
 func TestHighlighter(t *testing.T) {
 	tests := []test_helper.TestItem{
-		{`Type`, `[38;2;78;201;176mType[0m`},
-		{`int`, `[38;2;78;201;176mint[0m`},
-		{`int // comment`, `[38;2;78;201;176mint[0m [38;2;106;153;85m// comment[0m`},
-		{`"string"`, `[38;2;206;145;120m"string"[0m`},
-		{`42`, `[38;2;181;206;168m42[0m`},
-		{`ENUM`, `[38;2;79;193;255mENUM[0m`},
-		{`~~ docstring`, `[38;2;244;71;71m[4m~~[0m docstring`},
-		{`true`, `[38;2;86;156;214mtrue[0m`},
-		{`'q'`, `[38;2;206;145;120m'q'[0m`},
-		{`else`, `[38;2;197;134;192melse[0m`},
-		{"`foo`", "[38;2;206;145;120m`foo`[0m"},
-		{`0b10`, `[38;2;181;206;168m0b10[0m`},
-		{`0o10`, `[38;2;181;206;168m0o10[0m`},
-		{`0x10`, `[38;2;181;206;168m0x10[0m`},
-		{`foo(bar(spong()))`, `foo[38;2;255;215;0m([0mbar[38;2;218;112;214m([0mspong[38;2;23;159;255m([0m[38;2;23;159;255m)[0m[38;2;218;112;214m)[0m[38;2;255;215;0m)[0m`},
-		{`(]`, `[38;2;255;215;0m([0m[38;2;244;71;71m[4m][0m`},
-		{`int?`, `[38;2;78;201;176mint?[0m`},
-		{`int!`, `[38;2;78;201;176mint![0m`},
-		{`.`, `[38;2;86;156;214m.[0m`},
+		{"Type", "\x1b[38;2;78;201;176mType\x1b[0m"},
+		{"int", "\x1b[38;2;78;201;176mint\x1b[0m"},
+		{"int // comment", "\x1b[38;2;78;201;176mint\x1b[0m \x1b[38;2;106;153;85m// comment\x1b[0m"},
+		{`"string"`, "\x1b[38;2;206;145;120m\"string\"\x1b[0m"},
+		{"42", "\x1b[38;2;181;206;168m42\x1b[0m"},
+		{"ENUM", "\x1b[38;2;79;193;255mENUM\x1b[0m"},
+		{"~~ docstring", "\x1b[38;2;244;71;71m\x1b[4m~~\x1b[0m docstring"},
+		{"true", "\x1b[38;2;86;156;214mtrue\x1b[0m"},
+		{"'q'", "\x1b[38;2;206;145;120m'q'\x1b[0m"},
+		{"else", "\x1b[38;2;197;134;192melse\x1b[0m"},
+		{"`foo`", "\x1b[38;2;206;145;120m`foo`\x1b[0m"},
+		{"0b10", "\x1b[38;2;181;206;168m0b10\x1b[0m"},
+		{"0o10", "\x1b[38;2;181;206;168m0o10\x1b[0m"},
+		{"0x10", "\x1b[38;2;181;206;168m0x10\x1b[0m"},
+		{"foo(bar(spong()))", "foo\x1b[38;2;255;215;0m(\x1b[0mbar\x1b[38;2;218;112;214m(\x1b[0mspong\x1b[38;2;23;159;255m(\x1b[0m\x1b[38;2;23;159;255m)\x1b[0m\x1b[38;2;218;112;214m)\x1b[0m\x1b[38;2;255;215;0m)\x1b[0m"},
+		{"(]", "\x1b[38;2;255;215;0m(\x1b[0m\x1b[38;2;244;71;71m\x1b[4m]\x1b[0m"},
+		{"int?", "\x1b[38;2;78;201;176mint?\x1b[0m"},
+		{"int!", "\x1b[38;2;78;201;176mint!\x1b[0m"},
+		{".", "\x1b[38;2;86;156;214m.\x1b[0m"},
 	}
 	test_helper.RunTest(t, "highlighter_test.pf", tests, test_helper.TestHighlighter)
 }
@@ -729,7 +729,7 @@ func TestLiterals(t *testing.T) {
 func TestLog(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
-		{`hub run "../hub/test-files/log.pf"`, `Starting script [36m"log.pf"[39m as service [36m"log"[39m.`},
+		{`hub run "../hub/test-files/log.pf"`, "Starting script \x1b[36m\"log.pf\"\x1b[39m as service \x1b[36m\"log\"\x1b[39m."},
 		{`big 6`, `"small"`},
 		{`hub log`, "\x1b[0m  ▪ Log at line 8 : Called \x1b[0m\x1b[48;2;0;0;64m\x1b[97mbig\x1b[0m. \n\x1b[0m  ▪ At line 9 we evaluated the condition \x1b[0m\x1b[48;2;0;0;64m\x1b[97mi >= 100\x1b[0m. The condition failed. \n\x1b[0m  ▪ At line 11 we took the \x1b[0m\x1b[48;2;0;0;64m\x1b[97melse\x1b[0m branch, so at line 12 function \x1b[0m\x1b[48;2;0;0;64m\x1b[97mbig\x1b[0m returned \x1b[0m\x1b[48;2;0;0;64m\x1b[97m\"small\"\x1b[0m."},
 		{`find(["fee", "fie", "fo", "fum"], "fie")`, `1`},
@@ -737,7 +737,7 @@ func TestLog(t *testing.T) {
 		{`add [7, 8]`, `15`},
 		{`hub log`, "\x1b[0m  ▪ We entered the loop at line 22 with \x1b[0m\x1b[48;2;0;0;64m\x1b[97ma\x1b[0m = \x1b[0m\x1b[48;2;0;0;64m\x1b[97m15\x1b[0m and \x1b[0m\x1b[48;2;0;0;64m\x1b[97mel\x1b[0m = \x1b[0m\x1b[48;2;0;0;64m\x1b[97m8\x1b[0m. \n\x1b[0m  ▪ At line 23 the body of the \x1b[0m\x1b[48;2;0;0;64m\x1b[97mfor\x1b[0m loop evaluated to \x1b[0m\x1b[48;2;0;0;64m\x1b[97m7\x1b[0m. \n\x1b[0m  ▪ We entered the loop at line 22 with \x1b[0m\x1b[48;2;0;0;64m\x1b[97ma\x1b[0m = \x1b[0m\x1b[48;2;0;0;64m\x1b[97m15\x1b[0m and \x1b[0m\x1b[48;2;0;0;64m\x1b[97mel\x1b[0m = \x1b[0m\x1b[48;2;0;0;64m\x1b[97m8\x1b[0m. \n\x1b[0m  ▪ At line 23 the body of the \x1b[0m\x1b[48;2;0;0;64m\x1b[97mfor\x1b[0m loop evaluated to \x1b[0m\x1b[48;2;0;0;64m\x1b[97m15\x1b[0m."},
 		{`hub halt "log"`, `OK`},
-		{`hub quit`, "[32mOK[0m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
+		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}
 	test_helper.RunHubTest(t, "default", test)
 }

@@ -28,7 +28,6 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/dtypes"
 	"github.com/tim-hardcastle/pipefish/source/err"
-	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/initializer"
 	"github.com/tim-hardcastle/pipefish/source/pf"
 	"github.com/tim-hardcastle/pipefish/source/settings"
@@ -904,12 +903,11 @@ func (h *Hub) createService(name, scriptFilepath string, forceUpdate bool) bool 
 	if !needsRebuild {
 		return false
 	}
-	newService := pf.NewService(filesystem.OSFileSystem{})
-	newService.SetLocalExternalServices(h.Services)
-	if text.Head(scriptFilepath, "!") {
+	newService := pf.NewService().Update(pf.Dependencies{ExternalServices: h.Services})
+	if text.Head(scriptFilepath, "!") { // TODO --- deprecated.
 		scriptFilepath = filepath.Join(settings.PipefishHomeDirectory, scriptFilepath[1:])
 	}
-	e := newService.InitializeFromFilepathWithStore(scriptFilepath, h.store) // We get an error only if it completely fails to open the file, otherwise there'll be errors in the Common Parser Bindle as usual.
+	e := newService.InitializeFromFilepath(scriptFilepath) // We get an error only if it completely fails to open the file, otherwise there'll be errors in the Common Parser Bindle as usual.
 	h.Sources, _ = newService.GetSources()
 	if newService.IsBroken() {
 		if name == "hub" {
@@ -940,7 +938,7 @@ func (h *Hub) createService(name, scriptFilepath string, forceUpdate bool) bool 
 		return false
 	}
 	if testing.Testing() {
-		newService.SetOutHandler(newService.MakeLiteralOutHandler(h.Out))
+		newService.Update(pf.Dependencies{OutHandler: newService.MakeLiteralOutHandler(h.Out)})
 	}
 	h.Services[name] = newService
 	return true
@@ -952,10 +950,10 @@ func StartServiceFromCli() {
 		os.Exit(6)
 	}
 	filename := os.Args[2]
-	newService := pf.NewService(filesystem.OSFileSystem{})
+	newService := pf.NewService()
 	// This ought to get the `$_env` settings.
 	// Then we could do proper markdown in the errors.
-	newService.InitializeFromFilepathWithStore(filename, values.Map{})
+	newService.InitializeFromFilepath(filename)
 	if newService.IsBroken() {
 		fmt.Println("\nThere were errors running the script " + text.CYAN + "\"" + filename + "\"" + text.RESET + ".\n")
 		s, _ := newService.GetErrorReport()
@@ -986,8 +984,8 @@ func GetWiki() {
 		os.Exit(6)
 	}
 	filename := os.Args[2]
-	newService := pf.NewService(filesystem.OSFileSystem{})
-	newService.InitializeFromFilepathWithStore(filename, values.Map{})
+	newService := pf.NewService()
+	newService.InitializeFromFilepath(filename)
 	if newService.IsBroken() {
 		fmt.Println("\nThere were errors running the script " + text.CYAN + "\"" + filename + "\"" + text.RESET + ".\n")
 		s, _ := newService.GetErrorReport()
@@ -1225,7 +1223,7 @@ func (h *Hub) OpenHubFolder(hubFolder string) {
 
 func (h *Hub) SaveAndPropagateHubStore() {
 	for _, srv := range h.Services {
-		srv.SetEnv(h.store)
+		srv.Update(pf.Dependencies{Environment: h.store})
 	}
 	storePath := h.hubFilepath[0:len(h.hubFilepath)-len(filepath.Ext(h.hubFilepath))] + ".env"
 	storeDump := h.Services["hub"].WriteSecret(h.store, h.storekey)
@@ -1312,7 +1310,7 @@ func (h *Hub) handleJsonRequest(w http.ResponseWriter, r *http.Request) {
 	oldOut := h.Out
 	h.Out = &buf
 	sv := h.Services[request.Service]
-	sv.SetOutHandler(sv.MakeLiteralOutHandler(&buf))
+	sv.Update(pf.Dependencies{OutHandler: sv.MakeLiteralOutHandler(&buf)})
 	h.Do(request.Body, request.Username, request.Password, request.Service, true)
 	h.Out = oldOut
 	response := jsonResponse{Body: buf.String()}

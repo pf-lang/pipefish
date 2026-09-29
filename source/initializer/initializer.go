@@ -14,7 +14,6 @@ import (
 	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/dtypes"
 	"github.com/tim-hardcastle/pipefish/source/err"
-	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/parser"
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
@@ -80,19 +79,13 @@ func NewInitializer(common *commonInitializerBindle) *Initializer {
 type commonInitializerBindle struct {
 	functions      map[funcSource]*parsedFunction // This is to ensure that the same function (i.e. from the same place in source code) isn't parsed more than once.
 	declarationMap map[decKey]any                 // This prevents redeclaration of types in the same sort of way.
-	// This is a map of the compilers of all the (potential) external services on the same hub.
-	// They're stored as compilers because the initializer can't see the `Service` class.
-	serviceCompilers map[string]*compiler.Compiler
-	hubStore         values.Map // The hub store --- see wiki.
 }
 
 // Initializes the `CommonInitializerBindle`.
-func NewCommonInitializerBindle(store values.Map, services map[string]*compiler.Compiler) *commonInitializerBindle {
+func NewCommonInitializerBindle() *commonInitializerBindle {
 	b := commonInitializerBindle{
 		functions:        make(map[funcSource]*parsedFunction),
 		declarationMap:   make(map[decKey]any),
-		serviceCompilers: services,
-		hubStore:         store,
 	}
 	return &b
 }
@@ -142,15 +135,15 @@ func newCompiler(Common *parser.CommonParserBindle, ccb *compiler.CommonCompiler
 func (iz *Initializer) prepareForCompilation(
 	scriptFilepath string,
 	sourcecode string,
-	fs filesystem.FileSystem,
+	dependencies *compiler.Dependencies,
 ) *compiler.Compiler {
 	iz.cmI("Parsing everything.")
 	vm := vm.BlankVm()
-	vm.FileSystem = fs
+
 	result := iz.ParseEverythingFromSourcecode(
 		vm,
 		parser.NewCommonParserBindle(),
-		compiler.NewCommonCompilerBindle(),
+		compiler.NewCommonCompilerBindle(dependencies),
 		scriptFilepath,
 		sourcecode,
 		"",
@@ -250,25 +243,19 @@ func (iz *Initializer) prepareForCompilation(
 // Initializes a compiler given the filepath.
 // This works without referring to the initializer, since sometimes we want to make a compiler
 // without one, and so a bunch of stuff is injected instead.
-func StartCompilerFromFilepath(filepath string, svs map[string]*compiler.Compiler, store values.Map, fs filesystem.FileSystem) (*compiler.Compiler, error) {
-	sourcecode, e := GetSourceCode(fs, filepath)
+func StartCompilerFromFilepath(filepath string, dependencies *compiler.Dependencies) (*compiler.Compiler, error) {
+	sourcecode, e := GetSourceCode(dependencies.FileSystem, filepath)
 	if e != nil {
 		return nil, e
 	}
-	return StartCompiler(filepath, sourcecode, svs, store, fs), nil
+	return StartCompiler(filepath, sourcecode, dependencies), nil
 }
 
-func StartCompiler(
-	scriptFilepath,
-	sourcecode string,
-	hubServices map[string]*compiler.Compiler,
-	store values.Map,
-	fs filesystem.FileSystem,
-) *compiler.Compiler {
+func StartCompiler(scriptFilepath, sourcecode string, dependencies *compiler.Dependencies) *compiler.Compiler {
 	iz := NewInitializer(
-		NewCommonInitializerBindle(store, hubServices),
+		NewCommonInitializerBindle(),
 	)
-	result := iz.prepareForCompilation(scriptFilepath, sourcecode, fs)
+	result := iz.prepareForCompilation(scriptFilepath, sourcecode, dependencies)
 	if iz.errorsExist() {
 		return result
 	}
@@ -306,13 +293,10 @@ func StartCompiler(
 // method, below.
 func (iz *Initializer) ParseEverythingFromSourcecode(mc *vm.Vm, cpb *parser.CommonParserBindle, ccb *compiler.CommonCompilerBindle, scriptFilepath, sourcecode, namespacePath string) *compiler.Compiler {
 	iz.cp = newCompiler(cpb, ccb, scriptFilepath, sourcecode, mc, namespacePath)
+	iz.cp.InjectDependencies()
 	iz.P = iz.cp.P
 	iz.parseEverything(scriptFilepath, sourcecode)
 	iz.cp.ScriptFilepath = scriptFilepath
-	if !(scriptFilepath == "" || scriptFilepath == "InitializeFromCode" ||
-		(len(scriptFilepath) >= 5 && scriptFilepath[0:5] == "http:")) &&
-		!(len(scriptFilepath) >= 11 && scriptFilepath[:11] == "test-files/") {
-	}
 	iz.P.Common.Sources[scriptFilepath] = strings.Split(sourcecode, "\n")
 	return iz.cp
 }
@@ -1258,7 +1242,6 @@ func (iz *Initializer) compileEverythingElse() [][]labeledParsedCodeChunk { // T
 		"$_cliDirectory":    {values.STRING, dir, altType(values.STRING)},
 		"$_cliArguments":    {values.LIST, cliArgs, altType(values.LIST)},
 		"$_moduleDirectory": {values.STRING, filepath.Dir(iz.cp.ScriptFilepath), altType(values.STRING)},
-		"$_env":             {values.MAP, iz.Common.hubStore, altType(values.MAP)},
 	}
 	// Service variables which tell the compiler how to compile things must be
 	// set before we compile the functions, and so can't be calculated but must
