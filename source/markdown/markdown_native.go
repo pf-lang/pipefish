@@ -7,5 +7,5 @@ func GetTuiRenderer(width int) func(string)string {
 }
 
 func NewTerminalRenderer(highlighter func(string) string, width int) Renderer {
-	return NewRenderer(MakeRenderFunction(getTerminalRenderer(92), highlighter))
+	return NewRenderer(MakeRenderFunction(getTerminalRenderer(width), highlighter), width, "\n")
 }

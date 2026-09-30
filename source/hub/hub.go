@@ -803,9 +803,9 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 		}
 		exp, _ := pf.ExplainError(h.ers, num)
 		h.WritePretty("<R>Error</>: " + h.ers[num].Message + ".")
-		h.WriteString("\n\n")
+		h.WriteString("\n")
 		h.WritePretty(exp)
-		h.WriteString("\n\n")
+		h.WriteString("\n")
 		refLine := h.GetPretty("Error has reference `\"" + h.ers[num].ErrorId + "\"`.")
 		padding := strings.Repeat(" ", h.getSV("width").V.(int)-len(text.StripColors(refLine))-2)
 		h.WriteString(padding)
@@ -846,20 +846,23 @@ func (h *Hub) WritePretty(s string) {
 	if !ok {
 		panic("Hub failed to initialize, error is `" + s + "`.")
 	}
-	mdFunc := hubService.GetMarkdowner("", h.getSV("width").V.(int), h.getFonts())
-	h.WriteString(mdFunc(s))
+
+	h.WriteString(hubService.Render(s)+"\n")
 }
 
 func (h *Hub) GetPretty(s string) string {
-	hubService, _ := h.Services["hub"]
-	mdFunc := hubService.GetMarkdowner("", h.getSV("width").V.(int), h.getFonts())
-	return mdFunc(s)
+	hubService, ok := h.Services["hub"]
+	if !ok {
+		panic("Hub failed to initialize, error is `" + s + "`.")
+	}
+
+	return hubService.Render(s)
 }
 
 func (h *Hub) WriteError(s string) {
 	h.WriteString("\n")
 	h.WritePretty(HUB_ERROR + s)
-	h.WriteString("\n\n")
+	h.WriteString("\n")
 }
 
 func (h *Hub) WriteString(s string) {
@@ -957,8 +960,7 @@ func StartServiceFromCli() {
 	if newService.IsBroken() {
 		fmt.Println("\nThere were errors running the script " + text.CYAN + "\"" + filename + "\"" + text.RESET + ".\n")
 		s, _ := newService.GetErrorReport()
-		mdFunc := newService.GetMarkdowner("", 92, values.Map{})
-		fmt.Println(mdFunc(s))
+		fmt.Println(newService.Render(s))
 		fmt.Println()
 		os.Exit(3)
 	}
@@ -987,10 +989,9 @@ func GetWiki() {
 	newService := pf.NewService()
 	newService.InitializeFromFilepath(filename)
 	if newService.IsBroken() {
-		fmt.Println("\nThere were errors running the script " + text.CYAN + "\"" + filename + "\"" + text.RESET + ".\n")
+		fmt.Println("\nThere were errors running the script " + text.Cyan("\"" + filename + "\"") + text.RESET + ".\n")
 		s, _ := newService.GetErrorReport()
-		mdFunc := newService.GetMarkdowner("", 92, values.Map{})
-		fmt.Println(mdFunc(s))
+		fmt.Println(newService.Render(s))
 		fmt.Println()
 		os.Exit(3)
 	}
@@ -1251,7 +1252,6 @@ func (h *Hub) list() {
 		}
 		h.WriteString("\n")
 	}
-	h.WriteString("\n")
 }
 
 func valToString(srv *pf.Service, val pf.Value) string {

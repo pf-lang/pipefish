@@ -425,9 +425,9 @@ func (sv *Service) GetErrorReport() (string, error) {
 // Gets the trace report of a runtime error, in the form of a string that can be passed
 // to the `PrettyString` function for highlighting.
 func GetTraceReport(e *err.Error) string {
-	result := text.RT_ERROR + e.Message + "\n\n"
+	result := text.RT_ERROR + e.Message + "\n"
 	for i := len(e.Trace) - 1; i >= 0; i-- {
-		result = result + "  From: " + err.DescribeTok(e.Trace[i]) + err.DescribePos(e.Trace[i]) + "."
+		result = result + "- From: " + err.DescribeTok(e.Trace[i]) + err.DescribePos(e.Trace[i]) + ".\n"
 	}
 	return result + "\n"
 }
@@ -559,8 +559,8 @@ func (sv *Service) SetPostHappened() {
 }
 
 // Gets markdown with appropriate highlighting.
-func (sv *Service) GetMarkdowner(leftMargin string, rightMargin int, fonts values.Map) func(string) string {
-	return sv.cp.GetMarkdowner(leftMargin, rightMargin, fonts)
+func (sv *Service) Render(s string) string {
+	return sv.cp.Common.Dependencies.MarkdownRenderer(s)
 }
 
 // Wraps ToGoWithType for better ergonomics.

@@ -274,7 +274,7 @@ func RunHubTest(t *testing.T, hubName string, test []TestItem) {
 	h := hub.New(hubDir, &capturingWriter{})
 	for _, item := range test {
 		h.Do(item.Input, "", "", h.CurrentServiceName(), false)
-		result := strings.TrimSpace(h.Out.(*capturingWriter).get())
+		result := strings.TrimLeft(strings.TrimRight(h.Out.(*capturingWriter).get(), "\n"), "\n")
 		if result != item.Want {
 			t.Fatal("\nOn input '" + item.Input + "'\n    Exp : " + strconv.Quote(item.Want) + "\n    Got : " + strconv.Quote(result))
 		}

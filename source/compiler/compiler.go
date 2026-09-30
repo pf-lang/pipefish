@@ -2504,8 +2504,8 @@ func (cp *Compiler) compileLog(node *parser.LogExpression, ctxt Context) (uint32
 			if errCount < len(cp.P.Common.Errors) {
 				lastError := cp.P.Common.Errors[len(cp.P.Common.Errors)-1]
 				snipTok := lastError.Token
-				lastError.Message = lastError.Message + " at line " + text.Yellow(strconv.Itoa(snipTok.Line) +
-				":" + strconv.Itoa(snipTok.ChStart) + "-" + strconv.Itoa(snipTok.ChEnd)) + "of embedded code"
+				lastError.Message = lastError.Message + " at line <Y>" + strconv.Itoa(snipTok.Line) +
+				":" + strconv.Itoa(snipTok.ChStart) + "-" + strconv.Itoa(snipTok.ChEnd) + "</> of embedded code"
 				lastError.Token = &node.Token
 				return uint32(DUMMY), false, false
 			}

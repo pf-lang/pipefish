@@ -10,23 +10,27 @@ import (
 
 type Renderer struct {
 	RenderAst func(mdNode) string
+	Width     int
+	LineBreak string
 }
 
 func NewAstRenderer() Renderer {
-	return NewRenderer(PpAst)
+	return NewRenderer(PpAst, -1, "")
 }
 
 func Iota(s string) string {
 	return s
 }
 
-func NewRenderer(fn func(mdNode) string) Renderer {
-	return Renderer{fn}
+func NewRenderer(fn func(mdNode) string, width int, lineBreak string) Renderer {
+	return Renderer{fn, width, lineBreak}
 }
 
 func (rnd Renderer) Render(raw string) string {
-	ast := rnd.Parse(raw)
-	return rnd.RenderAst(ast)
+	justified := Justify(rnd.Width, raw)
+	ast := Parse(justified)
+	textWithoutLineBreaks := rnd.RenderAst(ast)
+	return strings.TrimRight(strings.ReplaceAll(textWithoutLineBreaks, "⏎", rnd.LineBreak), "\n")
 }
 
 type ContentsItem struct {
@@ -68,7 +72,7 @@ func MakeRenderFunction(textWrapper map[mdStyle]func(s string) string, codeHighl
 			for _, block := range n.nodes {
 				sb.WriteString(sep)
 				sb.WriteString(render(block))
-				sep = "\n"
+				sep = "\n\n"
 			}
 		case mdParagraph:
 			result := ""
@@ -170,6 +174,7 @@ const (
 	stCyan
 	stBlue
 	stPurple
+	stLineBreak
 )
 
 var defaultSettings = map[mdStyle]func(string) string{
@@ -189,10 +194,10 @@ var defaultSettings = map[mdStyle]func(string) string{
 
 func getTerminalRenderer(width int) map[mdStyle]func(string) string {
 	terminalSettings := map[mdStyle]func(s string) string{
-		stH1: text.H1WithWidth(width),
-		stH2: text.H2WithWidth(width),
-		stH3: text.H3WithWidth(width),
-		stH4: text.H4WithWidth(width), 
+		stH1:        text.H1WithWidth(width),
+		stH2:        text.H2WithWidth(width),
+		stH3:        text.H3WithWidth(width),
+		stH4:        text.H4WithWidth(width), 
 	}
 	return merge(defaultSettings, terminalSettings)
 }

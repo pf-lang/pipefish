@@ -9,7 +9,7 @@ import (
 var BookRenderer = GetBookRenderer()
 
 func GetTuiRenderer(width int) func(string)string {
-	return NewRenderer(MakeRenderFunction(makeTuiHtml(width), htmlHighlighter)).Render
+	return NewRenderer(MakeRenderFunction(makeTuiHtml(width), htmlHighlighter), width, "<br>").Render
 }
 
 func RenderMdAsBookHtml(text string) string {
@@ -17,7 +17,7 @@ func RenderMdAsBookHtml(text string) string {
 }
 
 func GetBookRenderer() Renderer {
-	return NewRenderer(MakeRenderFunction(getBookHtml(), htmlHighlighter))
+	return NewRenderer(MakeRenderFunction(getBookHtml(), htmlHighlighter), -1, "")
 }
 
 func getBookHtml() map[mdStyle]func(string) string {
@@ -44,23 +44,25 @@ func getBookHtml() map[mdStyle]func(string) string {
 	</div>
 	`
 		},
-		stH1: text.H1,
-		stH2: text.H2,
-		stH3: text.H3,
-		stH4: text.H4,
+		stH1:        text.H1,
+		stH2:        text.H2,
+		stH3:        text.H3,
+		stH4:        text.H4,
+		stLineBreak: func(s string) string { return "This shouldn't happen." },
 	}
 	return merge(defaultSettings, bookSettings)
 }
 
 func makeTuiHtml(width int) map[mdStyle]func(string) string {
 	tuiSettings := map[mdStyle]func(string) string{
-		stIde:       func(s string) string { return `</div><pre><code>` + s + `</code></pre></div>` },
-		stCodeBlock: func(s string) string { return `</div><pre><code>` + s + `</code></pre></div>` },
-		stTuiBlock:  func(s string) string { return `</div><pre><code>` + s + `</code></pre></div>` },
-		stH1:        text.H1WithWidth(width),
-		stH2:        text.H2WithWidth(width),
-		stH3:        text.H3WithWidth(width),
-		stH4:        text.H4WithWidth(width),
+		stIde:        func(s string) string { return `</div><pre><code>` + s + `</code></pre></div>` },
+		stCodeBlock:  func(s string) string { return `</div><pre><code>` + s + `</code></pre></div>` },
+		stTuiBlock:   func(s string) string { return `</div><pre><code>` + s + `</code></pre></div>` },
+		stH1:         text.H1WithWidth(width),
+		stH2:         text.H2WithWidth(width),
+		stH3:         text.H3WithWidth(width),
+		stH4:         text.H4WithWidth(width),
+		stLineBreak:  func(s string) string { return "<br>" },
 	}
 	return merge(defaultSettings, tuiSettings)
 }

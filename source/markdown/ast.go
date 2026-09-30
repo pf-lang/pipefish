@@ -55,6 +55,11 @@ type mdInlineCode struct {
 
 func (n mdInlineCode) children() []mdNode { return nil }
 
+// A line break.
+type mdLineBreak struct {}
+
+func (n mdLineBreak) children() []mdNode { return nil }
+
 // A list node, the children of which will be of type mdListItem.
 type mdList struct {
 	nodes []mdNode
@@ -103,6 +108,7 @@ var mdFlavors = map[reflect.Type]string{
 	reflect.TypeFor[mdFormat]():     "format",
 	reflect.TypeFor[mdHeading]():    "heading",
 	reflect.TypeFor[mdInlineCode](): "code",
+	reflect.TypeFor[mdLineBreak]():  "linebreak",
 	reflect.TypeFor[mdList]():       "list",
 	reflect.TypeFor[mdListItem]():   "item",
 	reflect.TypeFor[mdQuote]():      "quote",

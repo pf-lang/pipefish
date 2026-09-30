@@ -2,7 +2,9 @@ package markdown
 
 import (
 	"strings"
+	"unicode/utf8"
 
+	"github.com/tim-hardcastle/pipefish/source/dtypes"
 	"github.com/tim-hardcastle/pipefish/source/text"
 )
 
@@ -19,8 +21,61 @@ const (
 	mdEnd
 )
 
+// As a pre-processing step, this inserts '⏎' characters where we need to insert a line break.
+func Justify(width int, text string) string {
+	if width <= 0 {
+		return text
+	}
+	word := ""
+	line := ""
+	justifiedText := ""
+	textLength := utf8.RuneCount([]byte(text))
+	lineLengthCount := 0
+	previousRune := '\n'
+	textAsRunes := []rune(text)
+	consumingCodeBlock := false
+	for i, r := range textAsRunes {
+		if previousRune == '\n' && r == '`' && i + 2 < textLength && textAsRunes[i+1] == '`' &&
+		textAsRunes[i+2] == '`' {
+			consumingCodeBlock = !consumingCodeBlock
+		}
+		if consumingCodeBlock {
+			justifiedText = justifiedText + string(r)
+			previousRune = r 
+			continue
+		}
+		if previousRune == '\n' {
+			if dtypes.SetOf('+', '-', '*').Contains(r) {
+				lineLengthCount = 3
+			}
+			if r == '>' {
+				lineLengthCount = -2
+			}
+		}
+		word = word + string(r)
+		if dtypes.SetOf('/', '-', ' ', '\n', ',', '.', ')', ';', ':', '>').Contains(r) || i+1 == textLength {
+			wordLength := utf8.RuneCount([]byte(word))
+			switch {
+			case dtypes.SetOf("<R>", "<Y>", "<G>", "<C>", "<B>", "<P>", "</>").Contains(word) :
+				line = line + word 
+			case lineLengthCount + wordLength <= width :
+				line = line + word
+				lineLengthCount = lineLengthCount + wordLength
+			default:
+				justifiedText = justifiedText + line + "⏎"
+				line = word
+				lineLengthCount = wordLength
+			}
+			word = ""
+		}
+		previousRune = r
+	}
+	justifiedText = justifiedText + line
+	return justifiedText
+}
+
 // The block parser.
-func (rnd Renderer) Parse(raw string) mdDocument {
+func Parse(raw string) mdDocument {
 	lines := strings.Split(raw, "\n")
 	docNodes := []mdNode{}
 	accumulator := []string{}
@@ -78,6 +133,7 @@ mainloop:
 				docNodes = append(docNodes, makeList(accumulator))
 			}
 		}
+		
 		// And we start a new block
 		if text.Head(line, "```") { // We discard code block fences.
 			accumulator = []string{}
@@ -163,15 +219,15 @@ const (
 )
 
 var stopAt = map[parserMode][]string{
-	pmText:   {"**", "*", "`", "<R>", "<Y>", "<G>", "<C>", "<B>", "<P>"},
-	pmBold:   {"**"},
-	pmItalic: {"*"},
-	pmRed:    {"</>"},
-	pmYellow: {"</>"},
-	pmGreen:  {"</>"},
-	pmCyan:   {"</>"},
-	pmBlue:   {"</>"},
-	pmPurple: {"</>"},
+	pmText:      {"**", "*", "`", "<R>", "<Y>", "<G>", "<C>", "<B>", "<P>"},
+	pmBold:      {"**"},
+	pmItalic:    {"*"},
+	pmRed:       {"</>"},
+	pmYellow:    {"</>"},
+	pmGreen:     {"</>"},
+	pmCyan:      {"</>"},
+	pmBlue:      {"</>"},
+	pmPurple:    {"</>"},
 }
 
 func (ip *inlineParser) parseAll() []mdNode {
@@ -191,57 +247,70 @@ func (ip *inlineParser) parse(pM parserMode) []mdNode {
 		// Inline code is handled differently since it doesn't get bold or italics or colors
 		// in it.
 		if pM == pmNone && ip.char() == '`' {
-			return append([]mdNode{ip.parseInlineCode()}, ip.parse(pM)...)
+			return append([]mdNode{ip.parseInlineCode()}, ip.parse(pmNone)...)
 		}
 		if (pM == pmNone || pM == pmItalic) && ip.headIs("**") {
 			ip.skip(2)
 			bolded := ip.parse(pmBold)
 			ip.skip(2)
-			return append([]mdNode{mdFormat{stBold, bolded}})
+			return []mdNode{mdFormat{stBold, bolded}}
 		}
 		if (pM == pmNone && ip.headIs("*")) ||
 			(pM == pmBold && ip.headIs("*") && !ip.headIs("**")) {
 			ip.next()
 			italicized := ip.parse(pmItalic)
 			ip.next()
-			return append([]mdNode{mdFormat{stItalic, italicized}})
+			return []mdNode{mdFormat{stItalic, italicized}}
 		}
 		if (pM == pmNone && ip.headIs("<R>")) {
 			ip.next(); ip.next(); ip.next()
 			coloredText := ip.parse(pmRed)
-			ip.next()
-			return append([]mdNode{mdFormat{stRed, coloredText}})
+			if ip.headIs("</>") {
+				ip.skip(3)
+			}
+			return []mdNode{mdFormat{stRed, coloredText}}
 		}
 		if (pM == pmNone && ip.headIs("<Y>")) {
 			ip.next(); ip.next(); ip.next()
 			coloredText := ip.parse(pmYellow)
-			ip.next()
-			return append([]mdNode{mdFormat{stYellow, coloredText}})
+			if ip.headIs("</>") {
+				ip.skip(3)
+			}
+			return []mdNode{mdFormat{stYellow, coloredText}}
 		}
 		if (pM == pmNone && ip.headIs("<G>")) {
 			ip.next(); ip.next(); ip.next()
-			coloredText := ip.parse(pmRed)
-			ip.next()
-			return append([]mdNode{mdFormat{stYellow, coloredText}})
+			coloredText := ip.parse(pmGreen)
+			if ip.headIs("</>") {
+				ip.skip(3)
+			}
+			return []mdNode{mdFormat{stGreen, coloredText}}
 		}
 		if (pM == pmNone && ip.headIs("<C>")) {
 			ip.next(); ip.next(); ip.next()
 			coloredText := ip.parse(pmCyan)
-			ip.next()
-			return append([]mdNode{mdFormat{stCyan, coloredText}})
+			if ip.headIs("</>") {
+				ip.skip(3)
+			}
+			return []mdNode{mdFormat{stCyan, coloredText}}
 		}
 		if (pM == pmNone && ip.headIs("<B>")) {
 			ip.next(); ip.next(); ip.next()
 			coloredText := ip.parse(pmBlue)
-			ip.next()
-			return append([]mdNode{mdFormat{stBlue, coloredText}})
+			if ip.headIs("</>") {
+				ip.skip(3)
+			}
+			return []mdNode{mdFormat{stBlue, coloredText}}
 		}
 		if (pM == pmNone && ip.headIs("<P>")) {
 			ip.next(); ip.next(); ip.next()
 			coloredText := ip.parse(pmPurple)
-			ip.next()
-			return append([]mdNode{mdFormat{stPurple, coloredText}})
+			if ip.headIs("</>") {
+				ip.skip(3)
+			}
+			return []mdNode{mdFormat{stPurple, coloredText}}
 		}
+
 		if pM == pmNone {
 			pM = pmText
 		}

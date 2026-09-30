@@ -40,7 +40,7 @@ func Italic(s string) string {
 }
 
 func Paragraph(s string) string {
-	return s + "\n\n"
+	return s
 }
 
 func InlineCode(s string) string {
@@ -49,11 +49,11 @@ func InlineCode(s string) string {
 }
 
 func List(s string) string {
-	return s + "\n"
+	return s
 }
 
 func ListItem(s string) string {
-	return BULLET + s + "\n"
+	return BULLET + s
 }
 
 func H1WithWidth(width int) (func(string) string) { return func(s string) string{return "≡≡≡≡ " + s + " " + strings.Repeat("≡", width - 6 - utf8.RuneCountInString(s))}}
