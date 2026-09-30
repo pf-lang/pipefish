@@ -3,7 +3,6 @@ package err
 import (
 	"strconv"
 
-	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/token"
 	"github.com/tim-hardcastle/pipefish/source/values"
 )
@@ -54,7 +53,7 @@ func GetList(ers Errors) string {
 	result := ""
 	sep := ""
 	for i, v := range ers {
-		result = result + sep + "[" + strconv.Itoa(i) + "] " + text.ERROR + (v.Message) + DescribePos(v.Token) + "."
+		result = result + sep + "[" + strconv.Itoa(i) + "] <R>Error</>: " + (v.Message) + DescribePos(v.Token) + "."
 		sep = "\n\n"
 	}
 	return result
