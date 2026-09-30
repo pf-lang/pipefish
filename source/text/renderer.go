@@ -1,11 +1,10 @@
-package markdown
+package text
 
 import (
 	"reflect"
 	"strings"
 
 	"github.com/tim-hardcastle/pipefish/source/dtypes"
-	"github.com/tim-hardcastle/pipefish/source/text"
 )
 
 type Renderer struct {
@@ -178,30 +177,29 @@ const (
 )
 
 var defaultSettings = map[mdStyle]func(string) string{
-	stParagraph:text.Paragraph,
-	stBold:     text.Bold,
-	stItalic:   text.Italic,
-	stInline:   text.InlineCode,
-	stRed:		text.Red,
-	stYellow:	text.Yellow,
-	stGreen:	text.Green,
-	stCyan:		text.Cyan,
-	stBlue:		text.Blue,
-	stPurple:	text.Purple,
-	stList:     text.List,
-	stListItem: text.ListItem,
+	stParagraph: Paragraph,
+	stBold:      Bold,
+	stItalic:    Italic,
+	stInline:    InlineCode,
+	stRed:       Red,
+	stYellow:    Yellow,
+	stGreen:     Green,
+	stCyan:      Cyan,
+	stBlue:      Blue,
+	stPurple:    Purple,
+	stList:      List,
+	stListItem:  ListItem,
 }
 
 func getTerminalRenderer(width int) map[mdStyle]func(string) string {
 	terminalSettings := map[mdStyle]func(s string) string{
-		stH1:        text.H1WithWidth(width),
-		stH2:        text.H2WithWidth(width),
-		stH3:        text.H3WithWidth(width),
-		stH4:        text.H4WithWidth(width), 
+		stH1: H1WithWidth(width),
+		stH2: H2WithWidth(width),
+		stH3: H3WithWidth(width),
+		stH4: H4WithWidth(width),
 	}
 	return merge(defaultSettings, terminalSettings)
 }
-
 
 func merge(maps ...map[mdStyle]func(string) string) map[mdStyle]func(string) string {
 	merged := map[mdStyle]func(string) string{}

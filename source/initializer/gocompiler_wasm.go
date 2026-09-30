@@ -11,7 +11,6 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
-	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/parser"
 	"github.com/tim-hardcastle/pipefish/source/token"
 	"github.com/tim-hardcastle/pipefish/source/values"
@@ -94,9 +93,7 @@ func (iz *Initializer) compileGo() {
 		}
 
 		for typeName, goValue := range valueConverter {
-			iz.cp.Vm.GoToPipefishTypes[
-				reflect.TypeOf(goValue).Elem(),
-			] = iz.cp.ConcreteTypeWithNamespaceNow(typeName)
+			iz.cp.Vm.GoToPipefishTypes[reflect.TypeOf(goValue).Elem()] = iz.cp.ConcreteTypeWithNamespaceNow(typeName)
 		}
 
 		for _, function := range iz.goBucket.functions[source] {
@@ -162,9 +159,7 @@ func init() {
 			}
 
 			source := strings.TrimPrefix(path, "libraries/")
-			wasmStandardLibrarySources[
-				"/source/initializer/libraries/"+source,
-			] = string(data)
+			wasmStandardLibrarySources["/source/initializer/libraries/"+source] = string(data)
 
 			return nil
 		},
@@ -177,11 +172,11 @@ func init() {
 
 func GetDefaultDependencies() *compiler.Dependencies {
 	return &compiler.Dependencies{
-		FileSystem: &filesystem.VFS{},
-		InHandler: nil,
-		OutHandler: vm.MakeSimpleOutHandler(os.Stdout, nil),
-		Environment: values.Map{},
+		FileSystem:       &filesystem.VFS{},
+		InHandler:        nil,
+		OutHandler:       vm.MakeSimpleOutHandler(os.Stdout, nil),
+		Environment:      values.Map{},
 		ExternalServices: map[string]*compiler.Compiler{},
-		MarkdownRenderer: markdown.GetTuiRenderer(92),
+		MarkdownRenderer: text.GetTuiRenderer(92),
 	}
 }

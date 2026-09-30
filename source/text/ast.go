@@ -1,4 +1,4 @@
-package markdown
+package text
 
 import (
 	"fmt"
@@ -56,7 +56,7 @@ type mdInlineCode struct {
 func (n mdInlineCode) children() []mdNode { return nil }
 
 // A line break.
-type mdLineBreak struct {}
+type mdLineBreak struct{}
 
 func (n mdLineBreak) children() []mdNode { return nil }
 

@@ -1,4 +1,4 @@
-package markdown
+package text
 
 import (
 	"strings"
@@ -17,12 +17,12 @@ func BoxDrawing(s string) string {
 		cookedLine := []rune{}
 		for x, r := range line {
 			q := getLocus(locus{
-					r,
-					safeLook(rawRunes, x, y-1),
-					safeLook(rawRunes, x, y+1),
-					safeLook(rawRunes, x-1, y),
-					safeLook(rawRunes, x+1, y),
-				},
+				r,
+				safeLook(rawRunes, x, y-1),
+				safeLook(rawRunes, x, y+1),
+				safeLook(rawRunes, x-1, y),
+				safeLook(rawRunes, x+1, y),
+			},
 			)
 			cookedLine = append(cookedLine, q)
 		}
@@ -38,7 +38,7 @@ func safeLook(rawRunes [][]rune, x, y int) rune {
 	return rawRunes[y][x]
 }
 
-type locus struct{center, up, down, left, right rune}
+type locus struct{ center, up, down, left, right rune }
 
 func getLocus(L locus) rune {
 	switch L.center {
@@ -192,17 +192,15 @@ func getLocus(L locus) rune {
 		}
 	case '+':
 		if dtypes.SetOf('-', '|', '^', '+').Contains(L.up) ||
-		dtypes.SetOf('-', '|', 'v', '+').Contains(L.down) ||
-		dtypes.SetOf('-', '|', '<', '+').Contains(L.left) ||
-		dtypes.SetOf('-', '|', '>', '+').Contains(L.right) {
+			dtypes.SetOf('-', '|', 'v', '+').Contains(L.down) ||
+			dtypes.SetOf('-', '|', '<', '+').Contains(L.left) ||
+			dtypes.SetOf('-', '|', '>', '+').Contains(L.right) {
 			return '┼'
 		} else {
 			return '+'
 		}
-			
 
 	default:
 		return L.center
 	}
 }
-

@@ -10,7 +10,6 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/compiler"
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
-	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/parser"
 	"github.com/tim-hardcastle/pipefish/source/settings"
 	"github.com/tim-hardcastle/pipefish/source/text"
@@ -118,13 +117,11 @@ func GetSourceCode(fs filesystem.FileSystem, scriptFilepath string) (string, err
 
 func GetDefaultDependencies() *compiler.Dependencies {
 	return &compiler.Dependencies{
-		FileSystem: filesystem.OSFileSystem{},
-		InHandler: nil,
-		OutHandler: vm.MakeSimpleOutHandler(os.Stdout, nil),
-		Environment: values.Map{},
+		FileSystem:       filesystem.OSFileSystem{},
+		InHandler:        nil,
+		OutHandler:       vm.MakeSimpleOutHandler(os.Stdout, nil),
+		Environment:      values.Map{},
 		ExternalServices: map[string]*compiler.Compiler{},
-		MarkdownRenderer: markdown.NewTerminalRenderer(func(s string) string {return s}, 92).Render,
+		MarkdownRenderer: text.NewTerminalRenderer(func(s string) string { return s }, 92).Render,
 	}
 }
-
-

@@ -61,3 +61,10 @@ func H2WithWidth(width int) (func(string) string) { return func(s string) string
 func H3WithWidth(width int) (func(string) string) { return func(s string) string{return "―――― " + s + " " + strings.Repeat("―", width - 6 - utf8.RuneCountInString(s))}}
 func H4WithWidth(width int) (func(string) string) { return func(s string) string{return "┈┈┈┈ " + s + " " + strings.Repeat("┈", width - 6 - utf8.RuneCountInString(s))}}
 
+func GetTuiRenderer(width int) func(string) string {
+	return NewTerminalRenderer(Iota, width).Render
+}
+
+func NewTerminalRenderer(highlighter func(string) string, width int) Renderer {
+	return NewRenderer(MakeRenderFunction(getTerminalRenderer(width), highlighter), width, "\n")
+}

@@ -6,14 +6,13 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/test_helper"
 	"github.com/tim-hardcastle/pipefish/source/text"
 )
 
 func TestColors(t *testing.T) {
 	if !(text.Red("foo") == "\x1b[31mfoo\x1b[39m") {
-		t.Fatal("Can't make things red.", strconv.Quote(text.Red("foo")))
+		t.Fatal("Can't make things red.")
 	}
 	if !(text.Cyan("foo") == "\x1b[36mfoo\x1b[39m") {
 		t.Fatal("Can't make things cyan.")
@@ -41,7 +40,7 @@ func TestMarkdown(t *testing.T) {
 		{`## Heading`, "════ Heading ═══════════════════════════════════════════════════════════════════════════════"},
 		{"- Bullet point", "  ▪ Bullet point"},
 	}
-	render := markdown.GetTuiRenderer(92)
+	render := text.GetTuiRenderer(92)
 	for _, test := range tests {
 		got := render(test.Input)
 		println(got)

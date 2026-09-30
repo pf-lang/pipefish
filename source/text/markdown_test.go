@@ -1,14 +1,14 @@
-package markdown_test
+package text_test
 
 import (
 	"strconv"
 	"testing"
 
-	"github.com/tim-hardcastle/pipefish/source/markdown"
+	"github.com/tim-hardcastle/pipefish/source/text"
 )
 
-type mdTest struct{
-	input string
+type mdTest struct {
+	input  string
 	output string
 }
 
@@ -23,7 +23,7 @@ func TestParsing(t *testing.T) {
 		{"```\nhello\ndarkness\n```", "doc(codeblock(hello, darkness))"},
 		{"##hello darkness", "doc(heading(2, text(hello darkness)))"},
 	}
-	runTests(t, tests, markdown.NewAstRenderer())
+	runTests(t, tests, text.NewAstRenderer())
 }
 
 // func TestHtml(t *testing.T) {
@@ -37,7 +37,7 @@ func TestParsing(t *testing.T) {
 // 		{"### Title", "<h3 id=\"Title\">Title</h3>\n"},
 // 		{"#### Title", "<h4>Title</h4>\n"},
 // 	}
-// 	runTests(t, tests, markdown.GetBookRenderer())
+// 	runTests(t, tests, GetBookRenderer())
 // }
 
 func TestBoxDrawing(t *testing.T) {
@@ -49,14 +49,14 @@ func TestBoxDrawing(t *testing.T) {
 		{"-----\n|-+-|\n-----", "╭─┬─╮\n├─┼─┤\n╰─┴─╯"},
 	}
 	for _, test := range tests {
-		result := markdown.BoxDrawing(test.input)
+		result := text.BoxDrawing(test.input)
 		if result != test.output {
 			t.Fatalf("expected \n%s\n and got \n%s\n", strconv.Quote(test.output), strconv.Quote(result))
 		}
 	}
 }
 
-func runTests(t *testing.T, tests []mdTest, rnd markdown.Renderer) {
+func runTests(t *testing.T, tests []mdTest, rnd text.Renderer) {
 	for _, test := range tests {
 		result := rnd.Render(test.input)
 		if result != test.output {

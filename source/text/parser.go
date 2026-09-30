@@ -1,11 +1,10 @@
-package markdown
+package text
 
 import (
 	"strings"
 	"unicode/utf8"
 
 	"github.com/tim-hardcastle/pipefish/source/dtypes"
-	"github.com/tim-hardcastle/pipefish/source/text"
 )
 
 type mdMode int
@@ -35,13 +34,13 @@ func Justify(width int, text string) string {
 	textAsRunes := []rune(text)
 	consumingCodeBlock := false
 	for i, r := range textAsRunes {
-		if previousRune == '\n' && r == '`' && i + 2 < textLength && textAsRunes[i+1] == '`' &&
-		textAsRunes[i+2] == '`' {
+		if previousRune == '\n' && r == '`' && i+2 < textLength && textAsRunes[i+1] == '`' &&
+			textAsRunes[i+2] == '`' {
 			consumingCodeBlock = !consumingCodeBlock
 		}
 		if consumingCodeBlock {
 			justifiedText = justifiedText + string(r)
-			previousRune = r 
+			previousRune = r
 			continue
 		}
 		if previousRune == '\n' {
@@ -56,9 +55,9 @@ func Justify(width int, text string) string {
 		if dtypes.SetOf('/', '-', ' ', '\n', ',', '.', ')', ';', ':', '>').Contains(r) || i+1 == textLength {
 			wordLength := utf8.RuneCount([]byte(word))
 			switch {
-			case dtypes.SetOf("<R>", "<Y>", "<G>", "<C>", "<B>", "<P>", "</>").Contains(word) :
-				line = line + word 
-			case lineLengthCount + wordLength <= width :
+			case dtypes.SetOf("<R>", "<Y>", "<G>", "<C>", "<B>", "<P>", "</>").Contains(word):
+				line = line + word
+			case lineLengthCount+wordLength <= width:
 				line = line + word
 				lineLengthCount = lineLengthCount + wordLength
 			default:
@@ -94,15 +93,15 @@ mainloop:
 		switch {
 		case line == "" && !(mode == mdGettingCodeBlock || mode == mdGettingCliBlock):
 			newMode = mdUnassigned
-		case text.Head(line, "#"):
+		case Head(line, "#"):
 			newMode = mdGettingHeading
-		case text.Head(line, "* ") || text.Head(line, "- ") || text.Head(line, "+ "):
+		case Head(line, "* ") || Head(line, "- ") || Head(line, "+ "):
 			newMode = mdGettingList
-		case text.Head(line, "> "):
+		case Head(line, "> "):
 			newMode = mdGettingQuote
-		case text.Head(line, "```tui"):
+		case Head(line, "```tui"):
 			newMode = mdGettingCliBlock
-		case text.Head(line, "```"):
+		case Head(line, "```"):
 			if mode == mdGettingCodeBlock || mode == mdGettingCliBlock {
 				newMode = mdUnassigned
 			} else {
@@ -133,9 +132,9 @@ mainloop:
 				docNodes = append(docNodes, makeList(accumulator))
 			}
 		}
-		
+
 		// And we start a new block
-		if text.Head(line, "```") { // We discard code block fences.
+		if Head(line, "```") { // We discard code block fences.
 			accumulator = []string{}
 		} else { // Otherwise the line that marked the end of the old block is the start of the new one.
 			accumulator = []string{line}
@@ -210,24 +209,24 @@ const (
 	pmText
 	pmBold
 	pmItalic
-	pmRed 
-	pmYellow 
-	pmGreen 
-	pmCyan 
+	pmRed
+	pmYellow
+	pmGreen
+	pmCyan
 	pmBlue
 	pmPurple
 )
 
 var stopAt = map[parserMode][]string{
-	pmText:      {"**", "*", "`", "<R>", "<Y>", "<G>", "<C>", "<B>", "<P>"},
-	pmBold:      {"**"},
-	pmItalic:    {"*"},
-	pmRed:       {"</>"},
-	pmYellow:    {"</>"},
-	pmGreen:     {"</>"},
-	pmCyan:      {"</>"},
-	pmBlue:      {"</>"},
-	pmPurple:    {"</>"},
+	pmText:   {"**", "*", "`", "<R>", "<Y>", "<G>", "<C>", "<B>", "<P>"},
+	pmBold:   {"**"},
+	pmItalic: {"*"},
+	pmRed:    {"</>"},
+	pmYellow: {"</>"},
+	pmGreen:  {"</>"},
+	pmCyan:   {"</>"},
+	pmBlue:   {"</>"},
+	pmPurple: {"</>"},
 }
 
 func (ip *inlineParser) parseAll() []mdNode {
@@ -262,48 +261,60 @@ func (ip *inlineParser) parse(pM parserMode) []mdNode {
 			ip.next()
 			return []mdNode{mdFormat{stItalic, italicized}}
 		}
-		if (pM == pmNone && ip.headIs("<R>")) {
-			ip.next(); ip.next(); ip.next()
+		if pM == pmNone && ip.headIs("<R>") {
+			ip.next()
+			ip.next()
+			ip.next()
 			coloredText := ip.parse(pmRed)
 			if ip.headIs("</>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stRed, coloredText}}
 		}
-		if (pM == pmNone && ip.headIs("<Y>")) {
-			ip.next(); ip.next(); ip.next()
+		if pM == pmNone && ip.headIs("<Y>") {
+			ip.next()
+			ip.next()
+			ip.next()
 			coloredText := ip.parse(pmYellow)
 			if ip.headIs("</>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stYellow, coloredText}}
 		}
-		if (pM == pmNone && ip.headIs("<G>")) {
-			ip.next(); ip.next(); ip.next()
+		if pM == pmNone && ip.headIs("<G>") {
+			ip.next()
+			ip.next()
+			ip.next()
 			coloredText := ip.parse(pmGreen)
 			if ip.headIs("</>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stGreen, coloredText}}
 		}
-		if (pM == pmNone && ip.headIs("<C>")) {
-			ip.next(); ip.next(); ip.next()
+		if pM == pmNone && ip.headIs("<C>") {
+			ip.next()
+			ip.next()
+			ip.next()
 			coloredText := ip.parse(pmCyan)
 			if ip.headIs("</>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stCyan, coloredText}}
 		}
-		if (pM == pmNone && ip.headIs("<B>")) {
-			ip.next(); ip.next(); ip.next()
+		if pM == pmNone && ip.headIs("<B>") {
+			ip.next()
+			ip.next()
+			ip.next()
 			coloredText := ip.parse(pmBlue)
 			if ip.headIs("</>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stBlue, coloredText}}
 		}
-		if (pM == pmNone && ip.headIs("<P>")) {
-			ip.next(); ip.next(); ip.next()
+		if pM == pmNone && ip.headIs("<P>") {
+			ip.next()
+			ip.next()
+			ip.next()
 			coloredText := ip.parse(pmPurple)
 			if ip.headIs("</>") {
 				ip.skip(3)

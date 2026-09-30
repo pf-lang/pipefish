@@ -13,8 +13,8 @@ import (
 	"syscall"
 	"github.com/tim-hardcastle/pipefish/source/err"
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
-	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/settings"
+	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/token"
 	"github.com/tim-hardcastle/pipefish/source/values"
 	"src.elv.sh/pkg/persistent/vector"
@@ -43,13 +43,13 @@ type Vm struct {
 	// the type.
 	NamespaceInfo []map[values.ValueType]string
 	// This contains the information necessary to call the tests of a given compiler.
-	Tests         [][]TestInfo
-	Labels                     []string // Array from the number of a field label to its name.
-	ValidationErrors           []*ValidationError
-	Tracking                   []TrackingData // Data needed by the 'trak' opcode to produce the live tracking data.
-	AbstractTypes              []AbstractTypeInfo
-	UsefulTypes                UsefulTypes
-	UsefulValues               UsefulValues
+	Tests            [][]TestInfo
+	Labels           []string // Array from the number of a field label to its name.
+	ValidationErrors []*ValidationError
+	Tracking         []TrackingData // Data needed by the 'trak' opcode to produce the live tracking data.
+	AbstractTypes    []AbstractTypeInfo
+	UsefulTypes      UsefulTypes
+	UsefulValues     UsefulValues
 	// TODO --- why isn't this in UsefulTypes?
 	TypeNumberOfUnwrappedError values.ValueType  // What it says. When we unwrap an 'error' to an 'Error' struct, the vm needs to know the number of the struct.
 	StringifyLoReg             uint32            // |
@@ -68,16 +68,15 @@ type Vm struct {
 	OutputTo    string            // Gives a filename to dump output to.
 	IndentBy    int               // Indentation to allow us to display the children of a node att a different depth.
 	IsCompiling bool              // So we can optionally only dump the VM during compilation, i.e. when it's doing constant folding.
-	
 	// What the VM thinks the outside world looks like.
-	World       World
+	World World
 }
-type World struct{
-	FileSystem            filesystem.FileSystem
-	InHandle              InHandler
-	OutHandle             OutHandler
-	ExternalCallHandlers  []ExternalCallHandler
-	MarkdownRenderer      func(string)string
+type World struct {
+	FileSystem           filesystem.FileSystem
+	InHandle             InHandler
+	OutHandle            OutHandler
+	ExternalCallHandlers []ExternalCallHandler
+	MarkdownRenderer     func(string) string
 }
 // In general, the VM can't convert from type names to type numbers, because it doesn't
 // need to. And we don't need the whole map of them because only a tiny proportion are
@@ -92,8 +91,8 @@ type UsefulValues struct {
 	OutputAs uint32
 }
 type TestInfo struct {
-	CallTo uint32  // The address to call to run a given test.
-	Return uint32  // Where it puts its return value.
+	CallTo uint32 // The address to call to run a given test.
+	Return uint32 // Where it puts its return value.
 }
 // Contains a Go function in the form of a reflect.Value, and, currently, nothing else.
 // TODO --- this has been the case for a long time, you could probably refactor now.
@@ -302,11 +301,11 @@ loop:
 					trackingString := vm.TrackingToString([]TrackingData{newData})
 					switch vm.Mem[staticData.LogToLoc].T {
 					case vm.UsefulTypes.LogTo:
-						mdStr := markdown.GetTuiRenderer(92)(trackingString)
+						mdStr := text.GetTuiRenderer(92)(trackingString)
 						if vm.Mem[staticData.LogToLoc].V.(int) == 0 {
-							println(strings.TrimRight(mdStr, "\n")+"\n")
+							println(strings.TrimRight(mdStr, "\n") + "\n")
 						} else {
-							vm.World.OutHandle.Write(strings.TrimRight(mdStr, "\n")+"\n")
+							vm.World.OutHandle.Write(strings.TrimRight(mdStr, "\n") + "\n")
 						}
 					case values.STRING:
 						filename := vm.Mem[staticData.LogToLoc].V.(string)
@@ -1817,7 +1816,7 @@ loop:
 				//     #3  : the location to jump to
 				//     n#4 : the index of the token to use if producing an error
 				switch vm.Mem[args[1]].T {
-				case values.BOOL :
+				case values.BOOL:
 					if vm.Mem[args[1]].V.(bool) {
 						vm.Mem[args[0]] = values.Value{values.SUCCESSFUL_VALUE, nil}
 						addr = addr + 1
@@ -1828,10 +1827,10 @@ loop:
 				case values.SUCCESSFUL_VALUE:
 					vm.Mem[args[0]] = values.Value{values.SUCCESSFUL_VALUE, nil}
 					addr = addr + 1
-				case values.ERROR :					
+				case values.ERROR:
 					vm.Mem[args[0]] = vm.Mem[args[1]]
 					addr = args[3]
-				default :
+				default:
 					vm.Mem[args[0]] = vm.makeError("vm/test/bool.a", args[4], vm.Mem[args[2]].V.(string), args[1])
 					addr = args[3]
 				}
@@ -1848,7 +1847,7 @@ loop:
 				//     #5  : the location to jump to
 				//     n#6 : the index of the token to use if producing an error
 				switch vm.Mem[args[1]].T {
-				case values.BOOL :
+				case values.BOOL:
 					if vm.Mem[args[1]].V.(bool) {
 						vm.Mem[args[0]] = values.Value{values.SUCCESSFUL_VALUE, nil}
 						addr = addr + 1
@@ -1856,10 +1855,10 @@ loop:
 						vm.Mem[args[0]] = vm.makeError("vm/test/std", args[6], vm.Mem[args[2]].V.(string), vm.Literal(vm.Mem[args[3]], 0), vm.Literal(vm.Mem[args[4]], 0))
 						addr = args[5]
 					}
-				case values.ERROR :					
+				case values.ERROR:
 					vm.Mem[args[0]] = vm.Mem[args[1]]
 					addr = args[5]
-				default :
+				default:
 					vm.Mem[args[0]] = vm.makeError("vm/test/bool.b", args[6], vm.Mem[args[2]].V.(string), args[1])
 					addr = args[5]
 				}
@@ -1926,7 +1925,7 @@ loop:
 				typeNo := vm.Mem[args[2]].V.(values.AbstractType).Types[0]
 				if info, ok := vm.ConcreteTypeInfo[typeNo].(CloneType); !ok {
 					vm.Mem[args[0]] = vm.makeError("vm/unsafe/clone", args[3])
-						break Switch
+					break Switch
 				} else {
 					if info.Parent != vm.Mem[args[1]].T {
 						vm.Mem[args[0]] = vm.makeError("vm/cast/parent", args[3])

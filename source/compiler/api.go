@@ -1,21 +1,20 @@
 package compiler
 
 import (
-	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/values"
 )
 
 func (cp *Compiler) Api(name string, path []string, fonts values.Map, width int) string {
-	markdown := markdown.GetTuiRenderer(width)
+	markdown := text.GetTuiRenderer(width)
 	return cp.RenderApi(name, path, fonts, markdown, false)
 }
 
 func (cp *Compiler) Wiki(path []string) string {
-	return cp.RenderApi("", path, values.Map{}, markdown.Iota, true)
+	return cp.RenderApi("", path, values.Map{}, text.Iota, true)
 }
 
-func (cp *Compiler) RenderApi(name string, path []string, fonts values.Map, render func(string)string, wiki bool) string {
+func (cp *Compiler) RenderApi(name string, path []string, fonts values.Map, render func(string) string, wiki bool) string {
 	if len(path) > 0 {
 		newCp, ok := cp.Modules[path[0]]
 		if !ok {
@@ -43,7 +42,7 @@ func (cp *Compiler) RenderApi(name string, path []string, fonts values.Map, rend
 			continue
 		}
 		hasContents = true
-		result = result + "\n" + render("## " + headings[i]) + "\n"
+		result = result + "\n" + render("## "+headings[i]) + "\n"
 		for _, item := range items {
 			heading := item.Declaration
 			if item.DocString != "" {
@@ -71,4 +70,3 @@ type ApiItem struct {
 }
 
 var headings = []string{"Modules", "Types", "Constants", "Variables", "Commands", "Functions"}
-

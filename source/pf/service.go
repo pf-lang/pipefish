@@ -27,37 +27,37 @@ import (
 )
 
 type Service struct {
-	cp             *compiler.Compiler
-	dependencies   Dependencies
+	cp           *compiler.Compiler
+	dependencies Dependencies
 }
 
 type FileSystem = filesystem.FileSystem
 
-type Dependencies = struct{
+type Dependencies = struct {
 	// This is the file system used both by the runtime and by the compiler: by the runtime via
 	// the `files` standard library, and by the compiler to locate dependencies.
-	FileSystem            FileSystem  
+	FileSystem FileSystem
 
-	// Where `get x from Terminal("prompt")` will get input from.         
-	InHandler             InHandler  
+	// Where `get x from Terminal("prompt")` will get input from.
+	InHandler InHandler
 
-	// Where `post x` / `post x to Output()` will post to.           
-	OutHandler            OutHandler    
+	// Where `post x` / `post x to Output()` will post to.
+	OutHandler OutHandler
 
-	// Where `post x to Terminal()` will post to.   
-	// Terminal              ***  
+	// Where `post x to Terminal()` will post to.
+	// Terminal              ***
 
 	// The contents of `$_env`.
-	Environment           Map      
+	Environment Map
 
 	// Map of names to services, to be compiled as external services with the names as namespaces.
-	ExternalServices      map[string]*Service
+	ExternalServices map[string]*Service
 
-	// A function which knows how to render markdown in the TUI of the service. This is going to 
-	// be different according to whether it's running in a Linux terminal and we're using the 
+	// A function which knows how to render markdown in the TUI of the service. This is going to
+	// be different according to whether it's running in a Linux terminal and we're using the
 	// terminal control codes; or running in the browser and using HTML: or other cases not yet
 	// encountered.
-	MarkdownRenderer      func(string)string 
+	MarkdownRenderer func(string) string
 }
 
 func (sv *Service) Inject(d Dependencies) *Service {
@@ -76,7 +76,7 @@ func (sv *Service) Update(d Dependencies) *Service {
 	}
 	if len(d.ExternalServices) != 0 {
 		result.ExternalServices = d.ExternalServices
-	} 
+	}
 	if d.FileSystem != nil {
 		result.FileSystem = d.FileSystem
 	}
@@ -115,8 +115,8 @@ func convertDependencies(d Dependencies) *compiler.Dependencies {
 // Returns a new service.
 func NewService() *Service {
 	return &Service{
-		cp: nil,
-		dependencies: getDefaultDependencies(),         
+		cp:           nil,
+		dependencies: getDefaultDependencies(),
 	}
 }
 
@@ -291,7 +291,7 @@ func (sv *Service) Do(line string) (Value, error) {
 	}
 	if sv.IsBroken() {
 		errs, _ := sv.GetErrorReport()
-		return Value{}, errors.New("Do: service is broken"+"\n\n"+errs)
+		return Value{}, errors.New("Do: service is broken" + "\n\n" + errs)
 	}
 	sv.cp.P.ResetAfterError()
 	sv.cp.Vm.LiveTracking = make([]vm.TrackingData, 0)
@@ -380,7 +380,7 @@ func needsUpdate(cp *compiler.Compiler) (bool, error) {
 	for fname, timestamp := range cp.Sources {
 		file, _ := os.Stat(fname)
 		if file != nil { // Exempts things like the builtins.
-		currentTimeStamp := file.ModTime().UnixMilli()
+			currentTimeStamp := file.ModTime().UnixMilli()
 			if timestamp != currentTimeStamp {
 				return true, nil
 			}
@@ -814,7 +814,7 @@ func (sv *Service) Highlight(code []rune, fonts Map) string {
 	return sv.cp.Highlight(code, fonts)
 }
 
-// Returns a description of the API in rendered markdown.
+// Returns a description of the API in rendered text.
 // The `fonts` field is only used for rendering Pipefish code in code blocks, and
 // so may be omitted if you don't want to do that.
 func (sv *Service) Api(title string, path []string, fonts values.Map, width int) string {

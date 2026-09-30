@@ -7,7 +7,6 @@ import (
 
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/initializer"
-	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/pf"
 	"github.com/tim-hardcastle/pipefish/source/vm"
 	"github.com/tim-hardcastle/pipefish/web-component/generated-go/registry"
@@ -108,7 +107,7 @@ func main() {
 			this js.Value,
 			args []js.Value,
 		) interface{} {
-			return markdown.BlockHighlighter(
+			return text.BlockHighlighter(
 				args[0].String(),
 			)
 		}),
@@ -120,7 +119,7 @@ func main() {
 			this js.Value,
 			args []js.Value,
 		) interface{} {
-			return markdown.RenderMdAsBookHtml(
+			return text.RenderMdAsBookHtml(
 				args[0].String(),
 			)
 		}),

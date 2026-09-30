@@ -7,7 +7,6 @@ import (
 	"math"
 
 	"github.com/tim-hardcastle/pipefish/source/err"
-	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/token"
 	"github.com/tim-hardcastle/pipefish/source/values"
@@ -184,7 +183,7 @@ func (vm *Vm) ToString(v values.Value, flavor descriptionFlavor, cpNumber uint32
 		if ob.ErrorId != "vm/user" {
 			ob = err.CreateErr(ob.ErrorId, ob.Token, ob.Args...)
 		}
-		return markdown.GetTuiRenderer(92)(text.Red("Error") + ": " + ob.Message + err.DescribePos(ob.Token) + ".")
+		return text.GetTuiRenderer(92)(text.Red("Error") + ": " + ob.Message + err.DescribePos(ob.Token) + ".")
 	case values.FLOAT:
 		f := v.V.(float64)
 		if f == math.Trunc(f) {
