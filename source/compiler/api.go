@@ -1,47 +1,41 @@
 package compiler
 
 import (
-	"strings"
-
+	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/values"
 )
 
-// This supplies the bits and pieces we need to render the API.
-// We're doing this here and now rather than at initialization so that in principle
-// we could get the font and width from a desktop client.
-
 func (cp *Compiler) Api(name string, path []string, fonts values.Map, width int) string {
-	markdowner := text.NewMarkdown("", width, func(s string) string { return cp.Highlight([]rune(s), fonts) })
-	return cp.RenderApi(name, path, fonts, markdowner)
+	markdown := markdown.GetTuiRenderer(width)
+	return cp.RenderApi(name, path, fonts, markdown, false)
 }
 
 func (cp *Compiler) Wiki(path []string) string {
-	return cp.RenderApi("", path, values.Map{}, wikifier{})
+	return cp.RenderApi("", path, values.Map{}, markdown.Iota, true)
 }
 
-func (cp *Compiler) RenderApi(name string, path []string, fonts values.Map, rdr renderer) string {
-	_, md := rdr.(*text.Markdown)
+func (cp *Compiler) RenderApi(name string, path []string, fonts values.Map, render func(string)string, wiki bool) string {
 	if len(path) > 0 {
 		newCp, ok := cp.Modules[path[0]]
 		if !ok {
-			return rdr.Render([]string{"The module `" + path[0] + "` does not exist."})
+			return render("The module `" + path[0] + "` does not exist.")
 		}
 		if newCp.P.Private {
-			return rdr.Render([]string{"The module `" + path[0] + "` is private."})
+			return render("The module `" + path[0] + "` is private.")
 		}
-		return newCp.RenderApi(name, path[1:], fonts, rdr)
+		return newCp.RenderApi(name, path[1:], fonts, render, wiki)
 	}
 	hasContents := false
 	result := ""
 	if name != "" {
-		result = rdr.Render([]string{"# " + name})
+		result = render("# " + name)
 		result = result + "\n"
 	}
-	if cp.DocString != "" {
-		result = result + rdr.Render([]string{"## Overview"})
-		result = result + "\n"
-		result = result + rdr.Render(strings.Split(cp.DocString, "\n"))
+	if cp.DocString != "" && !wiki {
+		result = result + "\n" + render("## Overview")
+		result = result + "\n\n"
+		result = result + render(cp.DocString)
 		result = result + "\n"
 	}
 	for i, items := range cp.ApiDescription {
@@ -49,19 +43,19 @@ func (cp *Compiler) RenderApi(name string, path []string, fonts values.Map, rdr 
 			continue
 		}
 		hasContents = true
-		result = result + rdr.Render([]string{"## " + headings[i]})
+		result = result + "\n" + render("## " + headings[i]) + "\n"
 		for _, item := range items {
 			heading := item.Declaration
-			if item.DocString != "" && md {
+			if item.DocString != "" {
 				heading = append(heading, ' ', ':')
 			}
-			if md {
+			if !wiki {
 				result = result + "\n" + text.Cyan("•") + " " + cp.Highlight(heading, fonts) + "\n"
 			} else {
 				result = result + "\n### `" + string(heading) + "`\n"
 			}
 			if item.DocString != "" {
-				result = result + "\n" + rdr.Render(strings.Split(item.DocString,"\n"))
+				result = result + "\n" + render(item.DocString) + "\n"
 			}
 		}
 	}
@@ -77,32 +71,4 @@ type ApiItem struct {
 }
 
 var headings = []string{"Modules", "Types", "Constants", "Variables", "Commands", "Functions"}
-
-type renderer interface {
-	Render([]string) string
-}
-
-type wikifier struct{}
-
-func (w wikifier) Render(lines []string) string {
-	result :=  ""
-	lastWasList := false
-	for i, line := range lines {
-		if text.Head(line, "- ") {
-			if !lastWasList {
-				result = result + "\n"
-				lastWasList = true 
-			}
-			result = result + line + "\n"
-		} else {
-			if line == "" && i != len(lines)-1 {
-				result = result + "\n\n"
-			} else {
-				result = result + line + " "
-			}
-			lastWasList = false
-		}
-	}
-	return result + "\n"
-}
 

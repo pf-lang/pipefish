@@ -7,6 +7,7 @@ package text
 // in the `hub` package, and changes made here may need to be reflected there.
 
 import (
+	"regexp"
 	"strings"
 )
 
@@ -43,7 +44,21 @@ const (
 	RT_ERROR               = "<R>Error</>: "
 	ERROR                  = "<R>Error</>: "
 	ORANGE                 = "\033[38;2;255;165;0m"
+	RED                    = "\033[31m"
+	YELLOW                 = "\033[33m"
+	GREEN                  = "\033[32m"
+	CYAN                   = "\033[36m"
+	BLUE                   = "\033[34m"
+	PURPLE                 = "\033[35m"
 )
+
+var (
+	stripColorCodes, _ = regexp.Compile("\033\\[[0-9;]*m")
+)
+
+func StripColors(s string) string {
+	return string(stripColorCodes.ReplaceAllString(s, ""))
+}
 
 func Head(s, substr string) bool {
 	if len(s) < len(substr) {

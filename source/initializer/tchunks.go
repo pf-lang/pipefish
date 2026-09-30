@@ -188,7 +188,7 @@ func (tc *tokenizedExternalOrImportDeclaration) getDeclarationType() declaration
 func (tc *tokenizedExternalOrImportDeclaration) indexToken() token.Token { return tc.name }
 
 func (tc *tokenizedExternalOrImportDeclaration) api() (string, string, bool) {
-	if tc.private || settings.MandatoryImportSet().Contains(tc.name.Source) {
+	if tc.private || settings.MandatoryImportSet().Contains(tc.name.Source) || tc.golang {
 		return "", "", false
 	}
 	return tc.name.Literal + " (\"" + tc.path.Literal +"\")", tc.docString, true

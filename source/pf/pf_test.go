@@ -17,7 +17,7 @@ func TestApi(t *testing.T) {
 	// no t.Parallel()
 	test := []test_helper.TestItem{
 		{`hub run "../hub/test-files/foo.pf"`, "Starting script \x1b[36m\"foo.pf\"\x1b[39m as service \x1b[36m\"foo\"\x1b[39m."},
-		{`hub api`, "\x1b[1m\x1b[3m≡≡≡≡ foo ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡\n\x1b[0m\n\x1b[1m════ Functions ════════════════════════════════════════════════════════════════════════════\n\x1b[0m\n\x1b[36m•\x1b[39m foo\x1b[38;2;255;215;0m(\x1b[0mx \x1b[38;2;78;201;176many?\x1b[0m\x1b[38;2;255;215;0m)\x1b[0m"},
+		{`hub api`, "≡≡≡≡ foo ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡\n\n════ Functions ═════════════════════════════════════════════════════════════════════════════\n\n\x1b[36m•\x1b[39m foo\x1b[38;2;255;215;0m(\x1b[0mx \x1b[38;2;78;201;176many?\x1b[0m\x1b[38;2;255;215;0m)\x1b[0m"},
 		{`hub halt "foo"`, `OK`},
 		{`hub quit`, "\x1b[32mOK\x1b[39m\n" + text.Logo() + "Thank you for using Pipefish. Have a nice day!"},
 	}

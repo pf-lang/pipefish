@@ -309,16 +309,6 @@ func IsProtectedPunctuation(ch rune) bool {
 	return ch == ',' || ch == ':' || ch == ';' || ch == '.' || ch == '='
 }
 
-func (cp *Compiler) GetMarkdowner(leftMargin string, rightMargin int, fonts values.Map) func(string) string {
-	hl := func(s string) string {
-		return cp.Highlight([]rune(s), fonts)
-	}
-	md := text.NewMarkdown(leftMargin, rightMargin, hl)
-	return func(s string) string {
-		return md.RenderString(s)
-	}
-}
-
 func wrapFont(body, tokenIs string, fonts values.Map) string {
 	var out bytes.Buffer
 	out.WriteString(getFont(tokenIs, fonts))

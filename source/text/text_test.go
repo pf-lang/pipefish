@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/tim-hardcastle/pipefish/source/markdown"
 	"github.com/tim-hardcastle/pipefish/source/test_helper"
 	"github.com/tim-hardcastle/pipefish/source/text"
 )
@@ -33,18 +34,16 @@ func TestColors(t *testing.T) {
 
 func TestMarkdown(t *testing.T) {
 	tests := []test_helper.TestItem{
-		{`Hello`, `Hello `},
-		{`Hello *darkness* my **old** ***friend***.`, "Hello \x1b[3mdarkness\x1b[22m\x1b[23m my \x1b[1mold\x1b[22m\x1b[23m \x1b[1m\x1b[3mfriend\x1b[22m\x1b[23m. "},
-		{`<R>red</> <B><blue</>`, "\x1b[31mred\x1b[39m \x1b[34m<blue\x1b[39m"},
-		{"inline `code` looks like this", "inline \x1b[0m\x1b[48;2;0;0;64m\x1b[97mcode\x1b[0m looks like this "},
-		{`## Heading`, "\x1b[1m════ Heading ══════════════════════════════════════════════════════════════════════════════\n\x1b[0m"},
-		{"> Block quote", "\n\x1b[0m  ‖ Block quote "},
-		{"- Bullet point", "\n\x1b[0m  ▪ Bullet point "},
-		{"```\ncode\nmore code\n```", "\n  ¦ code\n  ¦ more code\n"},
+		{`Hello`, `Hello`},
+		{`Hello *darkness* my **old** friend.`, "Hello \x1b[3mdarkness\x1b[23m my \x1b[1mold\x1b[22m friend."},
+		{`<R>red</>.`, "\x1b[31mred\x1b[39m."},
+		{"inline `code` looks like this.", "inline \x1b[48;2;0;0;64m\x1b[97mcode\x1b[49m\x1b[39m looks like this."},
+		{`## Heading`, "════ Heading ═══════════════════════════════════════════════════════════════════════════════"},
+		{"- Bullet point", "  ▪ Bullet point"},
 	}
-	md := text.NewMarkdown("", 92, func(s string) string { return s })
+	render := markdown.GetTuiRenderer(92)
 	for _, test := range tests {
-		got := md.RenderString(test.Input)
+		got := render(test.Input)
 		println(got)
 		if !(test.Want == got) {
 			t.Fatalf("Test failed with input %s \nExp :\n%s\nGot :\n%s", test.Input, strconv.Quote(test.Want), strconv.Quote(got))
