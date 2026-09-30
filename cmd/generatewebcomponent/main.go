@@ -8,6 +8,7 @@ import (
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/initializer"
 	"github.com/tim-hardcastle/pipefish/source/pf"
+	"github.com/tim-hardcastle/pipefish/source/text"
 	"github.com/tim-hardcastle/pipefish/source/vm"
 	"github.com/tim-hardcastle/pipefish/web-component/generated-go/registry"
 )

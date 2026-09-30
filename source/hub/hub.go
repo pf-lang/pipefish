@@ -189,13 +189,13 @@ func (h *Hub) Do(line, username, password, service string, external bool) {
 	h.Sources["REPL input"] = []string{line}
 	_, ok := h.Services[service]
 	if !ok {
-		h.WriteError("the hub can't find the service <C>\"" + service + "\"</>.")
+		h.WriteError("the hub can't find the service <C>\"" + service + "\"<0>.")
 		return
 	}
 	if h.administered() {
 		if !userHasService(h.Db, username, service) {
 			if isAdmin, _ := IsUserAdmin(h.Db, username); !isAdmin {
-				h.WriteError("you have no access to a service named <C>\"" + service + "\"</> on this hub.")
+				h.WriteError("you have no access to a service named <C>\"" + service + "\"<0> on this hub.")
 				return
 			}
 		}
@@ -394,7 +394,7 @@ func (hw hubWriter) Write(b []byte) (int, error) {
 		}
 		h.TerminalUsername = args[0]
 		h.TerminalPassword = args[4]
-		h.WritePretty("You are logged on as <C>" + h.TerminalUsername + "</>.\n")
+		h.WritePretty("You are logged on as <C>" + h.TerminalUsername + "<0>.\n")
 		h.setSV("isAdministered", pf.BOOL, true)
 	case "create-group":
 		err := CreateGroup(h.Db, args[0])
@@ -446,7 +446,7 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 			if err != nil {
 				h.WriteError(err.Error())
 			} else {
-				h.WritePretty("An email with a replacement password has been sent to <C>" + args[1] + "</>.")
+				h.WritePretty("An email with a replacement password has been sent to <C>" + args[1] + "<0>.")
 			}
 		}
 	case "fork-hub":
@@ -478,7 +478,7 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 		if ok {
 			name = args[0]
 		} else {
-			h.WriteError("the hub can't find the service <C>\"" + args[0] + "\"</>.")
+			h.WriteError("the hub can't find the service <C>\"" + args[0] + "\"<0>.")
 			break
 		}
 		if name == "" || name == "hub" {
@@ -501,7 +501,7 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 		h.WriteString(GREEN_OK)
 		go h.StartHttp(args, true)
 	case "hub":
-		h.WritePretty("Hub is <C>\"" + filepath.Base(filepath.Dir(h.hubFilepath)) + "\"</>.")
+		h.WritePretty("Hub is <C>\"" + filepath.Base(filepath.Dir(h.hubFilepath)) + "\"<0>.")
 	case "let-own":
 		var inGroup bool
 		inGroup, err = IsUserInGroup(h.Db, args[0], args[1])
@@ -538,12 +538,12 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 		h.TerminalUsername = args[0]
 		h.TerminalPassword = args[1]
 		h.makeEmptyServiceCurrent()
-		h.WritePretty("You are logged on as <C>" + h.TerminalUsername + "</>.\n")
+		h.WritePretty("You are logged on as <C>" + h.TerminalUsername + "<0>.\n")
 	case "log-off":
 		h.TerminalUsername = ""
 		h.TerminalPassword = ""
 		h.makeEmptyServiceCurrent()
-		h.WritePretty("<G>OK</>")
+		h.WritePretty("<G>OK<0>")
 		h.WriteString("\n\n" + strings.Repeat("┈", hw.hub.getSV("width").V.(int)) + "\n\n")
 		h.WritePretty("This is an administered hub and you aren't logged on. Please use either " +
 			"`hub register` to register as a guest; `hub forgot password(username, email string)` " +
@@ -592,7 +592,7 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 		}
 		h.TerminalUsername = args[0]
 		h.TerminalPassword = args[4]
-		h.WritePretty("You are logged on as <C>" + h.TerminalUsername + "</>.\n")
+		h.WritePretty("You are logged on as <C>" + h.TerminalUsername + "<0>.\n")
 	case "reset":
 		serviceToReset, ok := h.Services[h.CurrentServiceName()]
 		if !ok {
@@ -603,7 +603,7 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 		}
 		filepath, _ := serviceToReset.GetFilepath()
 		h.WritePretty("Restarting script <C>\"" + filepath +
-			"\"</> as service <C>\"" + h.CurrentServiceName() + "\"</>.\n")
+			"\"<0> as service <C>\"" + h.CurrentServiceName() + "\"<0>.\n")
 		h.createService(h.CurrentServiceName(), filepath, true)
 	case "run":
 		fname := args[0]
@@ -619,7 +619,7 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 		if filepath.Ext(displayName) == "" {
 			displayName = displayName + ".pf"
 		}
-		h.WritePretty("Starting script <C>\"" + displayName + "\"</> as service <C>\"" + sname + "\"</>.\n")
+		h.WritePretty("Starting script <C>\"" + displayName + "\"<0> as service <C>\"" + sname + "\"<0>.\n")
 		ext := h.getSV("$_external").V.(bool) // Note that we need to do this before createService, which may do external things.
 		h.createService(sname, fname, true)
 		if h.Services[sname] != nil && h.Services[sname].IsInitialized() {
@@ -658,11 +658,11 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 	case "switch":
 		sname := args[0]
 		if h.administered() && !isAdmin && !userHasService(h.Db, username, sname) {
-			h.WriteError("you have no access to any service named <C>" + sname + "</>.")
+			h.WriteError("you have no access to any service named <C>" + sname + "<0>.")
 			break
 		}
 		if h.Services[sname] == nil || !h.Services[sname].IsInitialized() {
-			h.WriteError("service <C>" + sname + "</> is not initialized.")
+			h.WriteError("service <C>" + sname + "<0> is not initialized.")
 			break
 		}
 		_, ok := h.Services[sname]
@@ -671,9 +671,9 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 			break
 		}
 		if !h.administered() || isAdmin {
-			h.WriteError("service <C>" + sname + "</> doesn't exist.")
+			h.WriteError("service <C>" + sname + "<0> doesn't exist.")
 		} else {
-			h.WriteError("although you have permissions to use a service called <C>" + sname + "</> on this hub, it's not currently running any service of that name.")
+			h.WriteError("although you have permissions to use a service called <C>" + sname + "<0> on this hub, it's not currently running any service of that name.")
 		}
 	case "trace":
 		if len(h.ers) == 0 {
@@ -802,7 +802,7 @@ Your replacement password for your account ` + args[0] + ` is ` + newPassword + 
 			break
 		}
 		exp, _ := pf.ExplainError(h.ers, num)
-		h.WritePretty("<R>Error</>: " + h.ers[num].Message + ".")
+		h.WritePretty("<R>Error<0>: " + h.ers[num].Message + ".")
 		h.WriteString("\n")
 		h.WritePretty(exp)
 		h.WriteString("\n")
@@ -847,7 +847,7 @@ func (h *Hub) WritePretty(s string) {
 		panic("Hub failed to initialize, error is `" + s + "`.")
 	}
 
-	h.WriteString(hubService.Render(s)+"\n")
+	h.WriteString(hubService.Render(s) + "\n")
 }
 
 func (h *Hub) GetPretty(s string) string {
@@ -928,7 +928,7 @@ func (h *Hub) createService(name, scriptFilepath string, forceUpdate bool) bool 
 			panic("That's all folks!")
 		}
 		if newService == nil || !newService.IsInitialized() {
-			h.WriteError("unable to open <C>\"" + scriptFilepath + "\"</> with error `" + e.Error() + "`.")
+			h.WriteError("unable to open <C>\"" + scriptFilepath + "\"<0> with error `" + e.Error() + "`.")
 			h.Sources = map[string][]string{}
 			h.makeEmptyServiceCurrent()
 		} else {
@@ -989,7 +989,7 @@ func GetWiki() {
 	newService := pf.NewService()
 	newService.InitializeFromFilepath(filename)
 	if newService.IsBroken() {
-		fmt.Println("\nThere were errors running the script " + text.Cyan("\"" + filename + "\"") + text.RESET + ".\n")
+		fmt.Println("\nThere were errors running the script " + text.Cyan("\""+filename+"\"") + text.RESET + ".\n")
 		s, _ := newService.GetErrorReport()
 		fmt.Println(newService.Render(s))
 		fmt.Println()
@@ -1245,10 +1245,10 @@ func (h *Hub) list() {
 		fpath, _ := h.Services[k].GetFilepath()
 		if h.Services[k].IsBroken() {
 			h.WriteString(BROKEN)
-			h.WritePretty("Service <C>\"" + k + "\"</> running script <C>\"" + filepath.Base(fpath) + "\"</>.")
+			h.WritePretty("Service <C>\"" + k + "\"<0> running script <C>\"" + filepath.Base(fpath) + "\"<0>.")
 		} else {
 			h.WriteString(GOOD_BULLET)
-			h.WritePretty("Service <C>\"" + k + "\"</> running script <C>\"" + filepath.Base(fpath) + "\"</>.")
+			h.WritePretty("Service <C>\"" + k + "\"<0> running script <C>\"" + filepath.Base(fpath) + "\"<0>.")
 		}
 		h.WriteString("\n")
 	}
@@ -1336,7 +1336,7 @@ var (
 	INDENT_PROMPT  = "  "
 	ERROR          = text.ERROR
 	RT_ERROR       = text.ERROR
-	HUB_ERROR      = "<R>Hub error</>: "
+	HUB_ERROR      = "<R>Hub error<0>: "
 )
 
 const HELP = "\nUsage: pipefish [-v | --version] [-h | --help]\n" +

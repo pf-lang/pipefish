@@ -3087,7 +3087,7 @@ var errorCreatorMap = map[string]ErrorCreator{
 				plural = "s"
 			}
 			return "type constraint" + plural + " " + emph(args[1]) + " on bound variable" + plural + " of `for` loop declared at " +
-				"line <Y>" + strconv.Itoa(args[2].(*token.Token).Line) + "</> unsatisfied by value of type " + emph(args[3]) + " supplied " +
+				"line <Y>" + strconv.Itoa(args[2].(*token.Token).Line) + "<0> unsatisfied by value of type " + emph(args[3]) + " supplied " +
 				"by expression " + emph(args[4])
 		},
 		Explanation: func(tok *token.Token, args ...any) string {
@@ -3112,7 +3112,7 @@ var errorCreatorMap = map[string]ErrorCreator{
 				plural = "s"
 			}
 			return "type constraint" + plural + " " + emph(args[1]) + " on bound variable" + plural + " of `for` loop declared at " +
-				"line <Y>" + strconv.Itoa(args[2].(*token.Token).Line) + "</> unsatisfied by value of type " + emph(args[3])
+				"line <Y>" + strconv.Itoa(args[2].(*token.Token).Line) + "<0> unsatisfied by value of type " + emph(args[3])
 		},
 		Explanation: func(tok *token.Token, args ...any) string {
 			plural := ""
@@ -3136,7 +3136,7 @@ var errorCreatorMap = map[string]ErrorCreator{
 				plural = "s"
 			}
 			return "type constraint" + plural + " " + emph(args[1]) + " on index variable" + plural + " of `for` loop declared at " +
-				"line <Y>" + strconv.Itoa(args[2].(*token.Token).Line) + "</> unsatisfied by value of type " + emph(args[3]) + " supplied " +
+				"line <Y>" + strconv.Itoa(args[2].(*token.Token).Line) + "<0> unsatisfied by value of type " + emph(args[3]) + " supplied " +
 				"by expression " + emph(args[4])
 		},
 		Explanation: func(tok *token.Token, args ...any) string {
@@ -3161,7 +3161,7 @@ var errorCreatorMap = map[string]ErrorCreator{
 				plural = "s"
 			}
 			return "type constraint" + plural + " " + emph(args[1]) + " on index variable" + plural + " of `for` loop declared at " +
-				"line <Y>" + strconv.Itoa(args[2].(*token.Token).Line) + "</> unsatisfied by value of type " + emph(args[3]) + " supplied " +
+				"line <Y>" + strconv.Itoa(args[2].(*token.Token).Line) + "<0> unsatisfied by value of type " + emph(args[3]) + " supplied " +
 				"by expression " + emph(args[4])
 		},
 		Explanation: func(tok *token.Token, args ...any) string {
@@ -3391,5 +3391,5 @@ func redescribeType(s string) string {
 }
 
 func describeLine(x any) string {
-	return "<Y>" + strconv.Itoa(x.(int)) + "</>"
+	return "<Y>" + strconv.Itoa(x.(int)) + "<0>"
 }

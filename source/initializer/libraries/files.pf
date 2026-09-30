@@ -103,7 +103,7 @@ goDeleteFile(fileSystem FileSystem, fname string) : golang {
 goPutStringInFile(fileSystem FileSystem, output string, fname string) : golang {
     err := fileSystem.(filesystem.FileSystem).WriteFile(fname, []byte(output))
     if err != nil {
-        return errors.New("can't write to file <C>" + fname + "</>' with error `" + err.Error() + "`.")
+        return errors.New("can't write to file <C>" + fname + "<0>' with error `" + err.Error() + "`.")
     }
     return struct{}{}
 }

@@ -35,7 +35,7 @@ func TestMarkdown(t *testing.T) {
 	tests := []test_helper.TestItem{
 		{`Hello`, `Hello`},
 		{`Hello *darkness* my **old** friend.`, "Hello \x1b[3mdarkness\x1b[23m my \x1b[1mold\x1b[22m friend."},
-		{`<R>red</>.`, "\x1b[31mred\x1b[39m."},
+		{`<R>red<0> <B>blue<0>.`, "\x1b[31mred\x1b[39m \x1b[34mblue\x1b[39m."},
 		{"inline `code` looks like this.", "inline \x1b[48;2;0;0;64m\x1b[97mcode\x1b[49m\x1b[39m looks like this."},
 		{`## Heading`, "════ Heading ═══════════════════════════════════════════════════════════════════════════════"},
 		{"- Bullet point", "  ▪ Bullet point"},

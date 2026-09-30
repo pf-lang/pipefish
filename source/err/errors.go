@@ -53,7 +53,7 @@ func GetList(ers Errors) string {
 	result := ""
 	sep := ""
 	for i, v := range ers {
-		result = result + sep + "[" + strconv.Itoa(i) + "] <R>Error</>: " + (v.Message) + DescribePos(v.Token) + "."
+		result = result + sep + "[" + strconv.Itoa(i) + "] <R>Error<0>: " + (v.Message) + DescribePos(v.Token) + "."
 		sep = "\n\n"
 	}
 	return result
@@ -144,14 +144,14 @@ func DescribePos(token *token.Token) string {
 		return ""
 	}
 	if prettySource != "REPL input" {
-		prettySource = "<C>\"" + prettySource + "\"</>"
+		prettySource = "<C>\"" + prettySource + "\"<0>"
 	}
 	if token.Line > 0 {
 		result := strconv.Itoa(token.Line) + ":" + strconv.Itoa(token.ChStart)
 		if token.ChStart != token.ChEnd {
 			result = result + "-" + strconv.Itoa(token.ChEnd)
 		}
-		result = " at line <Y>" + result + "</>"
+		result = " at line <Y>" + result + "<0>"
 		return result + " of " + prettySource
 	}
 	return " in " + prettySource + ""

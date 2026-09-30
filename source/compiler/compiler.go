@@ -90,31 +90,31 @@ func NewCompiler(p *parser.Parser, ccb *CommonCompilerBindle) *Compiler {
 	return newC
 }
 
-type Dependencies struct{
+type Dependencies struct {
 	// This is the file system used both by the runtime and by the compiler: by the runtime via
 	// the `files` standard library, and by the compiler to locate dependencies.
-	FileSystem            filesystem.FileSystem  
+	FileSystem filesystem.FileSystem
 
-	// Where `get x from Terminal("prompt")` will get input from.         
-	InHandler             vm.InHandler  
+	// Where `get x from Terminal("prompt")` will get input from.
+	InHandler vm.InHandler
 
-	// Where `post x` / `post x to Output()` will post to.           
-	OutHandler            vm.OutHandler    
+	// Where `post x` / `post x to Output()` will post to.
+	OutHandler vm.OutHandler
 
-	// Where `post x to Terminal()` will post to.   
-	// Terminal              ***  
+	// Where `post x to Terminal()` will post to.
+	// Terminal              ***
 
 	// The contents of `$_env`.
-	Environment           values.Map      
+	Environment values.Map
 
 	// Map of names to services, to be compiled as external services with the names as namespaces.
-	ExternalServices      map[string]*Compiler
+	ExternalServices map[string]*Compiler
 
-	// A function which knows how to render markdown in the TUI of the service. This is going to 
-	// be different according to whether it's running in a Linux terminal and we're using the 
+	// A function which knows how to render markdown in the TUI of the service. This is going to
+	// be different according to whether it's running in a Linux terminal and we're using the
 	// terminal control codes; or running in the browser and using HTML: or other cases not yet
 	// encountered.
-	MarkdownRenderer      func(string)string 
+	MarkdownRenderer func(string) string
 }
 
 func (cp *Compiler) AddRecursionRelation(x, y uint32) {
@@ -2505,7 +2505,7 @@ func (cp *Compiler) compileLog(node *parser.LogExpression, ctxt Context) (uint32
 				lastError := cp.P.Common.Errors[len(cp.P.Common.Errors)-1]
 				snipTok := lastError.Token
 				lastError.Message = lastError.Message + " at line <Y>" + strconv.Itoa(snipTok.Line) +
-				":" + strconv.Itoa(snipTok.ChStart) + "-" + strconv.Itoa(snipTok.ChEnd) + "</> of embedded code"
+					":" + strconv.Itoa(snipTok.ChStart) + "-" + strconv.Itoa(snipTok.ChEnd) + "<0> of embedded code"
 				lastError.Token = &node.Token
 				return uint32(DUMMY), false, false
 			}
@@ -3284,7 +3284,7 @@ func (cp *Compiler) SetEnv(env values.Map) {
 		child.SetEnv(env)
 	}
 	envVar, _ := cp.GlobalVars.GetVar("$_env")
-	if envVar == nil                   {
+	if envVar == nil {
 		dummyTok := token.Token{}
 		cp.Reserve(values.MAP, env, &dummyTok)
 		cp.AddThatAsVariable(cp.GlobalVars, "$_env", GLOBAL_VARIABLE_PUBLIC, AltType(values.MAP), &dummyTok)

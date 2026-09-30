@@ -2,7 +2,7 @@
 ~~ terminal control codes.
 ~~
 ~~ The markdown is "Pipefish-flavored", i.e. the colors red, yellow, green, cyan, blue, and
-~~ purple can be produced by e.g. `<R>foo</>` for red.
+~~ purple can be produced by e.g. `<R>foo<0>` for red.
 
 import
 
@@ -42,5 +42,5 @@ stringify(S snippet) -> string :
         a + string el
 
 goRender(leftMargin string, width int, raw string) -> string : golang {
-    return text.NewMarkdown(leftMargin, width, func(s string) string {return s}).RenderString(raw)
+    return text.GetTuiRenderer(width)(raw)
 }

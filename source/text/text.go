@@ -41,8 +41,8 @@ const (
 	BOLD                   = "\033[1m"
 	BULLET                 = "  ▪ "
 	MASK                   = '▪'
-	RT_ERROR               = "<R>Error</>: "
-	ERROR                  = "<R>Error</>: "
+	RT_ERROR               = "<R>Error<0>: "
+	ERROR                  = "<R>Error<0>: "
 	ORANGE                 = "\033[38;2;255;165;0m"
 	RED                    = "\033[31m"
 	YELLOW                 = "\033[33m"

@@ -55,11 +55,14 @@ func Justify(width int, text string) string {
 		if dtypes.SetOf('/', '-', ' ', '\n', ',', '.', ')', ';', ':', '>').Contains(r) || i+1 == textLength {
 			wordLength := utf8.RuneCount([]byte(word))
 			switch {
-			case dtypes.SetOf("<R>", "<Y>", "<G>", "<C>", "<B>", "<P>", "</>").Contains(word):
+			case dtypes.SetOf("<R>", "<Y>", "<G>", "<C>", "<B>", "<P>", "<0>").Contains(word):
 				line = line + word
 			case lineLengthCount+wordLength <= width:
 				line = line + word
 				lineLengthCount = lineLengthCount + wordLength
+			case Tail(word, "<0>"):
+				line = line + word
+				lineLengthCount = lineLengthCount + wordLength-3
 			default:
 				justifiedText = justifiedText + line + "⏎"
 				line = word
@@ -221,12 +224,12 @@ var stopAt = map[parserMode][]string{
 	pmText:   {"**", "*", "`", "<R>", "<Y>", "<G>", "<C>", "<B>", "<P>"},
 	pmBold:   {"**"},
 	pmItalic: {"*"},
-	pmRed:    {"</>"},
-	pmYellow: {"</>"},
-	pmGreen:  {"</>"},
-	pmCyan:   {"</>"},
-	pmBlue:   {"</>"},
-	pmPurple: {"</>"},
+	pmRed:    {"<0>"},
+	pmYellow: {"<0>"},
+	pmGreen:  {"<0>"},
+	pmCyan:   {"<0>"},
+	pmBlue:   {"<0>"},
+	pmPurple: {"<0>"},
 }
 
 func (ip *inlineParser) parseAll() []mdNode {
@@ -266,7 +269,7 @@ func (ip *inlineParser) parse(pM parserMode) []mdNode {
 			ip.next()
 			ip.next()
 			coloredText := ip.parse(pmRed)
-			if ip.headIs("</>") {
+			if ip.headIs("<0>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stRed, coloredText}}
@@ -276,7 +279,7 @@ func (ip *inlineParser) parse(pM parserMode) []mdNode {
 			ip.next()
 			ip.next()
 			coloredText := ip.parse(pmYellow)
-			if ip.headIs("</>") {
+			if ip.headIs("<0>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stYellow, coloredText}}
@@ -286,7 +289,7 @@ func (ip *inlineParser) parse(pM parserMode) []mdNode {
 			ip.next()
 			ip.next()
 			coloredText := ip.parse(pmGreen)
-			if ip.headIs("</>") {
+			if ip.headIs("<0>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stGreen, coloredText}}
@@ -296,7 +299,7 @@ func (ip *inlineParser) parse(pM parserMode) []mdNode {
 			ip.next()
 			ip.next()
 			coloredText := ip.parse(pmCyan)
-			if ip.headIs("</>") {
+			if ip.headIs("<0>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stCyan, coloredText}}
@@ -306,7 +309,7 @@ func (ip *inlineParser) parse(pM parserMode) []mdNode {
 			ip.next()
 			ip.next()
 			coloredText := ip.parse(pmBlue)
-			if ip.headIs("</>") {
+			if ip.headIs("<0>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stBlue, coloredText}}
@@ -316,7 +319,7 @@ func (ip *inlineParser) parse(pM parserMode) []mdNode {
 			ip.next()
 			ip.next()
 			coloredText := ip.parse(pmPurple)
-			if ip.headIs("</>") {
+			if ip.headIs("<0>") {
 				ip.skip(3)
 			}
 			return []mdNode{mdFormat{stPurple, coloredText}}
