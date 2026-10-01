@@ -5,6 +5,7 @@ package main
 import (
 	"syscall/js"
 
+	"github.com/tim-hardcastle/pipefish/source/err"
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
 	"github.com/tim-hardcastle/pipefish/source/initializer"
 	"github.com/tim-hardcastle/pipefish/source/pf"
@@ -68,7 +69,7 @@ func compileMain(this js.Value, args []js.Value) any {
 	if err != nil {
 		return err.Error()
 	}
-
+	
 	if err := service.InitializeFromCode(string(main)); err != nil {
 		return err.Error()
 	}
@@ -77,9 +78,16 @@ func compileMain(this js.Value, args []js.Value) any {
 }
 
 func do(this js.Value, args []js.Value) any {
-	result, err := service.Do(args[0].String())
-	if err != nil {
-		return err.Error()
+	result, er := service.Do(args[0].String())
+	if er != nil {
+		return er.Error()
+	}
+	if result.T == pf.ERROR {
+		e := result.V.(*pf.Error)
+		if e.Message == "" {
+			e = err.CreateErr(e.ErrorId, e.Token, e.Args...)
+		}
+		return text.GetTuiRenderer(-1)("[0] " + text.ERROR + e.Message + err.DescribePos(e.Token) + ".")
 	}
 	if service.PostHappened() {
 		dump, _ := service.Dump()
