@@ -47,7 +47,8 @@ func compile(this js.Value, args []js.Value) any {
 	service = pf.NewService().Update(pf.Dependencies{FileSystem: fs})
 
 	if err := service.InitializeFromCode(string(main)); err != nil {
-		return err.Error()
+		errorReport, _ := service.GetErrorReport()
+		return errorReport
 	}
 	service.Update(pf.Dependencies{OutHandler: service.MakeCapturingOutHandler()})
 	return nil
@@ -78,9 +79,10 @@ func compileMain(this js.Value, args []js.Value) any {
 }
 
 func do(this js.Value, args []js.Value) any {
-	result, er := service.Do(args[0].String())
-	if er != nil {
-		return er.Error()
+	result, _ := service.Do(args[0].String())
+	if errorsExist, _ := service.ErrorsExist(); errorsExist {
+		errors, _ := service.GetErrorReport()
+		return text.GetTuiRenderer(-1)(errors)
 	}
 	if result.T == pf.ERROR {
 		e := result.V.(*pf.Error)
@@ -93,7 +95,6 @@ func do(this js.Value, args []js.Value) any {
 		dump, _ := service.Dump()
 		return dump
 	}
-
 	return service.ToString(result)
 }
 
