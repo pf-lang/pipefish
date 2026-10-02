@@ -3,6 +3,8 @@
 :host {
     display: block;
     width: 100%;
+
+    --inline-code-background: var(--paper);
 }
 
 .repl {
@@ -30,6 +32,10 @@
     font-family: "Google Sans Code", monospace;
     font-size: 14px;
     line-height: 1.4;
+}
+
+.transcript :not(pre) > code {
+    background: var(--inline-code-background);
 }
 
 .transcript-input {

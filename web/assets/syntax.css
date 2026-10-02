@@ -1,5 +1,6 @@
 :where(:root) {
     --code-background: #f1f4f8;
+    --paper: #fcfbf8;
     --code-header: #e4e9f1;
     --code-text: #202124;
     --code-border: #d6dce5;
@@ -32,13 +33,14 @@
 
     /* Font */
     --syntax-font: "Google Sans Code", monospace;
+    --syntax-font-size: 16px;
+
 }
 
 @font-face {
     font-family: "Google Sans Code";
     src: url("GoogleSansCode-VariableFont_MONO,wght.woff2")
          format("woff2");
-    font-weight: 100 900;
     font-style: normal;
     font-display: swap;
 }
@@ -54,6 +56,7 @@
     /* Code */
 
     --code-background: #191c21;
+    --paper: #23262d;
     --code-header: #292d35;
     --code-text: #dcdcaa;
     --code-border: #414752;
@@ -149,4 +152,13 @@
 
 .purple {
     color: var(--purple);
+}
+
+.code {
+    background-color: var(--inline-code-background);
+    font-family: var(--syntax-font);
+    font-size: var(--syntax-font-size);
+    border: 1px solid var(--code-border);
+    padding: .0em .20em;
+    border-radius: 4px;
 }
