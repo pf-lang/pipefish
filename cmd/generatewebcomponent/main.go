@@ -10,6 +10,7 @@ import (
 	"github.com/tim-hardcastle/pipefish/source/initializer"
 	"github.com/tim-hardcastle/pipefish/source/pf"
 	"github.com/tim-hardcastle/pipefish/source/text"
+	"github.com/tim-hardcastle/pipefish/source/values"
 	"github.com/tim-hardcastle/pipefish/source/vm"
 	"github.com/tim-hardcastle/pipefish/web-component/generated-go/registry"
 )
@@ -79,10 +80,18 @@ func compileMain(this js.Value, args []js.Value) any {
 }
 
 func do(this js.Value, args []js.Value) any {
-	result, _ := service.Do(args[0].String())
+	var result values.Value
+	if args[0].String() == "" {
+		compileMain(this, []js.Value{})
+	} else {
+		result, _ = service.Do(args[0].String())
+	}
 	if errorsExist, _ := service.ErrorsExist(); errorsExist {
 		errors, _ := service.GetErrorReport()
 		return text.GetTuiRenderer(-1)(errors)
+	}
+	if args[0].String() == "" {
+		return ""
 	}
 	if result.T == pf.ERROR {
 		e := result.V.(*pf.Error)

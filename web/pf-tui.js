@@ -431,31 +431,6 @@ class PipefishTui extends HTMLElement {
             command = lines.join("\n");
         }
 
-        if (!command.trim()) {
-            this.multiline = false;
-
-            const entry =
-                document.createElement("pre");
-
-            entry.classList.add("transcript-input");
-
-            entry.innerHTML =
-                `<span class="prompt">→ </span>` +
-                await this.highlighter.highlight(
-                    command
-                );
-
-            this.transcript.appendChild(entry);
-
-            this.input.value = "";
-            this.highlightedInput.innerHTML = "";
-
-            await this.service.compile();
-
-            this.scrollToBottom();
-            return;
-        }
-
         this.multiline = false;
 
         this.input.value = "";
