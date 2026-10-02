@@ -15,6 +15,7 @@ class PipefishTui extends HTMLElement {
 
         this.history = [];
         this.historyIndex = 0;
+        this.historyDraft = "";
         this.multiline = false;
 
         const shadow =
@@ -112,6 +113,46 @@ class PipefishTui extends HTMLElement {
 
                     input.dispatchEvent(
                         new Event("input")
+                    );
+
+                    return;
+                }
+
+                if (event.key === "ArrowUp") {
+                    event.preventDefault();
+
+                    if (this.historyIndex === this.history.length) {
+                        this.historyDraft = input.value;
+                    }
+
+                    if (this.historyIndex > 0) {
+                        this.historyIndex--;
+                        input.value = this.history[this.historyIndex];
+                        input.dispatchEvent(new Event("input"));
+                        input.setSelectionRange(
+                            input.value.length,
+                            input.value.length
+                        );
+                    }
+
+                    return;
+                }
+
+                if (event.key === "ArrowDown") {
+                    event.preventDefault();
+
+                    if (this.historyIndex < this.history.length - 1) {
+                        this.historyIndex++;
+                        input.value = this.history[this.historyIndex];
+                    } else {
+                        this.historyIndex = this.history.length;
+                        input.value = this.historyDraft;
+                    }
+
+                    input.dispatchEvent(new Event("input"));
+                    input.setSelectionRange(
+                        input.value.length,
+                        input.value.length
                     );
 
                     return;
@@ -443,7 +484,7 @@ class PipefishTui extends HTMLElement {
         await this.initialized;
         this.history.push(command);
         this.historyIndex = this.history.length;
-
+        this.historyDraft = "";
         const entry =
             document.createElement("pre");
 
