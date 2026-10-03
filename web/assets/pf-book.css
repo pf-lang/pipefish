@@ -172,7 +172,7 @@ pf-book {
     height: 2rem;
     padding: 0;
 
-    border: 1px solid #202124;
+    border: 1px solid var(--code-border);
     border-radius: 4px;
 
     background: #202124;

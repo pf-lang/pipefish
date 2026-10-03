@@ -32,11 +32,27 @@ class PipefishReader extends HTMLElement {
             document.createElement("div");
         tabs.classList.add("tabs");
 
+        const controls =
+            document.createElement("div");
+        controls.classList.add("top-controls");
+
+        const serviceName =
+            document.createElement("div");
+        serviceName.classList.add("top-control", "service-name");
+        serviceName.textContent = "Pipefish";
+
+        const minimize =
+            document.createElement("button");
+        minimize.classList.add("top-control", "minimize");
+        minimize.textContent = "−";
+
+        controls.append(serviceName, minimize);
+
         const box =
             document.createElement("pre");
         box.classList.add("reader");
 
-        shadow.append(style, syntax, tabs, box);
+        shadow.append(style, syntax, controls, tabs, box);
 
         this.tabs = tabs;
         this.box = box;
