@@ -39,7 +39,18 @@ jsify(value) :
 golang {
     func executeCode(code string) any {
         fn := js.Global().Get("Function").New(code)
-        jsValue := fn.Invoke()
+        var panicValue error 
+        jsValue := func() js.Value {
+            defer func() {
+                if r := recover(); r != nil {
+                    panicValue = r.(js.Error)
+                }
+            }()
+            return fn.Invoke()
+        }()
+        if panicValue != nil {
+            return panicValue
+        }
         switch jsValue.Type() {
         case js.TypeNumber :
             return jsValue.Float()
@@ -47,6 +58,10 @@ golang {
             return jsValue.String()
         case js.TypeBoolean :
             return jsValue.Bool()
+        case js.TypeNull :
+            return nil
+        case js.TypeUndefined :
+            return nil
         }
         return errors.New("can't convert JavaScript value of type `" + jsValue.Type().String())
     }
