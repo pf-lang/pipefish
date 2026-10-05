@@ -1,0 +1,54 @@
+import 
+
+golang "syscall/js"
+golang "errors"
+
+newtype
+
+JavaScript = struct(code string)
+
+cmd
+
+post(javascript JavaScript) : golang {
+    executeCode(javascript.Code)
+    return struct{}{}
+}
+
+get(x ref) from (javascript JavaScript) :
+    x = eval(javascript[code])
+
+
+def 
+
+eval(javascript JavaScript) : golang {
+    return executeCode(javascript.Code)
+}
+
+JavaScript(sn snippet) :
+    JavaScript from jsCode = "" for i::el = range sn :
+        i mod 2 == 0 :
+            jsCode + el 
+        else :
+            jsCode + jsify el 
+
+jsify(value) :
+    value in rune :
+        `"` + string(value) + `"`
+    else :
+        literal value
+
+golang {
+    func executeCode(code string) any {
+        fn := js.Global().Get("Function").New(code)
+        jsValue := fn.Invoke()
+        switch jsValue.Type() {
+        case js.TypeNumber :
+            return jsValue.Float()
+        case js.TypeString :
+            return jsValue.String()
+        case js.TypeBoolean :
+            return jsValue.Bool()
+        }
+        return errors.New("can't convert JavaScript value of type `" + jsValue.Type().String())
+    }
+}
