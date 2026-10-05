@@ -33,6 +33,8 @@ JavaScript(sn snippet) :
 jsify(value) :
     value in rune :
         `"` + string(value) + `"`
+    value in null :
+        "null"
     else :
         literal value
 
