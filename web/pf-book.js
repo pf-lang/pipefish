@@ -71,8 +71,6 @@ function parseContents(text) {
             });
         }
     }
-
-    // Don't forget the final section.
     if (section) {
         sections.push(section);
     }

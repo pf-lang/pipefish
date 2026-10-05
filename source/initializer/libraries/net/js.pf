@@ -17,7 +17,6 @@ post(javascript JavaScript) : golang {
 get(x ref) from (javascript JavaScript) :
     x = eval(javascript[code])
 
-
 def 
 
 eval(javascript JavaScript) : golang {

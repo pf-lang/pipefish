@@ -22,7 +22,18 @@ class PipefishEditor extends HTMLElement {
 
         const minimize = document.createElement("button");
         minimize.classList.add("top-control", "minimize");
-        minimize.textContent = "−";
+        minimize.innerHTML = `
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 3h8M4 10l4-4 4 4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-opacity=".8"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
+            </svg>
+        `;
+        minimize.setAttribute("aria-label", "Minimize");
 
         controls.append(serviceName, minimize);
 

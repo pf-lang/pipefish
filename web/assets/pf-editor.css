@@ -83,6 +83,7 @@
 
 .service-name {
     font-weight: 500;
+    color: var(--cyan);
 }
 
 .minimize {
@@ -90,6 +91,12 @@
     padding: 0;
     justify-content: center;
     cursor: pointer;
+}
+
+.minimize svg {
+    width: 14px;
+    height: 14px;
+    display: block;
 }
 
 .minimize:hover {
