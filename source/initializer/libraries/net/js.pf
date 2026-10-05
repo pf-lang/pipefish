@@ -10,7 +10,10 @@ JavaScript = struct(code string)
 cmd
 
 post(javascript JavaScript) : golang {
-    executeCode(javascript.Code)
+    x := executeCode(javascript.Code)
+    if err, ok := x.(error); ok {
+        return err
+    }
     return struct{}{}
 }
 
