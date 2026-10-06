@@ -17,3 +17,31 @@ pf-coder {
     display: block;
     margin-bottom: 0.4rem;
 }
+
+:host(.minimized) pf-tui {
+    display: none;
+}
+
+:host(.minimized) {
+    display: block;
+    height: 2.2rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 7px;
+    background: var(--code-background);
+}
+
+:host(.minimized) .service {
+    height: 2.15rem;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    background: var(--code-background);
+}
+
+:host(.minimized) pf-coder {
+    height: 100%;
+    margin: 0;
+    background: transparent;
+    border: 0;
+}

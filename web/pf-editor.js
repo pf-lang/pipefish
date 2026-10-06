@@ -10,11 +10,17 @@ class PipefishEditor extends HTMLElement {
         style.rel = "stylesheet";
         style.href =
             new URL("../assets/pf-editor.css", import.meta.url);
+
         const editor = document.createElement("div");
         editor.classList.add("editor");
 
         const controls = document.createElement("div");
         controls.classList.add("top-controls");
+
+        const logo = document.createElement("img");
+        logo.classList.add("logo");
+        logo.src = new URL("../assets/icon.ico", import.meta.url);
+        logo.alt = "";
 
         const serviceName = document.createElement("div");
         serviceName.classList.add("top-control", "service-name");
@@ -35,7 +41,11 @@ class PipefishEditor extends HTMLElement {
         `;
         minimize.setAttribute("aria-label", "Minimize");
 
-        controls.append(serviceName, minimize);
+        controls.append(
+            logo,
+            serviceName,
+            minimize
+        );
 
         const reader = document.createElement("pf-reader");
 
@@ -44,14 +54,37 @@ class PipefishEditor extends HTMLElement {
         code.classList.add("code-input");
         code.spellcheck = false;
 
-        editor.append(controls, reader, code);
+        editor.append(reader, code);
         shadow.append(style, controls, editor);
 
         this.reader = reader;
         this.code = code;
         this.ready = reader.ready;
-        this.editor = editor
+        this.editor = editor;
+        this.minimizeButton = minimize;
         this.initialHeightSet = false;
+
+        minimize.addEventListener("click", () => {
+        const minimized =
+            this.editor.classList.toggle("minimized");
+
+        this.classList.toggle("minimized", minimized);
+
+        this.minimizeButton.setAttribute(
+            "aria-label",
+            minimized ? "Maximize" : "Minimize"
+        );
+
+        this.dispatchEvent(
+            new CustomEvent(
+                minimized ? "minimize" : "maximize",
+                {
+                    bubbles: true,
+                    composed: true
+                }
+            )
+        );
+    });
 
         code.addEventListener("input", async () => {
             await this.reader.display(code.value);

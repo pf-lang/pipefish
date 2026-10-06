@@ -102,3 +102,51 @@
 .minimize:hover {
     background: var(--code-border);
 }
+
+.logo {
+    display: none;
+    width: 1.75rem;
+    height: 1.75rem;
+    object-fit: contain;
+    margin-right: auto;
+}
+
+.editor.minimized {
+    height: 1.75rem;
+    min-height: 1.75rem;
+    resize: none;
+    overflow: hidden;
+    border-radius: 7px;
+}
+
+:host(.minimized) .top-controls {
+    top: 0;
+    bottom: 0;
+    left: .35rem;
+    right: .35rem;
+    height: auto;
+    border: none;
+}
+
+:host(.minimized) .code-input,
+:host(.minimized) pf-reader {
+    display: none;
+}
+
+:host(.minimized) .logo {
+    display: block;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+:host(.minimized) .minimize svg {
+    transform: rotate(180deg);
+}
+
+:host(.minimized) .editor {
+    border: 0;
+}
+
+:host(.minimized) {
+    height: 100%;
+}

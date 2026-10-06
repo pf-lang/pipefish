@@ -11,6 +11,14 @@ class PipefishIde extends HTMLElement {
         const coder =
             document.createElement("pf-coder");
 
+        coder.addEventListener("minimize", () => {
+            this.classList.add("minimized");
+        });
+
+        coder.addEventListener("maximize", () => {
+            this.classList.remove("minimized");
+        });
+
         this.coder = coder;
         this.tui = tui;
 
