@@ -22,9 +22,49 @@ class PipefishEditor extends HTMLElement {
         logo.src = new URL("../assets/icon.ico", import.meta.url);
         logo.alt = "";
 
-        const serviceName = document.createElement("div");
+        const serviceName = document.createElement("button");
         serviceName.classList.add("top-control", "service-name");
-        serviceName.textContent = "Pipefish";
+
+        serviceName.innerHTML = `
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                    d="M2.5 4.5h4l1.5 1.5h5.5v7h-11z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.4"
+                    stroke-linejoin="round"/>
+            </svg>
+            <span></span>
+        `;
+
+        const serviceNameText = serviceName.querySelector("span");
+        serviceNameText.textContent = "⋮";
+        serviceName.addEventListener("click", event => {
+            event.stopPropagation();
+            menu.classList.toggle("open");
+        });
+
+        const menu = document.createElement("div");
+        menu.classList.add("menu");
+
+        for (const label of ["New", "Open", "Save", "Settings"]) {
+            const item = document.createElement("button");
+            item.textContent = label;
+
+            item.addEventListener("click", () => {
+                menu.classList.remove("open");
+
+                this.dispatchEvent(
+                    new CustomEvent("menu-select", {
+                        detail: label,
+                        bubbles: true,
+                        composed: true
+                    })
+                );
+            });
+
+            menu.append(item);
+        }
 
         const minimize = document.createElement("button");
         minimize.classList.add("top-control", "minimize");
@@ -44,6 +84,7 @@ class PipefishEditor extends HTMLElement {
         controls.append(
             logo,
             serviceName,
+            menu,
             minimize
         );
 
@@ -61,6 +102,8 @@ class PipefishEditor extends HTMLElement {
         this.code = code;
         this.ready = reader.ready;
         this.editor = editor;
+        this.menu = menu;
+        this.serviceName = serviceNameText;
         this.minimizeButton = minimize;
         this.initialHeightSet = false;
 

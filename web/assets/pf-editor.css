@@ -75,7 +75,7 @@
     background: var(--paper);
     color: var(--code-text);
     font-family: "Google Sans Code", monospace;
-    font-size: 12px;
+    font-size: 14px;
     display: flex;
     align-items: center;
     pointer-events: auto;
@@ -150,3 +150,68 @@
 :host(.minimized) {
     height: 100%;
 }
+
+.menu {
+    position: absolute;
+    top: calc(100% - 1px);
+    right: 1.75rem;
+
+    display: none;
+    flex-direction: column;
+
+    min-width: 8rem;
+    padding: .25rem;
+
+    border: 1px solid var(--code-border);
+    border-radius: 7px;
+
+    background: var(--paper);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+    pointer-events: auto;
+}
+
+.menu button {
+    box-sizing: border-box;
+    width: 100%;
+    padding: .45rem .65rem;
+
+    border: 0;
+    border-radius: 5px;
+
+    background: transparent;
+    color: var(--code-text);
+    font-family: "Google Sans Code", monospace;
+    font-size: 13px;
+    text-align: left;
+}
+
+.menu button:hover {
+    background: var(--code-border);
+}
+
+.menu {
+    display: flex;
+}
+
+.service-name {
+    gap: .4rem;
+    cursor: pointer;
+}
+
+.service-name svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    display: block;
+    color: var(--code-text)
+}
+
+.menu {
+    display: none;
+}
+
+.menu.open {
+    display: flex;
+}
+
+
