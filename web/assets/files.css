@@ -1,0 +1,219 @@
+@import url("./syntax.css");
+
+:host {
+display: block;
+color: var(--ink, #222);
+font: inherit;
+}
+
+[hidden] {
+display: none !important;
+}
+
+.backdrop {
+position: fixed;
+inset: 0;
+z-index: 10000;
+display: grid;
+place-items: center;
+padding: 1rem;
+background: rgb(0 0 0 / 38%);
+}
+
+.dialog {
+display: flex;
+flex-direction: column;
+box-sizing: border-box;
+width: min(28rem, 100%);
+max-height: min(38rem, 90vh);
+overflow: hidden;
+color: var(--ink, #222);
+background: var(--paper, #fcfbf8);
+border: 1px solid var(--line, rgb(100 100 100 / 30%));
+border-radius: 10px;
+box-shadow: 0 1rem 3rem rgb(0 0 0 / 25%);
+}
+
+.dialog-header,
+.dialog-footer {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: .75rem;
+padding: .8rem 1rem;
+}
+
+.dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .75rem;
+    padding: .8rem 1rem;
+    border-bottom: 1px solid var(--line, rgb(100 100 100 / 20%));
+}
+
+.dialog-header h2 {
+    margin: 0;
+    font: inherit;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.kind-choice {
+    display: flex;
+    gap: .5rem;
+    margin-left: 0;
+}
+
+.dialog-header .close {
+    margin-left: auto;
+}
+
+.kind-button {
+padding: .4rem .8rem;
+border: 1px solid var(--line, rgb(100 100 100 / 30%));
+border-radius: 5px;
+color: inherit;
+background: transparent;
+font: inherit;
+cursor: pointer;
+}
+
+.kind-button.selected {
+border-color: var(--accent, #75a8ff);
+background: color-mix(
+in srgb,
+var(--accent, #75a8ff) 18%,
+transparent
+);
+}
+
+.tree {
+min-height: 15rem;
+padding: .65rem;
+overflow: auto;
+}
+
+.tree-item {
+min-width: 0;
+}
+
+.tree-row {
+display: flex;
+align-items: center;
+gap: .4rem;
+box-sizing: border-box;
+width: 100%;
+min-height: 2rem;
+padding: .25rem .4rem;
+border: 0;
+border-radius: 5px;
+color: inherit;
+background: transparent;
+font: inherit;
+text-align: left;
+cursor: pointer;
+}
+
+.tree-row:hover,
+.tree-row.selected {
+background: color-mix(
+in srgb,
+var(--accent, #75a8ff) 18%,
+transparent
+);
+}
+
+.twisty {
+flex: 0 0 1rem;
+width: 1rem;
+text-align: center;
+font-size: .8rem;
+}
+
+.node-icon {
+flex: 0 0 1rem;
+width: 1rem;
+text-align: center;
+opacity: .8;
+}
+
+.node-name {
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+
+.tree-children {
+display: none;
+padding-left: 1.1rem;
+}
+
+.tree-item.expanded > .tree-children {
+display: block;
+}
+
+.name-field {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .65rem 1rem 1rem;
+    border-top: 1px solid var(--line, rgb(100 100 100 / 20%));
+}
+
+.field-label {
+    flex: 0 0 auto;
+    margin: 0;
+    font-weight: 600;
+}
+
+.text-field {
+box-sizing: border-box;
+width: 100%;
+padding: .55rem .65rem;
+border: 1px solid var(--line, #aaa);
+border-radius: 5px;
+color: inherit;
+background: var(--paper, #fcfbf8);
+font: inherit;
+}
+
+.name-field .text-field {
+    flex: 1;
+    min-width: 0;
+}
+
+.dialog-footer {
+justify-content: flex-end;
+border-top: 1px solid var(--line, rgb(100 100 100 / 20%));
+}
+
+.dialog-footer button,
+.icon-button {
+padding: .45rem .8rem;
+border: 1px solid var(--line, rgb(100 100 100 / 30%));
+border-radius: 5px;
+color: inherit;
+background: transparent;
+font: inherit;
+cursor: pointer;
+}
+
+.dialog-footer .confirm {
+border-color: var(--accent, #75a8ff);
+background: var(--accent, #75a8ff);
+color: var(--accent-ink, #111);
+}
+
+.icon-button {
+padding: .1rem .45rem;
+border: 0;
+font-size: 1.4rem;
+line-height: 1.2;
+}
+
+@media (max-width: 34rem) {
+.tree {
+max-height: 12rem;
+}
+}
