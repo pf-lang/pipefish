@@ -152,6 +152,24 @@ render() {
 
         if (row) row.click();
     }
+
+    this.shadowRoot.querySelectorAll(".kind-button").forEach(button => {
+        button.addEventListener("click", () => {
+            this.shadowRoot.querySelectorAll(".kind-button")
+                .forEach(el => el.classList.toggle("selected", el === button));
+
+            this.updateConfirmButton();
+        });
+    });
+
+    const nameField = this.shadowRoot.querySelector("#entity-name");
+    if (nameField) {
+        nameField.addEventListener("input", () => this.updateConfirmButton());
+    }
+
+    this.updateConfirmButton();
+
+
 }
 
 confirmLabel() {
@@ -214,6 +232,7 @@ renderNodes(nodes, container, parentPath) {
             if (isFolder) {
                 item.classList.toggle("expanded");
             }
+            this.updateConfirmButton();
         });
 
         if (isFolder && node.children?.length) {
@@ -293,6 +312,29 @@ confirm() {
     }));
 
     this.close();
+}
+
+updateConfirmButton() {
+    const button = this.shadowRoot.querySelector(".confirm");
+    if (!button) return;
+
+    let enabled = true;
+
+    if (["open", "download", "rename", "delete", "revert"].includes(this.operation)) {
+        enabled = !!this.selected;
+    }
+
+    if (this.operation === "new") {
+        const name = this.shadowRoot.querySelector("#entity-name")?.value.trim();
+        enabled = !!name && (!this.selected || this.selected.type === "folder");
+    }
+
+    if (this.operation === "rename") {
+        enabled = !!this.selected &&
+            !!this.shadowRoot.querySelector("#entity-name")?.value.trim();
+    }
+
+    button.disabled = !enabled;
 }
 
 }

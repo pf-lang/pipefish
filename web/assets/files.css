@@ -205,6 +205,11 @@ background: var(--accent, #75a8ff);
 color: var(--accent-ink, #111);
 }
 
+.dialog-footer .confirm:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
 .icon-button {
 padding: .1rem .45rem;
 border: 0;

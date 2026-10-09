@@ -46,8 +46,7 @@ class PipefishEditor extends HTMLElement {
 
         const menu = document.createElement("div");
         menu.classList.add("menu");
-
-        for (const label of ["New", "Open", "Save", "Settings"]) {
+        for (const label of ["Open", "New", "Rename", "Delete", "Upload", "Download"]) {
             const item = document.createElement("button");
             item.textContent = label;
 
