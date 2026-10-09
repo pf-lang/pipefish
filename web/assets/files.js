@@ -207,7 +207,7 @@ renderNodes(nodes, container, parentPath) {
 
         const icon = document.createElement("span");
         icon.className = "node-icon";
-        icon.textContent = isFolder ? "▰" : "▤";
+        icon.textContent = isFolder ? "🗀" : "🗎";
 
         const name = document.createElement("span");
         name.className = "node-name";
