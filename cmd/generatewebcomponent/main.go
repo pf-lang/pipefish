@@ -3,6 +3,8 @@
 package main
 
 import (
+	"path/filepath"
+	"sort"
 	"syscall/js"
 
 	"github.com/tim-hardcastle/pipefish/source/err"
@@ -107,6 +109,123 @@ func do(this js.Value, args []js.Value) any {
 	return service.ToString(result)
 }
 
+func getFileTree(this js.Value, args []js.Value) any {
+	if fs == nil {
+		return "filesystem has not been initialized"
+	}
+
+	return buildDirectoryTree(".")
+}
+
+func buildDirectoryTree(directory string) (result js.Value) {
+	result = js.Global().Get("Object").New()
+	result.Set("type", "folder")
+
+	name := directory
+	if directory == "." {
+		name = ""
+	} else {
+		name = filepath.Base(directory)
+	}
+	result.Set("name", name)
+
+	children := js.Global().Get("Array").New()
+
+	directories, err := fs.GetDirectoryNames(directory, false)
+	if err != nil {
+		return result
+	}
+	sort.Strings(directories)
+
+	for _, child := range directories {
+		children.Call("push", buildDirectoryTree(child))
+	}
+
+	files, err := fs.GetFilenames(directory, false)
+	if err != nil {
+		return result
+	}
+	sort.Strings(files)
+
+	for _, file := range files {
+		child := js.Global().Get("Object").New()
+		child.Set("type", "file")
+		child.Set("name", filepath.Base(file))
+		children.Call("push", child)
+	}
+
+	result.Set("children", children)
+	return result
+}
+
+func readFile(this js.Value, args []js.Value) any {
+	result := js.Global().Get("Object").New()
+
+	if fs == nil {
+		result.Set("ok", false)
+		result.Set("error", "filesystem has not been initialized")
+		return result
+	}
+
+	data, err := fs.ReadFile(args[0].String())
+	if err != nil {
+		result.Set("ok", false)
+		result.Set("error", err.Error())
+		return result
+	}
+
+	result.Set("ok", true)
+	result.Set("data", string(data))
+	return result
+}
+
+func createDirectory(this js.Value, args []js.Value) any {
+	if fs == nil {
+		return "filesystem has not been initialized"
+	}
+
+	if err := fs.CreateDirectory(args[0].String()); err != nil {
+		return err.Error()
+	}
+	return nil
+}
+
+func deleteFile(this js.Value, args []js.Value) any {
+	if fs == nil {
+		return "filesystem has not been initialized"
+	}
+
+	if err := fs.DeleteFile(args[0].String()); err != nil {
+		return err.Error()
+	}
+	return nil
+}
+
+func deleteDirectory(this js.Value, args []js.Value) any {
+	if fs == nil {
+		return "filesystem has not been initialized"
+	}
+
+	if err := fs.DeleteDirectory(args[0].String()); err != nil {
+		return err.Error()
+	}
+	return nil
+}
+
+func renamePath(this js.Value, args []js.Value) any {
+	if fs == nil {
+		return "filesystem has not been initialized"
+	}
+
+	oldPath := args[0].String()
+	newPath := args[1].String()
+
+	if err := fs.Rename(oldPath, newPath); err != nil {
+		return err.Error()
+	}
+	return nil
+}
+
 func main() {
 	initializer.RegisterWasmGoPackages(registry.Packages)
 
@@ -157,6 +276,36 @@ func main() {
 	js.Global().Set(
 		"pipefishCompileMain",
 		js.FuncOf(compileMain),
+	)
+
+	js.Global().Set(
+		"pipefishGetFileTree",
+		js.FuncOf(getFileTree),
+	)
+
+	js.Global().Set(
+		"pipefishReadFile",
+		js.FuncOf(readFile),
+	)
+
+	js.Global().Set(
+		"pipefishCreateDirectory",
+		js.FuncOf(createDirectory),
+	)
+
+	js.Global().Set(
+		"pipefishDeleteFile",
+		js.FuncOf(deleteFile),
+	)
+
+	js.Global().Set(
+		"pipefishDeleteDirectory",
+		js.FuncOf(deleteDirectory),
+	)
+
+	js.Global().Set(
+		"pipefishRenamePath",
+		js.FuncOf(renamePath),
 	)
 
 	select {}
