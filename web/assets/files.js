@@ -230,7 +230,8 @@ renderNodes(nodes, container, parentPath) {
             };
 
             if (isFolder) {
-                item.classList.toggle("expanded");
+                const expanded = item.classList.toggle("expanded");
+                twisty.textContent = expanded ? "▾" : "▸";
             }
             this.updateConfirmButton();
         });
