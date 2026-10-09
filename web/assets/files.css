@@ -2,7 +2,7 @@
 
 :host {
 display: block;
-color: var(--code-text);
+color: var(--text);
 font-family: var(--syntax-font);
 background-color: var(--paper);
 }
@@ -43,6 +43,8 @@ gap: .75rem;
 padding: .8rem 1rem;
 font: inherit;
 font-size: 1rem;
+color: var(--text);
+background-color: var(--background);
 }
 
 .dialog-header {
@@ -66,7 +68,7 @@ font-size: 1rem;
 
 .kind-button {
 padding: .4rem .8rem;
-border: 1px solid var(--line, rgb(100 100 100 / 30%));
+border: 1px solid var(--code-border);
 border-radius: 5px;
 color: inherit;
 background: transparent;
@@ -75,12 +77,7 @@ cursor: pointer;
 }
 
 .kind-button.selected {
-border-color: var(--accent, #75a8ff);
-background: color-mix(
-in srgb,
-var(--accent, #75a8ff) 18%,
-transparent
-);
+background: var(--paper);
 }
 
 .tree {
@@ -103,7 +100,7 @@ min-height: 2rem;
 padding: .25rem .4rem;
 border: 0;
 border-radius: 5px;
-color: inherit;
+color: var(--code-text);
 background: transparent;
 text-align: left;
 cursor: pointer;
@@ -113,11 +110,7 @@ font-size: 0.8rem;
 
 .tree-row:hover,
 .tree-row.selected {
-background: color-mix(
-in srgb,
-var(--accent, #75a8ff) 18%,
-transparent
-);
+background: var(--background);
 }
 
 .twisty {
@@ -153,16 +146,16 @@ display: block;
 box-sizing: border-box;
 width: 100%;
 padding: .55rem .65rem;
-border: 1px solid var(--line, #aaa);
+border: 1px solid var(--code-border);
 border-radius: 5px;
-color: inherit;
-background: var(--paper, #fcfbf8);
+color: var(--code-text);
+background: var(--paper);
 font: inherit;
 font-size: 1rem;
 }
 
 .name-field {
-    padding: 0 .65rem;
+    padding: 0.4rem .65rem;
     box-sizing: border-box;
 }
 
@@ -173,24 +166,18 @@ font-size: 1rem;
 
 .dialog-footer {
 justify-content: flex-end;
-border-top: 1px solid var(--line, rgb(100 100 100 / 20%));
+border-top: 1px solid var(--code-border);
 }
 
 .dialog-footer button,
 .icon-button {
 padding: .45rem .8rem;
-border: 1px solid var(--line, rgb(100 100 100 / 30%));
+border: 1px solid var(--code-border);
 border-radius: 5px;
-color: inherit;
-background: transparent;
+background: var(--paper);
 font: inherit;
 cursor: pointer;
-}
-
-.dialog-footer .confirm {
-border-color: var(--accent, #75a8ff);
-background: var(--accent, #75a8ff);
-color: var(--code-text, #111);
+color: var(--text)
 }
 
 .dialog-footer .confirm:disabled {
@@ -203,6 +190,12 @@ padding: .1rem .45rem;
 border: 0;
 font-size: 1.4rem;
 line-height: 1.2;
+color: inherit;
+}
+
+.name-field .text-field:focus {
+    outline: none;
+    border-color: var(--link);
 }
 
 @media (max-width: 34rem) {

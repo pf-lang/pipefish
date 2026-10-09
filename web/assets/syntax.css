@@ -1,9 +1,17 @@
 :where(:root) {
+    --background: #edf3fa;
     --code-background: #f1f4f8;
     --paper: #fcfbf8;
     --code-header: #e4e9f1;
     --code-text: #202124;
     --code-border: #d6dce5;
+    
+
+    --text: #202124;
+    --heading: #202124;
+
+    --link: #1544bf;
+    --link-hover: #2b71ff;
 
     --inline-code-background: var(--code-background);
 
@@ -53,6 +61,15 @@
 /* Dark theme */
 
 [data-theme="dark"] {
+
+    --background: #1b1d22;
+
+    --text: #dddddd;
+    --heading: #ffffff;
+
+    --link: #75a8ff;
+    --link-hover: #b6d2ff;
+
     /* Code */
 
     --code-background: #191c21;
