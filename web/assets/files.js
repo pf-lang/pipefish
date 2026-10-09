@@ -13,6 +13,10 @@ type: "folder", name: "", children: [
 { type: "folder", name: "examples", children: [
 { type: "file", name: "hello.pf" },
 { type: "file", name: "fibonacci.pf" },
+{ type: "folder", name: "more_examples", children: [
+{ type: "file", name: "hello.pf" },
+{ type: "file", name: "fibonacci.pf" },
+]},
 ] },
 { type: "folder", name: "libraries", children: [
 { type: "file", name: "math.pf" },
@@ -77,16 +81,15 @@ render() {
                 aria-labelledby="dialog-title">
 
                 <header class="dialog-header">
-                    <h2 id="dialog-title">${title}</h2>
-
+                    ${title}
                     ${this.operation === "new" ? `
                         <div class="kind-choice">
                             <button type="button"
                                 class="kind-button selected"
-                                data-kind="file">File</button>
+                                data-kind="file">▤</button>
                             <button type="button"
                                 class="kind-button"
-                                data-kind="folder">Folder</button>
+                                data-kind="folder">▱</button>
                         </div>
                     ` : ""}
 
@@ -99,9 +102,6 @@ render() {
 
                 ${this.operation === "new" || this.operation === "rename" ? `
                     <div class="name-field">
-                        <label class="field-label" for="entity-name">
-                            ${this.operation === "new" ? "Name" : "New name"}
-                        </label>
                         <input id="entity-name"
                             class="text-field"
                             type="text"
@@ -207,7 +207,7 @@ renderNodes(nodes, container, parentPath) {
 
         const icon = document.createElement("span");
         icon.className = "node-icon";
-        icon.textContent = isFolder ? "🗀" : "🗎";
+        icon.textContent = isFolder ? "▱" : "▤";
 
         const name = document.createElement("span");
         name.className = "node-name";

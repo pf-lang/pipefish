@@ -2,8 +2,9 @@
 
 :host {
 display: block;
-color: var(--ink, #222);
-font: inherit;
+color: var(--code-text);
+font-family: var(--syntax-font);
+background-color: var(--paper);
 }
 
 [hidden] {
@@ -27,7 +28,6 @@ box-sizing: border-box;
 width: min(28rem, 100%);
 max-height: min(38rem, 90vh);
 overflow: hidden;
-color: var(--ink, #222);
 background: var(--paper, #fcfbf8);
 border: 1px solid var(--line, rgb(100 100 100 / 30%));
 border-radius: 10px;
@@ -41,6 +41,8 @@ align-items: center;
 justify-content: space-between;
 gap: .75rem;
 padding: .8rem 1rem;
+font: inherit;
+font-size: 1rem;
 }
 
 .dialog-header {
@@ -50,13 +52,6 @@ padding: .8rem 1rem;
     gap: .75rem;
     padding: .8rem 1rem;
     border-bottom: 1px solid var(--line, rgb(100 100 100 / 20%));
-}
-
-.dialog-header h2 {
-    margin: 0;
-    font: inherit;
-    font-size: 1.1rem;
-    font-weight: 600;
 }
 
 .kind-choice {
@@ -110,9 +105,10 @@ border: 0;
 border-radius: 5px;
 color: inherit;
 background: transparent;
-font: inherit;
 text-align: left;
 cursor: pointer;
+font-family: inherit;
+font-size: 0.8rem;
 }
 
 .tree-row:hover,
@@ -128,7 +124,7 @@ transparent
 flex: 0 0 1rem;
 width: 1rem;
 text-align: center;
-font-size: .8rem;
+font-size: 0.8rem;
 }
 
 .node-icon {
@@ -153,20 +149,6 @@ padding-left: 1.1rem;
 display: block;
 }
 
-.name-field {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    padding: .65rem 1rem 1rem;
-    border-top: 1px solid var(--line, rgb(100 100 100 / 20%));
-}
-
-.field-label {
-    flex: 0 0 auto;
-    margin: 0;
-    font-weight: 600;
-}
-
 .text-field {
 box-sizing: border-box;
 width: 100%;
@@ -176,6 +158,12 @@ border-radius: 5px;
 color: inherit;
 background: var(--paper, #fcfbf8);
 font: inherit;
+font-size: 1rem;
+}
+
+.name-field {
+    padding: 0 .65rem;
+    box-sizing: border-box;
 }
 
 .name-field .text-field {
@@ -202,7 +190,7 @@ cursor: pointer;
 .dialog-footer .confirm {
 border-color: var(--accent, #75a8ff);
 background: var(--accent, #75a8ff);
-color: var(--accent-ink, #111);
+color: var(--code-text, #111);
 }
 
 .dialog-footer .confirm:disabled {
