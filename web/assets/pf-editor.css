@@ -139,8 +139,8 @@
     height: 1.2rem;
 }
 
-:host(.minimized) .minimize svg {
-    transform: rotate(180deg);
+:host(.minimized) .minimize svg path {
+    d: path("M4 3h8M4 7l4 4 4-4");
 }
 
 :host(.minimized) .editor {
