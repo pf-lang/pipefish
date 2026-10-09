@@ -3,6 +3,7 @@
 package filesystem
 
 import (
+    "fmt"
 	"os"
 	"path/filepath"
     "time"
@@ -125,4 +126,40 @@ func NewVFSFromDirectory(path string) (*VFS, error) {
 		return nil, err
 	}
 	return vfs, nil
+}
+
+func (fs OSFileSystem) CreateDirectory(path string) error {
+    return os.MkdirAll(path, 0755)
+}
+
+func (fs OSFileSystem) DeleteDirectory(path string) error {
+    info, err := os.Stat(path)
+    if err != nil {
+        return err
+    }
+
+    if !info.IsDir() {
+        return fmt.Errorf("%q is not a directory", path)
+    }
+
+    return os.RemoveAll(path)
+}
+
+func (fs OSFileSystem) Rename(oldPath, newPath string) error {
+    if oldPath == newPath {
+        return nil
+    }
+
+    if _, err := os.Stat(oldPath); err != nil {
+        return err
+    }
+
+    // Don't silently replace an existing file or directory.
+    if _, err := os.Lstat(newPath); err == nil {
+        return fmt.Errorf("%q already exists", newPath)
+    } else if !os.IsNotExist(err) {
+        return err
+    }
+
+    return os.Rename(oldPath, newPath)
 }

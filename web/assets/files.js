@@ -14,8 +14,8 @@ type: "folder", name: "", children: [
 { type: "file", name: "hello.pf" },
 { type: "file", name: "fibonacci.pf" },
 { type: "folder", name: "more_examples", children: [
-{ type: "file", name: "hello.pf" },
-{ type: "file", name: "fibonacci.pf" },
+{ type: "file", name: "hello_2.pf" },
+{ type: "file", name: "fibonacci_2.pf" },
 ]},
 ] },
 { type: "folder", name: "libraries", children: [
