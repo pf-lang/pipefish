@@ -1,4 +1,5 @@
 import "./pf-reader.js";
+import "../assets/files.js";
 
 class PipefishEditor extends HTMLElement {
     constructor() {
@@ -46,7 +47,14 @@ class PipefishEditor extends HTMLElement {
 
         const menu = document.createElement("div");
         menu.classList.add("menu");
-        for (const label of ["Open", "New", "Rename", "Delete", "Upload", "Download"]) {
+        for (const label of [
+            "Open",
+            "New",
+            "Rename",
+            "Delete",
+            "Revert",
+            "Download",
+        ]) {
             const item = document.createElement("button");
             item.textContent = label;
 
@@ -64,6 +72,11 @@ class PipefishEditor extends HTMLElement {
 
             menu.append(item);
         }
+
+        this.addEventListener("menu-select", event => {
+            const operation = event.detail.toLowerCase();
+            this.files.open(operation);
+        });
 
         const minimize = document.createElement("button");
         minimize.classList.add("top-control", "minimize");
@@ -88,6 +101,7 @@ class PipefishEditor extends HTMLElement {
         );
 
         const reader = document.createElement("pf-reader");
+        const files = document.createElement("pf-files");
 
         const code = document.createElement("textarea");
         code.placeholder = "Type Pipefish code here...";
@@ -95,13 +109,14 @@ class PipefishEditor extends HTMLElement {
         code.spellcheck = false;
 
         editor.append(reader, code);
-        shadow.append(style, controls, editor);
+        shadow.append(style, controls, editor, files);
 
         this.reader = reader;
         this.code = code;
         this.ready = reader.ready;
         this.editor = editor;
         this.menu = menu;
+        this.files = files;
         this.serviceName = serviceNameText;
         this.minimizeButton = minimize;
         this.initialHeightSet = false;
