@@ -159,15 +159,30 @@ class PipefishReader extends HTMLElement {
         this.tabs.innerHTML = "";
 
         for (const file of this.files) {
-            const tab =
-                document.createElement("button");
-
+            const tab = document.createElement("button");
             tab.classList.add("tab");
-            tab.textContent = file.path.split("/").pop();
-
+            tab.dataset.path = file.path;
             if (file.path === this.currentFile) {
                 tab.classList.add("selected");
             }
+
+            const name = document.createElement("span");
+            name.className = "tab-name";
+            name.textContent = file.path.split("/").pop();
+
+            const close = document.createElement("span");
+            close.className = "tab-close";
+            close.textContent = "×";
+            close.title = "Close tab";
+            close.setAttribute("role", "button");
+            close.setAttribute("aria-label", `Close ${name.textContent}`);
+
+            close.addEventListener("click", event => {
+                event.stopPropagation();
+                this.closeTab(file.path);
+            });
+
+            tab.append(name, close);
 
             tab.addEventListener("click", () => {
                 this.selectFile(file.path);
@@ -175,6 +190,10 @@ class PipefishReader extends HTMLElement {
 
             this.tabs.append(tab);
         }
+    }
+
+    readerClear() {
+        this.reader.textContent = "";
     }
 
     async selectFile(path) {
@@ -187,12 +206,9 @@ class PipefishReader extends HTMLElement {
 
         this.currentFile = path;
 
-        for (const tab of this.tabs.children) {
-            tab.classList.toggle(
-                "selected",
-                tab.textContent === path
-            );
-        }
+        this.tabs.querySelectorAll(".tab").forEach(tab => {
+            tab.classList.toggle("selected", tab.dataset.path === path);
+        });
 
         await this.display(file.data);
 
@@ -222,6 +238,32 @@ class PipefishReader extends HTMLElement {
         this.box.innerHTML =
             await highlighter(source) +
             (source.endsWith("\n") ? "\u00a0" : "");
+    }
+
+    async closeTab(path) {
+        const index = this.files.findIndex(file => file.path === path);
+        if (index === -1) return;
+
+        this.files.splice(index, 1);
+
+        if (this.currentFile === path) {
+            const next = this.files[Math.min(index, this.files.length - 1)];
+
+            this.currentFile = next?.path ?? null;
+            this.makeTabs();
+
+            if (next) {
+                await this.display(next.data);
+                this.dispatchEvent(new CustomEvent("filechange", {
+                    detail: { path: next.path, data: next.data },
+                }));
+            } else {
+                this.makeTabs();
+                this.readerClear();
+            }
+        } else {
+            this.makeTabs();
+        }
     }
 
     get scrollTop() {

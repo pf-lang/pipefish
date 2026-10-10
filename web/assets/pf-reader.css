@@ -29,11 +29,14 @@
 
 .tab {
     box-sizing: border-box;
-
-    padding: 0 1rem;
+    padding: 0 0.5rem 0 1rem;
 
     border: 0;
     border-right: 1px solid var(--code-border);
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 
     background: transparent;
     color: var(--code-text);
@@ -43,6 +46,35 @@
 
     white-space: nowrap;
     cursor: pointer;
+}
+
+.tab-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tab-close {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 1.2rem;
+    height: 1.2rem;
+
+    border: 1px solid var(--code-border);
+    border-radius: 3px;
+
+    font-family: sans-serif;
+    font-size: 17px;
+    line-height: 1;
+
+    background-color: var(--paper);
+}
+
+.tab-close:hover {
+    background: var(--code-border);
+    opacity: 1;
 }
 
 .tab:hover {
