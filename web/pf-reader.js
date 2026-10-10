@@ -239,6 +239,77 @@ class PipefishReader extends HTMLElement {
     set scrollLeft(value) {
         this.box.scrollLeft = value;
     }
+
+    async openPaths(paths) {
+        const opened = [];
+
+        for (const path of paths) {
+            const result = window.pipefishReadFile(path);
+
+            if (!result.ok) {
+                throw new Error(result.error);
+            }
+
+            opened.push({
+                path,
+                data: result.data,
+            });
+        }
+
+        const openedPaths = new Set(paths);
+
+        this.files = [
+            ...opened,
+            ...this.files.filter(file => !openedPaths.has(file.path)),
+        ];
+
+        if (!this.files.length) {
+            this.currentFile = null;
+            await this.display("");
+            this.makeTabs();
+            return;
+        }
+
+        this.currentFile = this.files[0].path;
+        this.makeTabs();
+        await this.display(this.files[0].data);
+
+        this.dispatchEvent(new CustomEvent("filechange", {
+            detail: {
+                path: this.files[0].path,
+                data: this.files[0].data,
+            },
+        }));
+    }
+
+
+    async removePaths(paths) {
+        const removed = new Set(paths);
+
+        this.files = this.files.filter(
+            file => !removed.has(file.path)
+        );
+
+        if (removed.has(this.currentFile)) {
+            this.currentFile = this.files[0]?.path ?? null;
+
+            this.makeTabs();
+
+            const file = this.files[0];
+
+            await this.display(file?.data ?? "");
+
+            this.dispatchEvent(new CustomEvent("filechange", {
+                detail: {
+                    path: file?.path ?? null,
+                    data: file?.data ?? "",
+                },
+            }));
+        } else {
+            this.makeTabs();
+        }
+    }
+
 }
 
 // This strips superfluous indentation from the source code given between

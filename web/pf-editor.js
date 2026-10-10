@@ -122,6 +122,12 @@ class PipefishEditor extends HTMLElement {
         this.minimizeButton = minimize;
         this.initialHeightSet = false;
 
+        files.addEventListener("files-action", event => {
+            this.handleFilesAction(event).catch(error => {
+                console.error("File operation failed:", error);
+            });
+        });
+
         minimize.addEventListener("click", () => {
         const minimized =
             this.editor.classList.toggle("minimized");
@@ -234,6 +240,252 @@ class PipefishEditor extends HTMLElement {
             code.dispatchEvent(new Event("input"));
         });
     }
+
+    refreshFileTree() {
+        this.files.setVFS(window.pipefishGetFileTree());
+    }
+
+    checkFileOperation(result) {
+        if (typeof result === "string" && result) {
+            throw new Error(result);
+        }
+    }
+
+    async handleFilesAction(event) {
+        const {
+            operation,
+            selection,
+            kind,
+            name,
+        } = event.detail;
+
+        const selectedPath = selection?.path ?? null;
+
+        const selectedType = selection?.node?.type;
+
+        const refresh = () => this.refreshFileTree();
+
+        switch (operation) {
+            case "open": {
+                if (selectedType === "file") {
+                    await this.reader.openPaths([selectedPath]);
+                } else if (selectedType === "folder") {
+                    const paths = (selection.children || [])
+                        .filter(child => child.type === "file")
+                        .map(child =>
+                            selectedPath === "."
+                                ? child.name
+                                : `${selectedPath}/${child.name}`
+                        );
+
+                    if (paths.length) {
+                        await this.reader.openPaths(paths);
+                    }
+                }
+
+                break;
+            }
+
+            case "download": {
+                if (selectedType === "file") {
+                    const result =
+                        window.pipefishReadFile(selectedPath);
+
+                    if (!result.ok) {
+                        throw new Error(result.error);
+                    }
+
+                    this.downloadBlob(
+                        new Blob([result.data], {
+                            type: "application/octet-stream",
+                        }),
+                        selection.name
+                    );
+                } else if (selectedType === "folder") {
+                    const result =
+                        window.pipefishZipDirectory(selectedPath);
+
+                    if (!result.ok) {
+                        throw new Error(result.error);
+                    }
+
+                    this.downloadBlob(
+                        new Blob([result.data], {
+                            type: "application/zip",
+                        }),
+                        `${selection.name || "project"}.zip`
+                    );
+                }
+
+                break;
+            }
+
+            case "new": {
+                if (!name || name.includes("/") || name.includes("\\")) {
+                    throw new Error("Enter a valid file or folder name.");
+                }
+
+                const parent = selectedType === "folder"
+                    ? selectedPath
+                    : ".";
+
+                const path = parent === "."
+                    ? name
+                    : `${parent}/${name}`;
+
+                if (kind === "folder") {
+                    this.checkFileOperation(
+                        window.pipefishCreateDirectory(path)
+                    );
+                } else {
+                    this.checkFileOperation(
+                        window.pipefishUpdateFile(path, "")
+                    );
+
+                    await this.reader.openPaths([path]);
+                }
+
+                refresh();
+                break;
+            }
+
+            case "rename": {
+                if (
+                    !name ||
+                    name.includes("/") ||
+                    name.includes("\\") ||
+                    selectedPath === "."
+                ) {
+                    throw new Error("Enter a valid new name.");
+                }
+
+                const parent = selectedPath.includes("/")
+                    ? selectedPath.slice(0, selectedPath.lastIndexOf("/"))
+                    : "";
+
+                const newPath = parent
+                    ? `${parent}/${name}`
+                    : name;
+
+                this.checkFileOperation(
+                    window.pipefishRenamePath(selectedPath, newPath)
+                );
+
+                const oldPrefix = selectedPath + "/";
+                const renamed = path =>
+                    path === selectedPath
+                        ? newPath
+                        : path.startsWith(oldPrefix)
+                            ? newPath + path.slice(selectedPath.length)
+                            : path;
+
+                for (const file of this.reader.files) {
+                    file.path = renamed(file.path);
+                }
+
+                if (this.reader.currentFile) {
+                    this.reader.currentFile =
+                        renamed(this.reader.currentFile);
+                }
+
+                this.reader.makeTabs();
+
+                if (this.reader.currentFile) {
+                    await this.reader.selectFile(
+                        this.reader.currentFile
+                    );
+                }
+
+                refresh();
+                break;
+            }
+
+            case "delete": {
+                if (selectedType === "folder") {
+                    this.checkFileOperation(
+                        window.pipefishDeleteDirectory(selectedPath)
+                    );
+                } else {
+                    this.checkFileOperation(
+                        window.pipefishDeleteFile(selectedPath)
+                    );
+                }
+
+                const removedPaths = [];
+
+                const collectPaths = (node, path) => {
+                    if (node.type === "file") {
+                        removedPaths.push(path);
+                        return;
+                    }
+
+                    for (const child of node.children || []) {
+                        collectPaths(
+                            child,
+                            path === "."
+                                ? child.name
+                                : `${path}/${child.name}`
+                        );
+                    }
+                };
+
+                collectPaths(selection, selectedPath);
+
+                await this.reader.removePaths(removedPaths);
+                refresh();
+                break;
+            }
+
+            case "revert": {
+                if (selectedType !== "file") {
+                    break;
+                }
+
+                this.checkFileOperation(
+                    window.pipefishRevertFile(selectedPath)
+                );
+
+                const result =
+                    window.pipefishReadFile(selectedPath);
+
+                if (!result.ok) {
+                    throw new Error(result.error);
+                }
+
+                const file = this.reader.files.find(
+                    file => file.path === selectedPath
+                );
+
+                if (file) {
+                    file.data = result.data;
+                }
+
+                if (this.reader.currentFile === selectedPath) {
+                    await this.reader.selectFile(selectedPath);
+                }
+
+                break;
+            }
+        }
+    }
+
+    downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+
+        anchor.href = url;
+        anchor.download = filename;
+
+        document.body.append(anchor);
+        anchor.click();
+        anchor.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+
+
+
 
     get value() {
         return this.code.value;

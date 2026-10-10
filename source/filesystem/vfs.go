@@ -103,10 +103,11 @@ func (fs *VFS) GetFilenames(directory string, recursive bool) ([]string, error) 
 
     for path := range fs.files {
         if recursive {
-            if filepath.Dir(path) == directory ||
-                strings.HasPrefix(path, directory+string(filepath.Separator)) {
-                result = append(result, path)
-            }
+			if filepath.Dir(path) == directory ||
+				directory == "." ||
+				strings.HasPrefix(path, directory+string(filepath.Separator)) {
+				result = append(result, path)
+			}
         } else if filepath.Dir(path) == directory {
             result = append(result, path)
         }

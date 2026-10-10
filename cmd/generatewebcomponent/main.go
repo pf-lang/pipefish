@@ -3,9 +3,13 @@
 package main
 
 import (
+	"bytes"
 	"path/filepath"
+	pathpkg "path"
 	"sort"
+	"strings"
 	"syscall/js"
+	"archive/zip"
 
 	"github.com/tim-hardcastle/pipefish/source/err"
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
@@ -18,15 +22,17 @@ import (
 )
 
 var (
-	service *pf.Service
-	fs      *filesystem.VFS
-	oH      *vm.CapturingOutHandler
+	service       *pf.Service
+	fs            *filesystem.VFS
+	oH            *vm.CapturingOutHandler
+	originalFiles map[string][]byte
 )
 
 func compile(this js.Value, args []js.Value) any {
 	files := args[0]
 
 	fs = filesystem.NewVFS()
+	originalFiles = make(map[string][]byte)
 
 	for i := 0; i < files.Length(); i++ {
 		file := files.Index(i)
@@ -36,6 +42,12 @@ func compile(this js.Value, args []js.Value) any {
 
 		data := make([]byte, dataJS.Get("byteLength").Int())
 		js.CopyBytesToGo(data, dataJS)
+
+		cleanPath := strings.TrimPrefix(path, "./")
+		cleanPath = strings.TrimPrefix(cleanPath, "/")
+		cleanPath = pathpkg.Clean(cleanPath)
+
+		originalFiles[cleanPath] = append([]byte(nil), data...)
 
 		if err := fs.WriteFile(path, data); err != nil {
 			return err.Error()
@@ -226,6 +238,93 @@ func renamePath(this js.Value, args []js.Value) any {
 	return nil
 }
 
+func revertFile(this js.Value, args []js.Value) any {
+    if fs == nil {
+        return "filesystem has not been initialized"
+    }
+
+    name := pathpkg.Clean(strings.TrimPrefix(args[0].String(), "./"))
+    original, ok := originalFiles[name]
+    if !ok {
+        return "no original version exists for " + name
+    }
+
+    if err := fs.WriteFile(name, original); err != nil {
+        return err.Error()
+    }
+
+    return nil
+}
+
+func zipDirectory(this js.Value, args []js.Value) any {
+    if fs == nil {
+        return errorResult("filesystem has not been initialized")
+    }
+
+    directory := pathpkg.Clean(strings.TrimPrefix(args[0].String(), "./"))
+    if directory == "" {
+        directory = "."
+    }
+
+    filenames, err := fs.GetFilenames(directory, true)
+    if err != nil {
+        return errorResult(err.Error())
+    }
+
+    sort.Strings(filenames)
+
+    var buffer bytes.Buffer
+    archive := zip.NewWriter(&buffer)
+
+    for _, filename := range filenames {
+        name := filename
+
+        if directory != "." {
+            name = strings.TrimPrefix(
+                strings.TrimPrefix(filename, directory),
+                "/",
+            )
+        }
+
+        contents, err := fs.ReadFile(filename)
+        if err != nil {
+            archive.Close()
+            return errorResult(err.Error())
+        }
+
+        writer, err := archive.Create(name)
+        if err != nil {
+            archive.Close()
+            return errorResult(err.Error())
+        }
+
+        if _, err := writer.Write(contents); err != nil {
+            archive.Close()
+            return errorResult(err.Error())
+        }
+    }
+
+    if err := archive.Close(); err != nil {
+        return errorResult(err.Error())
+    }
+
+    result := js.Global().Get("Object").New()
+    result.Set("ok", true)
+
+    bytesJS := js.Global().Get("Uint8Array").New(buffer.Len())
+    js.CopyBytesToJS(bytesJS, buffer.Bytes())
+    result.Set("data", bytesJS)
+
+    return result
+}
+
+func errorResult(message string) js.Value {
+    result := js.Global().Get("Object").New()
+    result.Set("ok", false)
+    result.Set("error", message)
+    return result
+}
+
 func main() {
 	initializer.RegisterWasmGoPackages(registry.Packages)
 
@@ -306,6 +405,16 @@ func main() {
 	js.Global().Set(
 		"pipefishRenamePath",
 		js.FuncOf(renamePath),
+	)
+
+	js.Global().Set(
+		"pipefishRevertFile", 
+		js.FuncOf(revertFile),
+	)
+
+	js.Global().Set(
+		"pipefishZipDirectory",
+		js.FuncOf(zipDirectory),
 	)
 
 	select {}
