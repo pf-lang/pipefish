@@ -241,21 +241,20 @@ class PipefishReader extends HTMLElement {
     }
 
     async openPaths(paths) {
+        
+        paths = paths.map(path => path.replace(/^\.\//, ""));
         const opened = [];
 
         for (const path of paths) {
-            const result = window.pipefishReadFile(path);
-
-            if (!result.ok) {
-                throw new Error(result.error);
+            const existing = this.files.find(file => file.path === path);
+            if (existing) {
+                opened.push(existing);
+                continue;
             }
-
-            opened.push({
-                path,
-                data: result.data,
-            });
+            const result = window.pipefishReadFile(path);
+            if (!result.ok) throw new Error(result.error);
+            opened.push({ path, data: result.data });
         }
-
         const openedPaths = new Set(paths);
 
         this.files = [
@@ -265,8 +264,8 @@ class PipefishReader extends HTMLElement {
 
         if (!this.files.length) {
             this.currentFile = null;
-            await this.display("");
             this.makeTabs();
+            await this.display("");
             return;
         }
 

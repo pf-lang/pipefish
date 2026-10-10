@@ -84,10 +84,10 @@ render() {
                 ` : ""}
 
                 <footer class="dialog-footer">
-                    <button class="cancel" type="button">Cancel</button>
                     <button class="confirm" type="button">
                         ${this.confirmLabel()}
                     </button>
+                    <button class="cancel" type="button">Cancel</button>
                 </footer>
             </section>
         </div>`;
