@@ -75,6 +75,7 @@ class PipefishEditor extends HTMLElement {
 
         this.addEventListener("menu-select", event => {
             const operation = event.detail.toLowerCase();
+            this.files.setVFS(window.pipefishGetFileTree());
             this.files.open(operation);
         });
 

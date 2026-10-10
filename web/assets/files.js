@@ -7,25 +7,6 @@ delete: "Delete",
 revert: "Revert",
 };
 
-const DEMO_VFS = {
-type: "folder", name: "", children: [
-{ type: "file", name: "main.pf" },
-{ type: "folder", name: "examples", children: [
-{ type: "file", name: "hello.pf" },
-{ type: "file", name: "fibonacci.pf" },
-{ type: "folder", name: "more_examples", children: [
-{ type: "file", name: "hello_2.pf" },
-{ type: "file", name: "fibonacci_2.pf" },
-]},
-] },
-{ type: "folder", name: "libraries", children: [
-{ type: "file", name: "math.pf" },
-{ type: "file", name: "strings.pf" },
-] },
-{ type: "file", name: "README.md" },
-],
-};
-
 class PFFiles extends HTMLElement {
 constructor() {
 super();
@@ -35,14 +16,6 @@ super();
     this.operation = "open";
     this.selected = null;
     this.selectedPath = null;
-}
-
-connectedCallback() {
-    if (!this.vfs) this.vfs = DEMO_VFS;
-
-    if (this.hasAttribute("demo")) {
-        this.open(this.getAttribute("operation") || "open");
-    }
 }
 
 setVFS(vfs) {

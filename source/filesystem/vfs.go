@@ -21,10 +21,13 @@ func (vfs *VFS) ReadFile(path string) ([]byte, error) {
 }
 
 func (vfs *VFS) WriteFile(path string, data []byte) error {
-	path = vfs.cleanPath(path)
-	vfs.files[path] = append([]byte(nil), data...)
-	vfs.dirs[path] = false
-	return nil
+    path = vfs.cleanPath(path)
+    if err := vfs.CreateDirectory(filepath.Dir(path)); err != nil {
+        return err
+    }
+    vfs.files[path] = append([]byte(nil), data...)
+    vfs.dirs[path] = false
+    return nil
 }
 
 func (vfs *VFS) DeleteFile(path string) error {
@@ -54,6 +57,35 @@ func (info vfsFileInfo) Name() string {
 
 func (info vfsFileInfo) IsDir() bool {
 	return info.isDir
+}
+
+func (vfs *VFS) CreateDirectory(path string) error {
+    path = vfs.cleanPath(path)
+
+    if path == "." {
+        return nil
+    }
+
+    // Create every directory in the path, starting with its parents.
+    current := ""
+    for _, part := range strings.Split(path, "/") {
+        if current == "" {
+            current = part
+        } else {
+            current += "/" + part
+        }
+
+        if isDir, exists := vfs.dirs[current]; exists {
+            if !isDir {
+                return fmt.Errorf("%q is a file, not a directory", current)
+            }
+            continue
+        }
+
+        vfs.dirs[current] = true
+    }
+
+    return nil
 }
 
 func (vfs *VFS) cleanPath(path string) string {
@@ -86,8 +118,8 @@ func (fs *VFS) GetFilenames(directory string, recursive bool) ([]string, error) 
 func (fs *VFS) GetDirectoryNames(directory string, recursive bool) ([]string, error) {
     result := []string{}
 
-    for path := range fs.dirs {
-        if path == directory {
+    for path, isDir := range fs.dirs {
+        if !isDir || path == directory {
             continue
         }
 
@@ -100,43 +132,12 @@ func (fs *VFS) GetDirectoryNames(directory string, recursive bool) ([]string, er
             result = append(result, path)
         }
     }
-
     return result, nil
 }
 
 // TODO --- will need to do this properly to implement the hub.
 func (fs VFS) ModTime(path string) time.Time {
     return time.Time{}
-}
-
-
-func (vfs *VFS) CreateDirectory(path string) error {
-    path = vfs.cleanPath(path)
-
-    if path == "." {
-        return nil
-    }
-
-    // Create every directory in the path, starting with its parents.
-    current := ""
-    for _, part := range strings.Split(path, "/") {
-        if current == "" {
-            current = part
-        } else {
-            current += "/" + part
-        }
-
-        if isDir, exists := vfs.dirs[current]; exists {
-            if !isDir {
-                return fmt.Errorf("%q is a file, not a directory", current)
-            }
-            continue
-        }
-
-        vfs.dirs[current] = true
-    }
-
-    return nil
 }
 
 func (vfs *VFS) DeleteDirectory(path string) error {
