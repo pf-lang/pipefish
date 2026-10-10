@@ -163,7 +163,7 @@ class PipefishReader extends HTMLElement {
                 document.createElement("button");
 
             tab.classList.add("tab");
-            tab.textContent = file.path;
+            tab.textContent = file.path.split("/").pop();
 
             if (file.path === this.currentFile) {
                 tab.classList.add("selected");

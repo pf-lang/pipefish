@@ -299,7 +299,7 @@ class PipefishEditor extends HTMLElement {
                         new Blob([result.data], {
                             type: "application/octet-stream",
                         }),
-                        selection.name
+                        selectedPath.split("/").pop()
                     );
                 } else if (selectedType === "folder") {
                     const result =
@@ -313,7 +313,7 @@ class PipefishEditor extends HTMLElement {
                         new Blob([result.data], {
                             type: "application/zip",
                         }),
-                        `${selection.name || "project"}.zip`
+                        `${selectedPath === "." ? "vfs" : selection.node.name}.zip`
                     );
                 }
 

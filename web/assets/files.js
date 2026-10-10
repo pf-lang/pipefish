@@ -59,10 +59,10 @@ render() {
                         <div class="kind-choice">
                             <button type="button"
                                 class="kind-button selected"
-                                data-kind="file">▤</button>
+                                data-kind="file">🗏</button>
                             <button type="button"
                                 class="kind-button"
-                                data-kind="folder">▱</button>
+                                data-kind="folder">🗀</button>
                         </div>
                     ` : ""}
 
@@ -94,7 +94,7 @@ render() {
 
     const tree = this.shadowRoot.querySelector(".tree");
 
-    this.renderNodes(this.vfs.children || [], tree, "");
+    this.renderNodes([this.vfs], tree, "");
 
     this.shadowRoot.querySelector(".close")
         .addEventListener("click", () => this.close());
@@ -155,12 +155,11 @@ confirmLabel() {
         revert: "Revert",
     }[this.operation] || "OK";
 }
-
 renderNodes(nodes, container, parentPath) {
     for (const node of nodes) {
         const path = parentPath
             ? `${parentPath}/${node.name}`
-            : node.name;
+            : node.name || ".";
 
         const item = document.createElement("div");
         item.className = "tree-item";
@@ -173,6 +172,7 @@ renderNodes(nodes, container, parentPath) {
         row.setAttribute("role", "treeitem");
 
         const isFolder = node.type === "folder";
+        const isRoot = node === this.vfs;
 
         const twisty = document.createElement("span");
         twisty.className = "twisty";
@@ -180,14 +180,29 @@ renderNodes(nodes, container, parentPath) {
 
         const icon = document.createElement("span");
         icon.className = "node-icon";
-        icon.textContent = isFolder ? "▱" : "▤";
+        icon.textContent = isFolder ? "🗀" : "🗏";
 
         const name = document.createElement("span");
         name.className = "node-name";
-        name.textContent = node.name;
+        name.textContent = isRoot ? "/" : node.name;
 
         row.append(twisty, icon, name);
         item.append(row);
+
+        if (isFolder) {
+            if (isRoot) {
+                item.classList.add("expanded");
+                twisty.textContent = "▾";
+            }
+
+            if (node.children?.length) {
+                const children = document.createElement("div");
+                children.className = "tree-children";
+
+                this.renderNodes(node.children, children, path);
+                item.append(children);
+            }
+        }
 
         row.addEventListener("click", () => {
             this.shadowRoot
@@ -206,21 +221,9 @@ renderNodes(nodes, container, parentPath) {
                 const expanded = item.classList.toggle("expanded");
                 twisty.textContent = expanded ? "▾" : "▸";
             }
+
             this.updateConfirmButton();
         });
-
-        if (isFolder && node.children?.length) {
-            const children = document.createElement("div");
-            children.className = "tree-children";
-
-            this.renderNodes(
-                node.children,
-                children,
-                path
-            );
-
-            item.append(children);
-        }
 
         container.append(item);
     }
@@ -306,6 +309,10 @@ updateConfirmButton() {
     if (this.operation === "rename") {
         enabled = !!this.selected &&
             !!this.shadowRoot.querySelector("#entity-name")?.value.trim();
+    }
+
+    if (this.selected?.path === "." && ["rename", "delete"].includes(this.operation)) {
+        enabled = false;
     }
 
     button.disabled = !enabled;
