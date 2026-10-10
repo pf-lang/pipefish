@@ -359,8 +359,10 @@ class PipefishEditor extends HTMLElement {
                     throw new Error("Enter a valid new name.");
                 }
 
-                const parent = selectedPath.includes("/")
-                    ? selectedPath.slice(0, selectedPath.lastIndexOf("/"))
+                const normalizedPath = selectedPath.replace(/^\.\//, "");
+
+                const parent = normalizedPath.includes("/")
+                    ? normalizedPath.slice(0, normalizedPath.lastIndexOf("/"))
                     : "";
 
                 const newPath = parent
@@ -368,32 +370,27 @@ class PipefishEditor extends HTMLElement {
                     : name;
 
                 this.checkFileOperation(
-                    window.pipefishRenamePath(selectedPath, newPath)
+                    window.pipefishRenamePath(normalizedPath, newPath)
                 );
 
-                const oldPrefix = selectedPath + "/";
+                const oldPrefix = normalizedPath + "/";
+                
                 const renamed = path =>
-                    path === selectedPath
+                    path === normalizedPath
                         ? newPath
                         : path.startsWith(oldPrefix)
-                            ? newPath + path.slice(selectedPath.length)
+                            ? newPath + path.slice(normalizedPath.length)
                             : path;
 
                 for (const file of this.reader.files) {
                     file.path = renamed(file.path);
                 }
 
-                if (this.reader.currentFile) {
-                    this.reader.currentFile =
-                        renamed(this.reader.currentFile);
-                }
+                this.reader.currentFile = renamed(this.reader.currentFile);
 
                 this.reader.makeTabs();
-
                 if (this.reader.currentFile) {
-                    await this.reader.selectFile(
-                        this.reader.currentFile
-                    );
+                    await this.reader.selectFile(this.reader.currentFile);
                 }
 
                 refresh();
