@@ -426,7 +426,7 @@ class PipefishEditor extends HTMLElement {
                     }
                 };
 
-                collectPaths(selection, selectedPath);
+                collectPaths(selection.node, selectedPath);
 
                 await this.reader.removePaths(removedPaths);
                 refresh();

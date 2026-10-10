@@ -325,19 +325,19 @@ class PipefishReader extends HTMLElement {
 
 
     async removePaths(paths) {
-        const removed = new Set(paths);
+        const normalize = path => path.replace(/^\.\//, "");
+        const removed = new Set(paths.map(normalize));
 
         this.files = this.files.filter(
-            file => !removed.has(file.path)
+            file => !removed.has(normalize(file.path))
         );
 
-        if (removed.has(this.currentFile)) {
+        if (removed.has(normalize(this.currentFile ?? ""))) {
             this.currentFile = this.files[0]?.path ?? null;
 
             this.makeTabs();
 
             const file = this.files[0];
-
             await this.display(file?.data ?? "");
 
             this.dispatchEvent(new CustomEvent("filechange", {
