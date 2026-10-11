@@ -55,6 +55,18 @@
     z-index: 1;
 }
 
+.editor::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 16px;
+    height: 16px;
+    background: var(--paper);
+    z-index: 3;
+    pointer-events: none;
+}
+
 .top-controls {
     position: absolute;
     z-index: 3;
