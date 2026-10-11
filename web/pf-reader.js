@@ -201,6 +201,7 @@ class PipefishReader extends HTMLElement {
             this.tabs.append(tab);
         }
         this.updateEmptyState();
+        this.dispatchEvent(new Event("tabschange"));
     }
 
     readerClear() {

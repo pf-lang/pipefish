@@ -154,6 +154,10 @@
     height: 100%;
 }
 
+:host(.no-open-files) .code-input {
+    overflow: hidden;
+}
+
 .menu {
     position: absolute;
     top: calc(100% - 1px);

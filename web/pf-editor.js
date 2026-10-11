@@ -175,6 +175,11 @@ class PipefishEditor extends HTMLElement {
         this.reader.addEventListener("filechange", event => {
             this.code.value = event.detail.data;
             this.syncScroll();
+            this.updateScrollbar();
+        });
+
+        this.reader.addEventListener("tabschange", () => {
+            this.updateScrollbar();
         });
 
         code.addEventListener("scroll", () => {
@@ -240,6 +245,17 @@ class PipefishEditor extends HTMLElement {
 
             code.dispatchEvent(new Event("input"));
         });
+    }
+
+    connectedCallback() {
+        this.updateScrollbar()
+    }
+
+    updateScrollbar() {
+        this.classList.toggle(
+            "no-open-files",
+            this.reader.files.length === 0
+        );
     }
 
     refreshFileTree() {
