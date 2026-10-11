@@ -434,33 +434,56 @@ class PipefishEditor extends HTMLElement {
             }
 
             case "revert": {
-                if (selectedType !== "file") {
+                if (selectedType !== "file" && selectedType !== "folder") {
                     break;
                 }
 
+                const target = selectedPath.replace(/^\.\//, "");
+
                 this.checkFileOperation(
-                    window.pipefishRevertFile(selectedPath)
+                    window.pipefishRevertFile(target)
                 );
 
-                const result =
-                    window.pipefishReadFile(selectedPath);
+                const affectsPath = path => {
+                    if (selectedType === "file") {
+                        return path === target;
+                    }
 
-                if (!result.ok) {
-                    throw new Error(result.error);
+                    return target === "." ||
+                        path === target ||
+                        path.startsWith(target + "/");
+                };
+
+                const currentPath = this.reader.currentFile;
+                const removedPaths = [];
+
+                for (const file of this.reader.files) {
+                    if (!affectsPath(file.path)) {
+                        continue;
+                    }
+
+                    const result = window.pipefishReadFile(file.path);
+
+                    if (result.ok) {
+                        file.data = result.data;
+                    } else {
+                        removedPaths.push(file.path);
+                    }
                 }
 
-                const file = this.reader.files.find(
-                    file => file.path === selectedPath
-                );
-
-                if (file) {
-                    file.data = result.data;
+                if (removedPaths.length) {
+                    await this.reader.removePaths(removedPaths);
                 }
 
-                if (this.reader.currentFile === selectedPath) {
-                    await this.reader.selectFile(selectedPath);
+                if (
+                    currentPath &&
+                    affectsPath(currentPath) &&
+                    !removedPaths.includes(currentPath)
+                ) {
+                    await this.reader.selectFile(currentPath);
                 }
 
+                refresh();
                 break;
             }
         }

@@ -10,7 +10,7 @@
     position: absolute;
     z-index: 2;
 
-    top: 1.2;
+    top: 0;
     left: 0;
     right: 0;
 
@@ -105,4 +105,26 @@
     overflow: auto;
 
     color: var(--code-text);
+
+}
+
+.empty-state {
+    display: none;
+    position: absolute;
+    top: 2.2rem;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+}
+
+.empty-state img {
+    display: block;
+    width: 100px;
+    height: auto;
+    opacity: 0.55;
 }

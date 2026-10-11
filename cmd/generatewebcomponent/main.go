@@ -244,13 +244,42 @@ func revertFile(this js.Value, args []js.Value) any {
     }
 
     name := pathpkg.Clean(strings.TrimPrefix(args[0].String(), "./"))
-    original, ok := originalFiles[name]
-    if !ok {
-        return "no original version exists for " + name
+
+    // Revert an individual file.
+    if fs.FileExists(name) {
+        original, ok := originalFiles[name]
+        if !ok {
+            return "no original version exists for " + name
+        }
+
+        if err := fs.WriteFile(name, original); err != nil {
+            return err.Error()
+        }
+
+        return nil
     }
 
-    if err := fs.WriteFile(name, original); err != nil {
-        return err.Error()
+    // Revert a folder: remove its current files first.
+    currentFiles, _ := fs.GetFilenames(name, true)
+    for _, file := range currentFiles {
+        if err := fs.DeleteFile(file); err != nil {
+            return err.Error()
+        }
+    }
+
+    // Restore every original file belonging to this folder.
+    for file, original := range originalFiles {
+        belongs := name == "." ||
+            file == name ||
+            strings.HasPrefix(file, name+"/")
+
+        if !belongs {
+            continue
+        }
+
+        if err := fs.WriteFile(file, original); err != nil {
+            return err.Error()
+        }
     }
 
     return nil

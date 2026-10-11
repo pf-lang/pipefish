@@ -36,10 +36,20 @@ class PipefishReader extends HTMLElement {
             document.createElement("pre");
         box.classList.add("reader");
 
-        shadow.append(style, syntax, tabs, box);
+        const emptyState = document.createElement("div");
+        emptyState.className = "empty-state";
+
+        const logo = document.createElement("img");
+        logo.src = new URL("./assets/rene.png", import.meta.url);
+        logo.alt = "";
+
+        emptyState.append(logo);
+
+        shadow.append(style, syntax, tabs, box, emptyState);
 
         this.tabs = tabs;
         this.box = box;
+        this.emptyState = emptyState
     }
 
     connectedCallback() {
@@ -190,10 +200,29 @@ class PipefishReader extends HTMLElement {
 
             this.tabs.append(tab);
         }
+        this.updateEmptyState();
     }
 
     readerClear() {
-        this.reader.textContent = "";
+        this.box.textContent = "";
+        this.box.scrollTop = 0;
+        this.box.scrollLeft = 0;
+    }
+
+    updateEmptyState() {
+        const empty = this.files.length === 0;
+
+        this.emptyState.style.display = empty ? "flex" : "none";
+        this.box.style.opacity = empty ? "0.4" : "";
+        this.tabs.style.opacity = empty ? "0.4" : "";
+
+        if (empty) {
+            this.readerClear();
+            this.box.style.overflow = "hidden";
+            this.currentFile = null;
+        } else {
+            this.box.style.overflow = "";
+        }
     }
 
     async selectFile(path) {
@@ -222,6 +251,11 @@ class PipefishReader extends HTMLElement {
 
     async display(source) {
         await this.ready;
+
+        if (!this.currentFile) {
+            this.readerClear();
+            return;
+        }
 
         const extension =
             this.currentFile
@@ -325,7 +359,6 @@ class PipefishReader extends HTMLElement {
 
 
     async removePaths(paths) {
-        const normalize = path => path.replace(/^\.\//, "");
         const removed = new Set(paths.map(normalize));
 
         this.files = this.files.filter(
@@ -333,12 +366,16 @@ class PipefishReader extends HTMLElement {
         );
 
         if (removed.has(normalize(this.currentFile ?? ""))) {
-            this.currentFile = this.files[0]?.path ?? null;
+            const file = this.files[0] ?? null;
 
+            this.currentFile = file?.path ?? null;
             this.makeTabs();
 
-            const file = this.files[0];
-            await this.display(file?.data ?? "");
+            if (file) {
+                await this.display(file.data);
+            } else {
+                this.readerClear();
+            }
 
             this.dispatchEvent(new CustomEvent("filechange", {
                 detail: {
