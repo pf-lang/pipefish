@@ -12,7 +12,7 @@ import (
 
 func (vfs *VFS) ReadFile(path string) ([]byte, error) {
 	path = vfs.cleanPath(path)
-	data, ok := vfs.files[path]
+	data, ok := vfs.files.Get(path)
 	if !ok {
 		return nil, errors.New("file does not exist")
 	}
@@ -25,24 +25,24 @@ func (vfs *VFS) WriteFile(path string, data []byte) error {
     if err := vfs.CreateDirectory(filepath.Dir(path)); err != nil {
         return err
     }
-    vfs.files[path] = append([]byte(nil), data...)
-    vfs.dirs[path] = false
+    vfs.files.Set(path, append([]byte(nil), data...))
+    vfs.dirs.Set(path, false)
     return nil
 }
 
 func (vfs *VFS) DeleteFile(path string) error {
 	path = vfs.cleanPath(path)
-	if _, exists := vfs.files[path]; !exists {
+	if _, exists := vfs.files.Get(path); !exists {
 		return errors.New("file does not exist")
 	}
-	delete(vfs.files, path)
-	delete(vfs.dirs, path)
+	vfs.files.Delete(path)
+	vfs.dirs.Delete(path)
 	return nil
 }
 
 func (vfs *VFS) FileExists(path string) bool {
 	path = vfs.cleanPath(path)
-	_, exists := vfs.files[path]
+	_, exists := vfs.files.Get(path)
 	return exists
 }
 
@@ -75,14 +75,14 @@ func (vfs *VFS) CreateDirectory(path string) error {
             current += "/" + part
         }
 
-        if isDir, exists := vfs.dirs[current]; exists {
+        if isDir, exists := vfs.dirs.Get(current); exists {
             if !isDir {
                 return fmt.Errorf("%q is a file, not a directory", current)
             }
             continue
         }
 
-        vfs.dirs[current] = true
+        vfs.dirs.Set(current, true)
     }
 
     return nil
@@ -101,7 +101,9 @@ func (vfs *VFS) cleanPath(path string) string {
 func (fs *VFS) GetFilenames(directory string, recursive bool) ([]string, error) {
     result := []string{}
 
-    for path := range fs.files {
+	for pair := fs.files.Oldest(); pair != nil; pair = pair.Next() {
+
+		path := pair.Key
         if recursive {
 			if filepath.Dir(path) == directory ||
 				directory == "." ||
@@ -119,7 +121,9 @@ func (fs *VFS) GetFilenames(directory string, recursive bool) ([]string, error) 
 func (fs *VFS) GetDirectoryNames(directory string, recursive bool) ([]string, error) {
     result := []string{}
 
-    for path, isDir := range fs.dirs {
+	for pair := fs.dirs.Oldest(); pair != nil; pair = pair.Next() {
+
+    	path, isDir := pair.Key, pair.Value
         if !isDir || path == directory {
             continue
         }
@@ -148,7 +152,7 @@ func (vfs *VFS) DeleteDirectory(path string) error {
         return errors.New("cannot delete the root directory")
     }
 
-    isDir, exists := vfs.dirs[path]
+    isDir, exists := vfs.dirs.Get(path)
     if !exists || !isDir {
         return fmt.Errorf("directory %q does not exist", path)
     }
@@ -156,16 +160,18 @@ func (vfs *VFS) DeleteDirectory(path string) error {
     prefix := path + "/"
 
     // Remove files in the directory and all its descendants.
-    for name := range vfs.files {
+	for pair := vfs.files.Oldest(); pair != nil; pair = pair.Next() {
+    	name := pair.Key
         if name == path || strings.HasPrefix(name, prefix) {
-            delete(vfs.files, name)
+            vfs.files.Delete(name)
         }
     }
 
     // Remove the directory and all descendant entries.
-    for name := range vfs.dirs {
+	for pair := vfs.dirs.Oldest(); pair != nil; pair = pair.Next() {
+    	name := pair.Key
         if name == path || strings.HasPrefix(name, prefix) {
-            delete(vfs.dirs, name)
+            vfs.dirs.Delete(name)
         }
     }
 
@@ -184,12 +190,12 @@ func (vfs *VFS) Rename(oldPath, newPath string) error {
         return nil
     }
 
-    isDir, exists := vfs.dirs[oldPath]
+    isDir, exists := vfs.dirs.Get(oldPath)
     if !exists {
         return fmt.Errorf("%q does not exist", oldPath)
     }
 
-    if _, exists := vfs.dirs[newPath]; exists {
+    if _, exists := vfs.dirs.Get(newPath); exists {
         return fmt.Errorf("%q already exists", newPath)
     }
 
@@ -204,7 +210,8 @@ func (vfs *VFS) Rename(oldPath, newPath string) error {
 
         // Collect directory entries before changing the map.
         dirs := make(map[string]bool)
-        for name, value := range vfs.dirs {
+        for pair := vfs.dirs.Oldest(); pair != nil; pair = pair.Next() {
+			name, value := pair.Key, pair.Value
             if strings.HasPrefix(name, oldPrefix) {
                 dirs[newPrefix+strings.TrimPrefix(name, oldPrefix)] = value
             }
@@ -212,43 +219,46 @@ func (vfs *VFS) Rename(oldPath, newPath string) error {
 
         // Collect file contents before changing the map.
         files := make(map[string][]byte)
-        for name, data := range vfs.files {
+        for pair := vfs.files.Oldest(); pair != nil; pair = pair.Next() {
+			name, data := pair.Key, pair.Value
             if strings.HasPrefix(name, oldPrefix) {
                 files[newPrefix+strings.TrimPrefix(name, oldPrefix)] = data
             }
         }
 
         // Remove the old directory tree.
-        for name := range vfs.dirs {
+        for pair := vfs.dirs.Oldest(); pair != nil; pair = pair.Next() {
+			name := pair.Key
             if name == oldPath || strings.HasPrefix(name, oldPrefix) {
-                delete(vfs.dirs, name)
+                vfs.dirs.Delete(name)
             }
         }
-        for name := range vfs.files {
+        for pair := vfs.files.Oldest(); pair != nil; pair = pair.Next() {
+			name, _ := pair.Key, pair.Value
             if strings.HasPrefix(name, oldPrefix) {
-                delete(vfs.files, name)
+                vfs.files.Delete(name)
             }
         }
 
         // Install the renamed directory tree.
-        vfs.dirs[newPath] = true
+        vfs.dirs.Set(newPath, true)
         for name, value := range dirs {
-            vfs.dirs[name] = value
+            vfs.dirs.Set(name, value)
         }
         for name, data := range files {
-            vfs.files[name] = data
+            vfs.files.Set(name, data)
         }
 
         return nil
     }
 
     // Rename a file.
-    data := vfs.files[oldPath]
-    delete(vfs.files, oldPath)
-    delete(vfs.dirs, oldPath)
+    data, _ := vfs.files.Get(oldPath)
+    vfs.files.Delete(oldPath)
+    vfs.dirs.Delete(oldPath)
 
-    vfs.files[newPath] = data
-    vfs.dirs[newPath] = false
+    vfs.files.Set(newPath, data)
+    vfs.dirs.Set(newPath, false)
 
     return nil
 }

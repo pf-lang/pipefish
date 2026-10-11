@@ -112,14 +112,14 @@ func NewVFSFromDirectory(path string) (*VFS, error) {
 		}
 		relativePath = filepath.ToSlash(relativePath)
 		if info.IsDir() {
-			vfs.dirs[relativePath] = true
+			vfs.dirs.Set(relativePath, true)
 			return nil
 		}
 		data, err := os.ReadFile(currentPath)
 		if err != nil {
 			return err
 		}
-		vfs.files[relativePath] = data
+		vfs.files.Set(relativePath, data)
 		return nil
 	})
 	if err != nil {

@@ -364,6 +364,7 @@ class PipefishReader extends HTMLElement {
 
 
     async removePaths(paths) {
+        const normalize = path => path.replace(/^\.\//, "");
         const removed = new Set(paths.map(normalize));
 
         this.files = this.files.filter(

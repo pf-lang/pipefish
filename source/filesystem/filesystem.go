@@ -1,10 +1,14 @@
 package filesystem
 
-import "time"
+import (
+	"time"
+
+	orderedmap "github.com/wk8/go-ordered-map/v2"
+)
 
 type VFS struct {
-	files map[string][]byte
-	dirs  map[string]bool
+	files *orderedmap.OrderedMap[string, []byte]
+	dirs  *orderedmap.OrderedMap[string, bool]
 }
 
 type FileSystem interface {
@@ -29,9 +33,11 @@ type FileInfo interface {
 }
 
 func NewVFS() *VFS {
+	dirs := orderedmap.New[string, bool]()
+	dirs.Set(".", true)
 	return &VFS{
-		files: make(map[string][]byte),
-		dirs:  map[string]bool{".": true},
+		files: orderedmap.New[string, []byte](),
+		dirs:  dirs,
 	}
 }
 
