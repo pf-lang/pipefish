@@ -300,6 +300,10 @@ class PipefishReader extends HTMLElement {
         }
     }
 
+    hideScrollbar() {
+        this.box.style.scrollbarWidth = "none";
+    }
+
     get scrollTop() {
         return this.box.scrollTop;
     }

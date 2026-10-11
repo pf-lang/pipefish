@@ -113,6 +113,7 @@ class PipefishEditor extends HTMLElement {
         shadow.append(style, controls, editor, files);
 
         this.reader = reader;
+        this.reader.hideScrollbar();
         this.code = code;
         this.ready = reader.ready;
         this.editor = editor;
