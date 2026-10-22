@@ -409,7 +409,7 @@ pf-writer h3,
 pf-writer h4,
 pf-writer h5,
 pf-writer h6  {
-    color: var(--heading);
+    color: var(--text);
     font-weight: 400;
 }
 
