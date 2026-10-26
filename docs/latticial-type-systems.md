@@ -1,28 +1,26 @@
 ## Introduction
 
-The type system that I invented for Pipefish turned out to resemble that of Julia down to some of the terminology. As "type-system-like-Julia" is awkward to say, and as there doesn't seem to be an existing term, I have coined "latticial type system" as a natural parallel to the term "algebraic type system".
+The type system that I invented for Pipefish turned out to be a re-invention of  [Julia's type system](https://docs.julialang.org/en/v1/manual/types/) down to some of the terminology. As "type-system-like-Julia-and-Pipefish" is awkward to say, and as there doesn't seem to be an existing term, I have coined "latticial type system" as a natural parallel to the term "algebraic type system". I know of no other examples besides Julia of such a system being used in production, but I have seen it re-invented for a number of languages in development, each otherwise with different orientations from Julia or Pipefish.
+
+My reinvention of the Julia authors' idea is particularly interesting because Julia is in a different paradigm oriented to a different domain, being an imperative math-oriented language, and so this suggests that this system is a natural method, independent of the other aspects of the language, for squeezing as much juice as we can out of a dynamic type system.
 
 In this document I shall look at what a latticial type system is definitionally, and the other features that seem to naturally go with it. It will not be an overview of everything the Julia and/or Pipefish type systems can do: e.g. I don't mention enums, since there's no particularly latticial way to do enums.
 
-My reinvention of the Julia authors' idea is particularly interesting because Julia is in a different paradigm oriented to a different domain, being an imperative math-oriented language, and so this suggests that this system is a method, independent of the other details of the language, for squeezing as much juice as we can out of a dynamic type system.
-
-"Dynamic type system" is a term which I should now define, or it will cause confusion, as it usually does.
-
 ## What is a dynamic type system?
 
-The term "dynamic type system" makes people think of interpreted languages, and of languages that aren't typechecked, and of languages that have *weak* typing where one can (e.g.) promiscuously add a string to an integer, or compare it with a boolean.
+The term "dynamic type system" makes people think of interpreted languages, or of languages that aren't typechecked, or of languages that have *weak* typing where one can (e.g.) promiscuously add a string to an integer, or compare it with a boolean.
 
-None of these is necessarily true. A **dynamic type system** is one in which the values of the language are tagged at runtime with their types, so that the runtime behavior can depend either on explicit inspection of the type by the code (**reflection**) or on decisions made automatically by the runtime (**dispatch**).
+None of these is necessarily true. Rather, a **dynamic type system** is one in which the values of the language are tagged at runtime with their types, so that the runtime behavior can depend either on explicit inspection of the type by the code (**reflection**) or on decisions made automatically by the runtime (**dispatch**).
 
 You will see from this description that many "static" languages are partly dynamic: for example all Java `Object`s are dynamic; so are all Go interfaces.
 
-As an important practical constraint, it is important that the tags should be simple integers, that they should have no *structure*: we can represent a type as `list{set{int/float}}` at compile time, but by runtime we want to have reduced it to `57`, so that the reflection/dispatch can work efficiently on the tags.
+As an important practical constraint, it is important that the tags should be simple integers, that they should have no *structure*: we can represent a type as `list{set{int/float}}` at compile time, but by runtime we want to have reduced it to `57`, so that the reflection/dispatch can work efficiently on the tag.
 
 ## Latticial types versus algebraic types
 
-We assume the reader is familiar with algebraic type systems, with their sum and product types: if not, hopefully the exposition below and a couple of minutes with Google will make the concept clear. Latticial type systems use product types (i.e. structs) in just the same way, but use union types instead of sum types.
+We assume the reader is familiar with algebraic type systems, with their sum and product types: if not, hopefully the exposition below and a couple of minutes with Google will make the concept clear. Latticial type systems use product types (i.e. structs) in just the same way as algebraic type systems, but use union types instead of sum types.
 
-To explain the distinction, suppose we want the idea "A circle is a shape with one parameter, a rectangle is a shape with two parameters". In a language with sum types, such as Rust, we would express it like this:
+To explain the distinction, suppose we want our type system to express the idea "A circle is a shape with one parameter; a rectangle is a shape with two parameters". In a language with sum types, such as Rust, we would express it like this (Rust uses the keyword `enum` to mean "sum type", for bad reasons):
 
 ```
 enum Shape {
@@ -31,7 +29,7 @@ enum Shape {
 }
 ```
 
-When we use either of the constructors, `Circle` or `Rectangle`, we get a value of type `Shape`, which contains a tag saying whether it's a `Circle` or a `Rectangle`. These are *not types*: they are varieties of the `Shape` type: you can't construct something of type `Circle`, or of type `Rectangle`. Rather, we have one type, `Shape`, with two constructors, `Circle` and `Rectangle`.
+When we use either of the constructors, `Circle` or `Rectangle`, we get a value of type `Shape`, which contains a vanriant tag saying whether it's a `Circle` or a `Rectangle`. These are *not types*: they are variants of the `Shape` type. You can't construct something of type `Circle`, or of type `Rectangle`: rather, we have one type, `Shape`, with two constructors, `Circle` and `Rectangle`.
 
 You might do something like this (again in Rust):
 
@@ -46,7 +44,7 @@ enum Shape {
 }
 ```
 
-Now a `Circle` type *exists*, but note that it still isn't a subtype of `Shape`, and the typechecker would reject any attempt to pass a `Circle` to something expecting a `Shape`.
+And now a `Circle` type *exists*, but note that it still isn't a subtype of `Shape`, and that the typechecker would reject any attempt to pass a `Circle` to something expecting a `Shape`: there is still a distinction betwen a value of type `Circle` and a value of type `Shape` and variant `Circle`.
 
 By contrast, let's express the same idea ("a circle is a shape with one parameter and a rectangle is a shape with two parameters") in Pipefish's latticial type system.
 
@@ -94,9 +92,9 @@ double(S struct) :
 
 In fact, both Pipefish and Julia practice *multiple dispatch*: unlike languages such as Java or Go which dispatch only on the type of the value on which a method is called, Julia and Pipefish will dispatch on all the type parameters of a function, so that for example if we define a `Vec` type we could e.g. define `(x float) * (v Vec)` as scalar multiplication and `(v Vec) * (w Vec)` as the dot product, and have them both work alongside the built-in definition of `(x float) * (y float)` and `(x int) * (y int)`.
 
-What we get from this is what the authors of Julia call "a dance between abstraction and specification" and which I more prosaically call "having your cake and eating it". When we want to, we can be strict about types and make sure you can only add apples to apples; and when we want to, for example when performing serialization, we can write functions which just treat all types as data.
+What we get from this is [what the authors of Julia call](https://julialang.org/assets/research/julia-fresh-approach-BEKS.pdf) "a dance between abstraction and specification" and which I more prosaically call "having your cake and eating it". When we want to, we can be strict about types and make sure you can only add apples to apples; and when we want to, for example when performing serialization, we can write functions which just treat all types as data, and distinguish between them as little as possible.
 
-In principle you *could* have a lattical type system (in the sense of having union types) that didn't use these facilities for dispatch, but why?
+In principle you *could* have a lattical type system that didn't use these facilities for dispatch, but why?
 
 ## Nominal types
 
@@ -110,7 +108,7 @@ It follows from the rules of a latticial type system that while we can have for 
 
 ## Conseqences for interfaces
 
-In a latticial type system, an interface, as in our example above, is an abstract type which is defined according to some criterion rather than by explicitly listing its members. Julia doesn't have them, for which it has been criticized; their extra semantic significance in Pipefish is discussed in the main documentation.
+In a latticial type system, an interface, as in our example above, is an abstract type which is defined according to some criterion rather than by explicitly listing its members. Julia doesn't have interfaces, for which it has been criticized; their extra semantic significance in Pipefish is discussed in the main documentation.
 
 ## Consequences for nullability
 
