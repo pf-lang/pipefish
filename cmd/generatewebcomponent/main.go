@@ -183,6 +183,8 @@ func buildDirectoryTreeFor(vfs *filesystem.VFS, directory string) js.Value {
     return result
 }
 
+// Author.
+
 func initAuthorFiles(this js.Value, args []js.Value) any {
     if len(args) < 1 || !args[0].Truthy() {
         return js.ValueOf(map[string]any{
@@ -302,6 +304,8 @@ func readAuthorFile(this js.Value, args []js.Value) any {
     return result
 }
 
+// Book.
+
 func readBookFile(this js.Value, args []js.Value) interface{} {
 	if bookFS == nil {
 		result := js.Global().Get("Object").New()
@@ -358,6 +362,8 @@ func writeBookFile(this js.Value, args []js.Value) interface{} {
     result.Set("ok", true)
     return result
 }
+
+// File-handling.
 
 func readFile(this js.Value, args []js.Value) any {
 	result := js.Global().Get("Object").New()
