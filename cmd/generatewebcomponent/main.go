@@ -505,7 +505,12 @@ func writeBookFile(this js.Value, args []js.Value) interface{} {
     }
 
     result.Set("ok", true)
-    return result
+
+	js.Global().Call(
+		"dispatchEvent",
+		js.Global().Get("CustomEvent").New("pipefish-book-file-written"),
+	)
+	return result
 }
 
 // File-handling.

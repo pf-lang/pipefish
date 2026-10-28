@@ -64,7 +64,7 @@ export class AuthorVFS {
                     result?.error ?? "Failed to restore author files."
                 );
             }
-
+            this.installPersistence();
             return;
         }
 
@@ -79,6 +79,15 @@ export class AuthorVFS {
         }
 
         await this.save();
+        this.installPersistence();
+    }
+
+    installPersistence() {
+        window.addEventListener("pipefish-book-file-written", () => {
+            this.save().catch(error => {
+                console.error("Failed to persist author files:", error);
+            });
+        });
     }
 
     async revertSampleBook() {
