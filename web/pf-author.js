@@ -5,6 +5,10 @@ import { FileManager } from "./assets/file-manager.js";
 import { AuthorVFS } from "./assets/author-vfs.js";
 import { loadWasm } from "./assets/pf-wasm.js";
 import { makeAuthorFileExtractor } from "./assets/files.js";
+import {
+    load,
+    save
+} from "./assets/author-storage.js";
 
 class PfAuthor extends PfBook {
     constructor() {
@@ -18,7 +22,7 @@ class PfAuthor extends PfBook {
         await loadWasm();
         await this.vfs.initialize();
 
-        this.bookRoot = "using-pf-author";
+        this.bookRoot = await load("openBook") ?? "using-pf-author";
         this.vfs.openBook(this.bookRoot);
 
         const result = window.pipefishReadBookFile("Contents.md");
@@ -26,7 +30,6 @@ class PfAuthor extends PfBook {
         if (!result.ok) {
             throw new Error(result.error);
         }
-
         this.initializeBook(result.data);
         this.addUnusedPages();
         this.applyTheme();
@@ -86,6 +89,8 @@ class PfAuthor extends PfBook {
     }
 
     async openBook(path) {
+        path = path.replace(/^\.\//, "");
+
         this.vfs.openBook(path);
         this.bookRoot = path;
 
@@ -98,6 +103,7 @@ class PfAuthor extends PfBook {
         const parsed = parseContents(result.data);
 
         this.header = parsed.header;
+        this.bookTitle = parsed.bookTitle;
         this.contents = parsed.sections;
 
         const usedFiles = new Set(
@@ -127,13 +133,22 @@ class PfAuthor extends PfBook {
             });
         }
 
-        this.render();
-
         const firstPage = this.contents[0]?.pages[0];
 
         if (firstPage) {
+            if (location.hash !== `#${firstPage.hash}`) {
+                location.hash = firstPage.hash;
+            }
+
+            this.render();
             await this.showPage(firstPage.hash);
+        } else {
+            this.render();
         }
+
+        window.scrollTo(0, 0);
+
+        await save("openBook", this.bookRoot);
     }
 
     async showPage(hash) {
@@ -185,7 +200,8 @@ class PfAuthor extends PfBook {
             items: [
                 "Open folder as book",
                 "Publish book",
-                "Download book"
+                "Download book",
+                "Revert sample book",
             ],
             size
         });
@@ -234,16 +250,34 @@ class PfAuthor extends PfBook {
         });
 
         booksMenu.addEventListener("menu-select", async event => {
-            switch (event.detail) {
-                case "Open folder as book":
-                    this.fileManager.open("open-book");
-                    break;
+            try {
+                switch (event.detail) {
+                    case "Open folder as book":
+                        this.fileManager.open("open-book");
+                        break;
 
-                case "Publish book":
-                    break;
+                    case "Revert sample book": {
+                        const refresh =
+                            this.bookRoot === "using-pf-author";
 
-                case "Download book":
-                    break;
+                        await this.vfs.revertSampleBook();
+
+                        if (refresh) {
+                            await this.openBook(this.bookRoot);
+                        }
+
+                        break;
+                    }
+
+                    case "Publish book":
+                        break;
+
+                    case "Download book":
+                        break;
+                }
+            } catch (error) {
+                console.error("Books menu operation failed:", error);
+                alert(error.message);
             }
         });
 

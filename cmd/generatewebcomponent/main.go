@@ -22,13 +22,14 @@ import (
 )
 
 var (
-	service       *pf.Service
-	mainFilepath  string
-	fs            *filesystem.VFS
-	authorFS      *filesystem.VFS
+    service       *pf.Service
+    mainFilepath  string
+    fs            *filesystem.VFS
+    authorFS      *filesystem.VFS
     bookFS        *filesystem.VFS
-	oH            *vm.CapturingOutHandler
-	originalFiles map[string][]byte
+    bookRoot      string
+    oH            *vm.CapturingOutHandler
+    originalFiles map[string][]byte
 )
 
 func compile(this js.Value, args []js.Value) any {
@@ -194,7 +195,8 @@ func initAuthorFiles(this js.Value, args []js.Value) any {
     }
 
     authorFS = filesystem.NewVFS()
-    bookFS = nil
+	bookFS = nil
+	bookRoot = ""
 
     files := args[0]
 
@@ -255,7 +257,8 @@ func openBook(this js.Value, args []js.Value) any {
     }
 
     bookFS = copied
-
+	bookRoot = pathpkg.Clean(directory)
+	
     return js.ValueOf(map[string]any{
         "ok":   true,
         "tree": buildDirectoryTreeFor(bookFS, "."),
@@ -304,6 +307,140 @@ func readAuthorFile(this js.Value, args []js.Value) any {
     return result
 }
 
+func getAuthorFiles(this js.Value, args []js.Value) any {
+    if authorFS == nil {
+        return js.ValueOf(map[string]any{
+            "ok":    false,
+            "error": "author filesystem has not been initialized",
+        })
+    }
+
+    paths, err := authorFS.GetFilenames(".", true)
+    if err != nil {
+        return js.ValueOf(map[string]any{
+            "ok":    false,
+            "error": err.Error(),
+        })
+    }
+
+    sort.Strings(paths)
+
+    files := js.Global().Get("Array").New()
+
+    for _, path := range paths {
+        data, err := authorFS.ReadFile(path)
+        if err != nil {
+            return js.ValueOf(map[string]any{
+                "ok":    false,
+                "error": err.Error(),
+            })
+        }
+
+        bytes := js.Global().Get("Uint8Array").New(len(data))
+        js.CopyBytesToJS(bytes, data)
+
+        item := js.Global().Get("Object").New()
+        item.Set("path", path)
+        item.Set("data", bytes)
+
+        files.Call("push", item)
+    }
+
+    result := js.Global().Get("Object").New()
+    result.Set("ok", true)
+    result.Set("files", files)
+
+    return result
+}
+
+func writeAuthorFile(this js.Value, args []js.Value) any {
+    if authorFS == nil {
+        return errorResult("author filesystem has not been initialized")
+    }
+    if len(args) < 2 {
+        return errorResult("expected a file path and contents")
+    }
+
+    var data []byte
+    value := args[1]
+
+    if value.Type() == js.TypeString {
+        data = []byte(value.String())
+    } else {
+        data = make([]byte, value.Get("byteLength").Int())
+        js.CopyBytesToGo(data, value)
+    }
+
+    if err := authorFS.WriteFile(args[0].String(), data); err != nil {
+        return errorResult(err.Error())
+    }
+
+    return successResult()
+}
+
+func createAuthorDirectory(this js.Value, args []js.Value) any {
+    if authorFS == nil {
+        return errorResult("author filesystem has not been initialized")
+    }
+    if len(args) < 1 {
+        return errorResult("expected a directory path")
+    }
+
+    if err := authorFS.CreateDirectory(args[0].String()); err != nil {
+        return errorResult(err.Error())
+    }
+
+    return successResult()
+}
+
+func deleteAuthorFile(this js.Value, args []js.Value) any {
+    if authorFS == nil {
+        return errorResult("author filesystem has not been initialized")
+    }
+    if len(args) < 1 {
+        return errorResult("expected a file path")
+    }
+
+    if err := authorFS.DeleteFile(args[0].String()); err != nil {
+        return errorResult(err.Error())
+    }
+
+    return successResult()
+}
+
+func deleteAuthorDirectory(this js.Value, args []js.Value) any {
+    if authorFS == nil {
+        return errorResult("author filesystem has not been initialized")
+    }
+    if len(args) < 1 {
+        return errorResult("expected a directory path")
+    }
+
+    if err := authorFS.DeleteDirectory(args[0].String()); err != nil {
+        return errorResult(err.Error())
+    }
+
+    return successResult()
+}
+
+func renameAuthorPath(this js.Value, args []js.Value) any {
+    if authorFS == nil {
+        return errorResult("author filesystem has not been initialized")
+    }
+    if len(args) < 2 {
+        return errorResult("expected old and new paths")
+    }
+
+    if err := authorFS.Rename(
+        args[0].String(),
+        args[1].String(),
+    ); err != nil {
+        return errorResult(err.Error())
+    }
+
+    return successResult()
+}
+
 // Book.
 
 func readBookFile(this js.Value, args []js.Value) interface{} {
@@ -338,7 +475,7 @@ func readBookFile(this js.Value, args []js.Value) interface{} {
 func writeBookFile(this js.Value, args []js.Value) interface{} {
     result := js.Global().Get("Object").New()
 
-    if bookFS == nil {
+    if bookFS == nil || authorFS == nil {
         result.Set("ok", false)
         result.Set("error", "no book is open")
         return result
@@ -354,6 +491,14 @@ func writeBookFile(this js.Value, args []js.Value) interface{} {
     contents := args[1].String()
 
     if err := bookFS.WriteFile(path, []byte(contents)); err != nil {
+        result.Set("ok", false)
+        result.Set("error", err.Error())
+        return result
+    }
+
+    authorPath := pathpkg.Join(bookRoot, path)
+
+    if err := authorFS.WriteFile(authorPath, []byte(contents)); err != nil {
         result.Set("ok", false)
         result.Set("error", err.Error())
         return result
@@ -553,6 +698,12 @@ func errorResult(message string) js.Value {
     return result
 }
 
+func successResult() js.Value {
+    result := js.Global().Get("Object").New()
+    result.Set("ok", true)
+    return result
+}
+
 func main() {
 	initializer.RegisterWasmGoPackages(registry.Packages)
 
@@ -683,6 +834,36 @@ func main() {
 	js.Global().Set(
 		"pipefishWriteBookFile",
 		js.FuncOf(writeBookFile),
+	)
+
+	js.Global().Set(
+		"pipefishGetAuthorFiles",
+		js.FuncOf(getAuthorFiles),
+	)
+
+	js.Global().Set(
+    "pipefishWriteAuthorFile",
+    js.FuncOf(writeAuthorFile),
+)
+
+	js.Global().Set(
+		"pipefishCreateAuthorDirectory",
+		js.FuncOf(createAuthorDirectory),
+	)
+
+	js.Global().Set(
+		"pipefishDeleteAuthorFile",
+		js.FuncOf(deleteAuthorFile),
+	)
+
+	js.Global().Set(
+		"pipefishDeleteAuthorDirectory",
+		js.FuncOf(deleteAuthorDirectory),
+	)
+
+	js.Global().Set(
+		"pipefishRenameAuthorPath",
+		js.FuncOf(renameAuthorPath),
 	)
 
 	select {}

@@ -1,5 +1,6 @@
 const TITLES = {
 open: "Open",
+"open-book": "Open",
 download: "Download",
 new: "New",
 rename: "Rename",

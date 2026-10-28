@@ -42,7 +42,6 @@ export class FileManager {
                 if (type !== "folder") {
                     break;
                 }
-
                 await this.host.openBook?.(path);
                 break;
             }
