@@ -178,3 +178,7 @@
     padding: .0em .20em;
     border-radius: 4px;
 }
+
+.vertical-break {
+    height: 1.5rem;
+}

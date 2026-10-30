@@ -116,6 +116,9 @@ func MakeRenderFunction(textWrapper map[mdStyle]func(s string) string, codeHighl
 				sep = "\n"
 			}
 			if dtypes.SetOf("pf-coder", "pf-editor", "pf-ide", "pf-reader", "pf-service", "pf-tui").Contains(n.tag) {
+				if n.tag != "pf-service" {
+					sb.WriteString("<div class=\"vertical-break\"></div>")
+				}
 				sb.WriteString("<")
 				sb.WriteString(n.tag)
 				sb.WriteString(">")
@@ -123,6 +126,9 @@ func MakeRenderFunction(textWrapper map[mdStyle]func(s string) string, codeHighl
 				sb.WriteString("</")
 				sb.WriteString(n.tag)
 				sb.WriteString(">")
+				if n.tag != "pf-service" {
+					sb.WriteString("<div class=\"vertical-break\"></div>")
+				}
 			} else {
 				sb.WriteString(textWrapper[stCodeBlock](result))
 			}

@@ -27,7 +27,7 @@ pf-coder {
     height: 2.2rem;
     box-sizing: border-box;
     overflow: hidden;
-    border-radius: 7px;
+    border-radius: 10px;
     background: var(--code-background);
 }
 

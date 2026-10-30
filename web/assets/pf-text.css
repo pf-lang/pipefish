@@ -1,0 +1,65 @@
+:host {
+    display: block;
+    position: absolute;
+    inset: 2.2rem 0 0;
+    overflow: hidden;
+    pointer-events: auto;
+    color: var(--code-text);
+    font-family: "Google Sans Code", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.surface {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.highlighted,
+.input {
+    box-sizing: border-box;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 1.3rem 1rem 1rem;
+    border: 0;
+    font: inherit;
+    line-height: inherit;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    tab-size: 4;
+}
+
+.highlighted {
+    z-index: 0;
+    overflow: hidden;
+    background: transparent;
+    color: var(--code-text);
+    pointer-events: none;
+    transform: translate(0, 0);
+}
+
+.input {
+    z-index: 1;
+    resize: none;
+    overflow: auto;
+    outline: none;
+    background: transparent;
+    color: transparent;
+    caret-color: var(--code-text);
+    -webkit-text-fill-color: transparent;
+    border-radius: 0;
+}
+
+.input::selection {
+    background: color-mix(in srgb, var(--link) 30%, transparent);
+    -webkit-text-fill-color: transparent;
+}
+
+.input[readonly] {
+    cursor: default;
+    caret-color: transparent;
+}

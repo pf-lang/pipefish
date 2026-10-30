@@ -316,12 +316,10 @@ pf-page::after, pf-writer::after {
 
 pf-page pf-ide {
     display: block;
-    margin-bottom: var(--space-m);
 }
 
 pf-writer pf-ide {
     display: block;
-    margin-bottom: var(--space-m);
 }
 
 /* ------------------------------------------------------------

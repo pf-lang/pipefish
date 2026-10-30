@@ -127,7 +127,7 @@ pf-reader {
     box-sizing: border-box;
     height: 1.75rem;
     padding: 0 .75rem;
-    border: 1px solid var(--code-border);
+    border: none;
     border-radius: 7px;
     background: var(--paper);
     color: var(--code-text);
