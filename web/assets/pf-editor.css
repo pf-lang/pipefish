@@ -19,40 +19,12 @@
     min-height: 1.4em;
 }
 
-.code-input {
+pf-reader {
     position: absolute;
-    top: 2.2rem;
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    box-sizing: border-box;
+    inset: 0;
     width: 100%;
-    height: auto;
-
+    height: 100%;
     margin: 0;
-    padding: 1.3rem 1rem 1rem 1rem;
-
-    font-family: "Google Sans Code", monospace;
-    font-size: 14px;
-    line-height: 1.4;
-
-    white-space: pre-wrap;
-    tab-size: 4;
-
-    overflow: auto;
-    resize: none;
-
-    border: 0;
-    outline: none;
-
-    background: transparent;
-    color: transparent;
-    caret-color: var(--code-text);
-
-    overscroll-behavior: auto;
-
-    z-index: 1;
 }
 
 .editor::after {
@@ -80,8 +52,9 @@
 }
 
 .minimize svg {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
+    flex: none;
     display: block;
 }
 
@@ -114,7 +87,6 @@
     border: none;
 }
 
-:host(.minimized) .code-input,
 :host(.minimized) pf-reader {
     display: none;
 }
@@ -135,10 +107,6 @@
 
 :host(.minimized) {
     height: 100%;
-}
-
-:host(.no-open-files) .code-input {
-    overflow: hidden;
 }
 
 .top-controls {
@@ -169,12 +137,3 @@
     align-items: center;
     pointer-events: auto;
 }
-
-.minimize svg {
-    width: 16px;
-    height: 16px;
-    flex: none;
-    display: block;
-}
-
-

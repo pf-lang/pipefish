@@ -50,29 +50,34 @@ const deadline = Date.now() + 10000;
     function check() {
         if (
             window.pipefishCompile &&
-            window.pipefishDo &&
-            window.pipefishHighlight &&
-            window.pipefishGetFilepath &&
-            window.pipefishRenderMdAsHtml &&
-            window.pipefishWasmReady &&
-            window.pipefishUpdateFile &&
             window.pipefishCompileMain &&
-            window.pipefishGetFileTree &&
-            window.pipefishReadFile &&
+            window.pipefishCreateAuthorDirectory &&
             window.pipefishCreateDirectory &&
-            window.pipefishReadFile &&
-            window.pipefishDeleteFile &&
+            window.pipefishDeleteAuthorDirectory &&
+            window.pipefishDeleteAuthorFile &&
             window.pipefishDeleteDirectory &&
-            window.pipefishRenamePath &&
-            window.pipefishRevertFile &&
-            window.pipefishZipDirectory &&
-            window.pipefishInitAuthorFiles &&
+            window.pipefishDeleteFile &&
+            window.pipefishDo &&
+            window.pipefishGetAuthorFiles &&
             window.pipefishGetAuthorFileTree &&
-            window.pipefishOpenBook &&
             window.pipefishGetBookFileTree &&
-            window.pipefishReadBookFile &&
-            window.pipefishReadAuthorFile &&
-            window.pipefishWriteBookFile
+            window.pipefishGetFilepath &&
+            window.pipefishGetFileTree &&
+            window.pipefishHighlight &&
+            window.pipefishInitAuthorFiles &&
+            window.pipefishOpenBook &&
+            window.pipefishReadAuthorFile && 
+            window.pipefishReadBookFile &&   
+            window.pipefishReadFile &&    
+            window.pipefishRenameAuthorPath &&   
+            window.pipefishRenamePath &&
+            window.pipefishRenderMdAsHtml &&
+            window.pipefishRevertFile &&
+            window.pipefishUpdateFile &&
+            window.pipefishWasmReady &&
+            window.pipefishWriteAuthorFile &&
+            window.pipefishWriteBookFile &&
+            window.pipefishZipDirectory
         ) {
             resolve();
             return;

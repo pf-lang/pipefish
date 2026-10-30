@@ -1,74 +1,50 @@
-// The base visual element that goes inside the `pf-editor` which goes inside
-// the `pf-coder` which goes inside the `pf-ide`, etc.
+import "./pf-text.js";
+import { loadWasm } from "./assets/pf-wasm.js";
 
 class PipefishReader extends HTMLElement {
     constructor() {
         super();
 
-        this.highlighter =
-            document.createElement("pf-highlighter");
-
-        this.ready = this.highlighter.ready;
-
+        this.text = document.createElement("pf-text");
+        this.text.editable = false;
+        this.text.highlighter = source => window.pipefishHighlight(source);
+        this.ready = loadWasm();
         this.files = [];
         this.currentFile = null;
         this.source = "";
         this.base = "";
 
-        const shadow =
-            this.attachShadow({ mode: "open" });
+        const shadow = this.attachShadow({ mode: "open" });
 
-        const style =
-            document.createElement("link");
+        const style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href =
-            new URL("./assets/pf-reader.css", import.meta.url);
+        style.href = new URL("./assets/pf-reader.css", import.meta.url);
 
-        const syntax =
-            document.createElement("link");
-        syntax.rel = "stylesheet";
-        syntax.href =
-            new URL("./assets/syntax.css", import.meta.url);
-
-        const tabs =
-            document.createElement("div");
-        tabs.classList.add("tabs");
-
-        const box =
-            document.createElement("pre");
-        box.classList.add("reader");
+        const tabs = document.createElement("div");
+        tabs.className = "tabs";
 
         const emptyState = document.createElement("div");
         emptyState.className = "empty-state";
+        emptyState.innerHTML = `
+            <img src="./assets/rene.png" alt="">
+        `;
 
-        const logo = document.createElement("img");
-        logo.src = new URL("./assets/rene.png", import.meta.url);
-        logo.alt = "";
-
-        emptyState.append(logo);
-
-        shadow.append(style, syntax, tabs, box, emptyState);
+        shadow.append(style, tabs, this.text, emptyState);
 
         this.tabs = tabs;
-        this.box = box;
-        this.emptyState = emptyState
+        this.emptyState = emptyState;
+
         this.fileExtractor = async (path, filename) => {
             const url = new URL(
                 filename,
-                new URL(
-                    path,
-                    new URL("book/", document.baseURI)
-                )
+                new URL(path, new URL("book/", document.baseURI))
             );
 
-            const response = await fetch(url, {
-                cache: "no-store"
-            });
+            const response = await fetch(url, { cache: "no-store" });
 
             if (!response.ok) {
                 throw new Error(
-                    `Unable to load ${url}: ` +
-                    `${response.status} ${response.statusText}`
+                    `Failed to load ${url}: ${response.status}`
                 );
             }
 
@@ -229,24 +205,21 @@ class PipefishReader extends HTMLElement {
     }
 
     readerClear() {
-        this.box.textContent = "";
-        this.box.scrollTop = 0;
-        this.box.scrollLeft = 0;
+        this.text.value = "";
+        this.text.scrollTop = 0;
+        this.text.scrollLeft = 0;
     }
 
     updateEmptyState() {
         const empty = this.files.length === 0;
 
         this.emptyState.style.display = empty ? "flex" : "none";
-        this.box.style.opacity = empty ? "0.4" : "";
+        this.text.style.opacity = empty ? "0.4" : "";
         this.tabs.style.opacity = empty ? "0.4" : "";
 
         if (empty) {
             this.readerClear();
-            this.box.style.overflow = "hidden";
             this.currentFile = null;
-        } else {
-            this.box.style.overflow = "";
         }
     }
 
@@ -282,75 +255,33 @@ class PipefishReader extends HTMLElement {
             return;
         }
 
-        const extension =
-            this.currentFile
-                .slice(this.currentFile.lastIndexOf("."))
-                .toLowerCase();
+        const extension = this.currentFile
+            .slice(this.currentFile.lastIndexOf("."))
+            .toLowerCase();
 
-        const highlighters = {
-            ".pf": async bytes =>
-                this.highlighter.highlight(
-                    new TextDecoder("utf-8").decode(bytes)
-                )
-        };
+        const source = new TextDecoder("utf-8").decode(data);
 
-        const highlighter =
-            highlighters[extension] ||
-            (async bytes =>
-                new TextDecoder("utf-8").decode(bytes));
+        this.text.highlighter = extension === ".pf"
+            ? source => window.pipefishHighlight(source)
+            : source => source;
 
-        this.box.innerHTML =
-            await highlighter(data) +
-            (data.length &&
-            new TextDecoder("utf-8").decode(data).endsWith("\n")
-                ? "\u00a0"
-                : "");
-    }
-
-    async closeTab(path) {
-        const index = this.files.findIndex(file => file.path === path);
-        if (index === -1) return;
-
-        this.files.splice(index, 1);
-
-        if (this.currentFile === path) {
-            const next = this.files[Math.min(index, this.files.length - 1)];
-
-            this.currentFile = next?.path ?? null;
-            this.makeTabs();
-
-            if (next) {
-                await this.display(next.data);
-                this.dispatchEvent(new CustomEvent("filechange", {
-                    detail: { path: next.path, data: next.data },
-                }));
-            } else {
-                this.makeTabs();
-                this.readerClear();
-            }
-        } else {
-            this.makeTabs();
-        }
-    }
-
-    hideScrollbar() {
-        this.box.style.scrollbarWidth = "none";
+        this.text.value = source;
     }
 
     get scrollTop() {
-        return this.box.scrollTop;
+        return this.text.scrollTop;
     }
 
     set scrollTop(value) {
-        this.box.scrollTop = value;
+        this.text.scrollTop = value;
     }
 
     get scrollLeft() {
-        return this.box.scrollLeft;
+        return this.text.scrollLeft;
     }
 
     set scrollLeft(value) {
-        this.box.scrollLeft = value;
+        this.text.scrollLeft = value;
     }
 
     async openPaths(paths) {

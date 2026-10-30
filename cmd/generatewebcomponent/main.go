@@ -718,13 +718,68 @@ func main() {
 	)
 
 	js.Global().Set(
+		"pipefishCompileMain",
+		js.FuncOf(compileMain),
+	)
+
+	js.Global().Set(
+		"pipefishCreateDirectory",
+		js.FuncOf(createDirectory),
+	)
+
+	js.Global().Set(
+		"pipefishCreateAuthorDirectory",
+		js.FuncOf(createAuthorDirectory),
+	)
+
+	js.Global().Set(
+		"pipefishDeleteAuthorDirectory",
+		js.FuncOf(deleteAuthorDirectory),
+	)
+
+	js.Global().Set(
+		"pipefishDeleteAuthorFile",
+		js.FuncOf(deleteAuthorFile),
+	)
+
+	js.Global().Set(
+		"pipefishDeleteDirectory",
+		js.FuncOf(deleteDirectory),
+	)
+
+	js.Global().Set(
+		"pipefishDeleteFile",
+		js.FuncOf(deleteFile),
+	)
+
+	js.Global().Set(
 		"pipefishDo",
 		js.FuncOf(do),
 	)
 
 	js.Global().Set(
+		"pipefishGetAuthorFiles",
+		js.FuncOf(getAuthorFiles),
+	)
+
+	js.Global().Set(
+		"pipefishGetAuthorFileTree",
+		js.FuncOf(getAuthorFileTree),
+	)
+
+	js.Global().Set(
+		"pipefishGetBookFileTree",
+		js.FuncOf(getBookFileTree),
+	)
+
+	js.Global().Set(
 		"pipefishGetFilepath",
 		js.FuncOf(getFilepath),
+	)
+
+	js.Global().Set(
+		"pipefishGetFileTree",
+		js.FuncOf(getFileTree),
 	)
 
 	js.Global().Set(
@@ -740,6 +795,41 @@ func main() {
 	)
 
 	js.Global().Set(
+		"pipefishInitAuthorFiles",
+		js.FuncOf(initAuthorFiles),
+	)
+
+	js.Global().Set(
+		"pipefishOpenBook",
+		js.FuncOf(openBook),
+	)
+
+	js.Global().Set(
+		"pipefishReadAuthorFile",
+		js.FuncOf(readAuthorFile),
+	)
+
+	js.Global().Set(
+		"pipefishReadBookFile",
+		js.FuncOf(readBookFile),
+	)
+
+	js.Global().Set(
+		"pipefishReadFile",
+		js.FuncOf(readFile),
+	)
+
+	js.Global().Set(
+		"pipefishRenameAuthorPath",
+		js.FuncOf(renameAuthorPath),
+	)
+
+	js.Global().Set(
+		"pipefishRenamePath",
+		js.FuncOf(renamePath),
+	)
+
+	js.Global().Set(
 		"pipefishRenderMdAsHtml",
 		js.FuncOf(func(
 			this js.Value,
@@ -752,8 +842,8 @@ func main() {
 	)
 
 	js.Global().Set(
-		"pipefishWasmReady",
-		true,
+		"pipefishRevertFile", 
+		js.FuncOf(revertFile),
 	)
 
 	js.Global().Set(
@@ -762,78 +852,13 @@ func main() {
 	)
 
 	js.Global().Set(
-		"pipefishCompileMain",
-		js.FuncOf(compileMain),
+		"pipefishWasmReady",
+		true,
 	)
 
 	js.Global().Set(
-		"pipefishGetFileTree",
-		js.FuncOf(getFileTree),
-	)
-
-	js.Global().Set(
-		"pipefishReadFile",
-		js.FuncOf(readFile),
-	)
-
-	js.Global().Set(
-		"pipefishCreateDirectory",
-		js.FuncOf(createDirectory),
-	)
-
-	js.Global().Set(
-		"pipefishDeleteFile",
-		js.FuncOf(deleteFile),
-	)
-
-	js.Global().Set(
-		"pipefishDeleteDirectory",
-		js.FuncOf(deleteDirectory),
-	)
-
-	js.Global().Set(
-		"pipefishRenamePath",
-		js.FuncOf(renamePath),
-	)
-
-	js.Global().Set(
-		"pipefishRevertFile", 
-		js.FuncOf(revertFile),
-	)
-
-	js.Global().Set(
-		"pipefishZipDirectory",
-		js.FuncOf(zipDirectory),
-	)
-
-	js.Global().Set(
-		"pipefishInitAuthorFiles",
-		js.FuncOf(initAuthorFiles),
-	)
-
-	js.Global().Set(
-		"pipefishGetAuthorFileTree",
-		js.FuncOf(getAuthorFileTree),
-	)
-
-	js.Global().Set(
-		"pipefishOpenBook",
-		js.FuncOf(openBook),
-	)
-
-	js.Global().Set(
-		"pipefishGetBookFileTree",
-		js.FuncOf(getBookFileTree),
-	)
-
-	js.Global().Set(
-		"pipefishReadBookFile",
-		js.FuncOf(readBookFile),
-	)
-
-	js.Global().Set(
-		"pipefishReadAuthorFile",
-		js.FuncOf(readAuthorFile),
+		"pipefishWriteAuthorFile",
+		js.FuncOf(writeAuthorFile),
 	)
 
 	js.Global().Set(
@@ -842,33 +867,8 @@ func main() {
 	)
 
 	js.Global().Set(
-		"pipefishGetAuthorFiles",
-		js.FuncOf(getAuthorFiles),
-	)
-
-	js.Global().Set(
-    "pipefishWriteAuthorFile",
-    js.FuncOf(writeAuthorFile),
-)
-
-	js.Global().Set(
-		"pipefishCreateAuthorDirectory",
-		js.FuncOf(createAuthorDirectory),
-	)
-
-	js.Global().Set(
-		"pipefishDeleteAuthorFile",
-		js.FuncOf(deleteAuthorFile),
-	)
-
-	js.Global().Set(
-		"pipefishDeleteAuthorDirectory",
-		js.FuncOf(deleteAuthorDirectory),
-	)
-
-	js.Global().Set(
-		"pipefishRenameAuthorPath",
-		js.FuncOf(renameAuthorPath),
+		"pipefishZipDirectory",
+		js.FuncOf(zipDirectory),
 	)
 
 	select {}

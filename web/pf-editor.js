@@ -10,8 +10,7 @@ class PipefishEditor extends HTMLElement {
 
         const style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href =
-            new URL("../assets/pf-editor.css", import.meta.url);
+        style.href = new URL("../assets/pf-editor.css", import.meta.url);
 
         const editor = document.createElement("div");
         editor.classList.add("editor");
@@ -32,23 +31,21 @@ class PipefishEditor extends HTMLElement {
         minimize.innerHTML = `
             <svg viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M4 3h8M4 11l4-4 4 4"
-                fill="none"
-                stroke="currentColor"
-                stroke-opacity=".8"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"/>
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-opacity=".8"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
             </svg>
         `;
         minimize.setAttribute("aria-label", "Minimize");
 
-        controls.append(
-            logo,
-            projectMenu,
-            minimize
-        );
+        controls.append(logo, projectMenu, minimize);
 
         const reader = document.createElement("pf-reader");
+        reader.text.editable = true;
+
         const files = document.createElement("pf-files");
 
         const manager = new FileManager(files, {
@@ -79,7 +76,9 @@ class PipefishEditor extends HTMLElement {
                     file.path = renamed(file.path);
                 }
 
-                this.reader.currentFile = renamed(this.reader.currentFile);
+                this.reader.currentFile =
+                    renamed(this.reader.currentFile);
+
                 this.reader.makeTabs();
 
                 if (this.reader.currentFile) {
@@ -131,148 +130,74 @@ class PipefishEditor extends HTMLElement {
             manager.open(event.detail.toLowerCase());
         });
 
-        const code = document.createElement("textarea");
-        code.placeholder = "";
-        code.classList.add("code-input");
-        code.spellcheck = false;
-
-        editor.append(reader, code);
+        editor.append(reader);
         shadow.append(style, controls, editor, files);
 
         this.reader = reader;
-        this.reader.hideScrollbar();
-        this.code = code;
         this.ready = reader.ready;
         this.editor = editor;
         this.menu = projectMenu;
         this.files = files;
         this.fileManager = manager;
         this.minimizeButton = minimize;
-        this.initialHeightSet = false;
-
-        
+        this.initialization = null;
 
         minimize.addEventListener("click", () => {
-        const minimized =
-            this.editor.classList.toggle("minimized");
+            const minimized =
+                this.editor.classList.toggle("minimized");
 
-        this.classList.toggle("minimized", minimized);
+            this.classList.toggle("minimized", minimized);
 
-        this.minimizeButton.setAttribute(
-            "aria-label",
-            minimized ? "Maximize" : "Minimize"
-        );
+            this.minimizeButton.setAttribute(
+                "aria-label",
+                minimized ? "Maximize" : "Minimize"
+            );
 
-        this.dispatchEvent(
-            new CustomEvent(
-                minimized ? "minimize" : "maximize",
-                {
-                    bubbles: true,
-                    composed: true
-                }
-            )
-        );
-    });
+            this.dispatchEvent(
+                new CustomEvent(
+                    minimized ? "minimize" : "maximize",
+                    {
+                        bubbles: true,
+                        composed: true
+                    }
+                )
+            );
+        });
 
-        code.addEventListener("input", async () => {
-            const bytes = new TextEncoder().encode(code.value);
-            await this.reader.display(bytes);
+        reader.addEventListener("input", async () => {
+            const path = this.reader.currentFile;
+
+            if (!path) {
+                return;
+            }
+
+            const source = this.reader.text.value;
+            const bytes = new TextEncoder().encode(source);
 
             const file = this.reader.files.find(
-                file => file.path === this.reader.currentFile
+                file => file.path === path
             );
 
             if (file) {
                 file.data = bytes;
             }
 
-            await window.pipefishUpdateFile(
-                this.reader.currentFile,
-                code.value
-            );
+            await window.pipefishUpdateFile(path, bytes);
 
-            this.dispatchEvent(
-                new CustomEvent("change")
-            );
+            this.dispatchEvent(new CustomEvent("change"));
         });
 
-        this.reader.addEventListener("filechange", event => {
-            this.code.value = new TextDecoder("utf-8").decode(event.detail.data);
-            this.syncScroll();
+        reader.addEventListener("tabschange", () => {
             this.updateScrollbar();
         });
 
-        this.reader.addEventListener("tabschange", () => {
-            this.updateScrollbar();
-        });
-
-        code.addEventListener("scroll", () => {
-            this.syncScroll();
-        });
-
-        code.addEventListener("wheel", event => {
-            const atTop = code.scrollTop === 0;
-            const atBottom =
-                code.scrollTop + code.clientHeight >= code.scrollHeight;
-
-            if (
-                (atTop && event.deltaY < 0) ||
-                (atBottom && event.deltaY > 0)
-            ) {
-                event.preventDefault();
-                window.scrollBy({
-                    top: event.deltaY,
-                    behavior: "auto"
-                });
-            }
-        }, { passive: false });
-
-        code.addEventListener("keydown", event => {
-            if (event.key === "Tab") {
-                event.preventDefault();
-
-                code.setRangeText(
-                    "\t",
-                    code.selectionStart,
-                    code.selectionEnd,
-                    "end"
-                );
-
-                code.dispatchEvent(new Event("input"));
-                return;
-            }
-
-            if (this.handleDelimiter(event)) {
-                return;
-            }
-
-            if (event.key !== "Enter") {
-                return;
-            }
-
-            event.preventDefault();
-
-            const start = code.selectionStart;
-            const before = code.value.slice(0, start);
-            const line = before.split("\n").pop();
-
-            const indent = line.match(/^[\t ]*/)[0];
-            const extraIndent =
-                /(:\s*|--\s*)$/.test(line) ? "\t" : "";
-
-            code.setRangeText(
-                "\n" + indent + extraIndent,
-                start,
-                code.selectionEnd,
-                "end"
-            );
-
-            code.dispatchEvent(new Event("input"));
+        reader.addEventListener("filechange", () => {
+            this.setInitialHeight();
         });
     }
 
     connectedCallback() {
-        this.updateScrollbar()
+        this.updateScrollbar();
     }
 
     updateScrollbar() {
@@ -283,23 +208,23 @@ class PipefishEditor extends HTMLElement {
     }
 
     get value() {
-        return this.code.value;
+        return this.reader.text.value;
     }
 
     set value(value) {
-        this.code.value = value;
-        this.display(value);
+        this.reader.text.value = String(value ?? "");
+        this.setInitialHeight();
     }
 
-    initialize(source) {
+    async initialize(source) {
         this.initialization = (async () => {
             await this.ready;
-        
+
             const firstLine = source.trim().split(/\r?\n/, 1)[0].trim();
-            this.menu.projectName = (firstLine.startsWith("./")
+
+            this.menu.projectName = firstLine.startsWith("./")
                 ? firstLine.replace(/\/+$/, "").split("/").pop()
-                : "⋮"
-            );
+                : "⋮";
 
             await this.reader.initialize(source);
         })();
@@ -308,196 +233,62 @@ class PipefishEditor extends HTMLElement {
     }
 
     async build(fileExtractor) {
-        await this.initialized;
+        await this.ready;
+
+        if (!this.initialization) {
+            await this.initialize(this.textContent);
+        } else {
+            await this.initialization;
+        }
+
         const bytes = await this.reader.build(fileExtractor);
-        this.value = new TextDecoder("utf-8").decode(bytes);
+
+        // A standalone editor owns the initial VFS setup.
+        // A coder-managed editor leaves that to pf-service.
+        if (!this.hasAttribute("managed")) {
+            await window.pipefishCompile(this.reader.files);
+        }
+
         this.setInitialHeight();
-        this.syncScroll();
+
+        return bytes;
     }
 
-    async display(pfCode) {
+    async display(source) {
         await this.ready;
-        await this.reader.display(new TextEncoder().encode(pfCode));
+
+        await this.reader.display(
+            new TextEncoder().encode(source)
+        );
+
         this.setInitialHeight();
-        this.syncScroll();
     }
 
     setInitialHeight() {
-        const lines =
-            Math.max(1, this.code.value.split("\n").length);
+        if (!this.reader.text?.input) {
+            return;
+        }
 
-        const visibleLines =
-            Math.min(lines, 20);
+        const input = this.reader.text.input;
+        const lines = Math.max(1, input.value.split("\n").length);
+        const visibleLines = Math.min(lines, 20);
 
-        const style =
-            getComputedStyle(this.code);
-
-        const lineHeight =
-            parseFloat(style.lineHeight);
-
+        const inputStyle = getComputedStyle(input);
+        const lineHeight = parseFloat(inputStyle.lineHeight);
         const padding =
-            parseFloat(style.paddingTop) +
-            parseFloat(style.paddingBottom);
+            parseFloat(inputStyle.paddingTop) +
+            parseFloat(inputStyle.paddingBottom);
 
-        const editorStyle =
-            getComputedStyle(this.editor);
-
+        const editorStyle = getComputedStyle(this.editor);
         const borders =
             parseFloat(editorStyle.borderTopWidth) +
             parseFloat(editorStyle.borderBottomWidth);
 
-        const codeStyle = getComputedStyle(this.code);
-
-        const top = parseFloat(codeStyle.top);
+        const tabsStyle = getComputedStyle(this.reader.tabs);
+        const tabsHeight = parseFloat(tabsStyle.height) || 0;
 
         this.editor.style.height =
-            `${visibleLines * lineHeight + padding + borders + top}px`; 
-
-    }
-
-    syncScroll() {
-        this.reader.scrollTop = this.code.scrollTop;
-        this.reader.scrollLeft = this.code.scrollLeft;
-    }
-
-    isEscaped(text, pos) {
-        let backslashes = 0;
-
-        for (
-            let i = pos - 1;
-            i >= 0 && text[i] === "\\";
-            i--
-        ) {
-            backslashes++;
-        }
-
-        return backslashes % 2 === 1;
-    }
-
-    quoteContext(text, pos, quote) {
-        let currentQuote = null;
-        let escaped = false;
-
-        for (let i = 0; i < pos; i++) {
-            const char = text[i];
-
-            if (escaped) {
-                escaped = false;
-                continue;
-            }
-
-            if (char === "\\") {
-                escaped = true;
-                continue;
-            }
-
-            if (currentQuote === null) {
-                if (
-                    char === '"' ||
-                    char === "'" ||
-                    char === "`"
-                ) {
-                    currentQuote = char;
-                }
-            } else if (char === currentQuote) {
-                currentQuote = null;
-            }
-        }
-
-        return currentQuote === quote;
-    }
-
-    handleDelimiter(event) {
-        const element = this.code;
-
-        const pairs = {
-            "(": ")",
-            "[": "]",
-            "{": "}",
-            '"': '"',
-            "'": "'",
-            "`": "`"
-        };
-
-        const closingDelimiters = new Set([
-            ")",
-            "]",
-            "}",
-            '"',
-            "'",
-            "`"
-        ]);
-
-        const isQuote =
-            event.key === '"' ||
-            event.key === "'" ||
-            event.key === "`";
-
-        if (closingDelimiters.has(event.key)) {
-            const pos = element.selectionStart;
-
-            if (
-                pos === element.selectionEnd &&
-                element.value[pos] === event.key
-            ) {
-                if (!isQuote) {
-                    event.preventDefault();
-                    element.setSelectionRange(pos + 1, pos + 1);
-                    return true;
-                }
-
-                if (
-                    this.quoteContext(
-                        element.value,
-                        pos,
-                        event.key
-                    ) &&
-                    !this.isEscaped(element.value, pos)
-                ) {
-                    event.preventDefault();
-                    element.setSelectionRange(pos + 1, pos + 1);
-                    return true;
-                }
-            }
-        }
-
-        if (pairs[event.key] !== undefined) {
-            const start = element.selectionStart;
-            const end = element.selectionEnd;
-
-            if (
-                isQuote &&
-                this.quoteContext(
-                    element.value,
-                    start,
-                    event.key
-                )
-            ) {
-                return false;
-            }
-
-            event.preventDefault();
-
-            const selected =
-                element.value.slice(start, end);
-
-            element.setRangeText(
-                event.key + selected + pairs[event.key],
-                start,
-                end,
-                "select"
-            );
-
-            element.setSelectionRange(
-                start + 1,
-                start + 1 + selected.length
-            );
-
-            element.dispatchEvent(new Event("input"));
-            return true;
-        }
-
-        return false;
+            `${tabsHeight + visibleLines * lineHeight + padding + borders}px`;
     }
 }
 

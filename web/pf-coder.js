@@ -14,6 +14,8 @@ class PipefishCoder extends HTMLElement {
         const editor =
             document.createElement("pf-editor");
 
+        editor.setAttribute("managed", "");
+
         shadow.append(
             service,
             editor
@@ -22,6 +24,7 @@ class PipefishCoder extends HTMLElement {
         this.service = service;
         this.editor = editor;
         this.dirty = false;
+        this.source = null;
 
         editor.addEventListener("change", () => {
             this.dirty = true;
@@ -36,8 +39,12 @@ class PipefishCoder extends HTMLElement {
     initialize(source) {
         this.initialization = (async () => {
             await this.ready;
+
+            this.source = source;
+
             await this.service.initialize(source);
             await this.editor.initialize(source);
+
             this.dirty = false;
         })();
 
@@ -45,18 +52,36 @@ class PipefishCoder extends HTMLElement {
     }
 
     async build(fileExtractor) {
-        await this.initialization;
+        await this.ready;
+
+        // A standalone pf-coder is initialized on its first build.
+        if (!this.initialization) {
+            await this.initialize(this.textContent);
+        } else {
+            await this.initialization;
+        }
+
         await this.editor.build(fileExtractor);
         await this.service.build(fileExtractor);
     }
 
     async compile() {
         await this.ready;
-        if (!this.dirty) {
-            return
+
+        if (!this.initialization) {
+            throw new Error(
+                "pf-coder must be initialized before compiling"
+            );
         }
+
+        await this.initialization;
+
+        if (!this.dirty) {
+            return;
+        }
+
         await this.service.compileMain();
-        this.dirty = false
+        this.dirty = false;
     }
 
     async do(line) {
@@ -70,7 +95,6 @@ class PipefishCoder extends HTMLElement {
         await this.compile();
         return this.service.getFilepath();
     }
-    
 }
 
 customElements.define(
