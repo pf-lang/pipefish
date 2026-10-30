@@ -2,14 +2,11 @@
 
 :host {
     display: block;
-    border: 1px solid var(--code-border);
-    border-radius: 10px;
     overflow: visible;
 }
 
 .service {
     box-sizing: border-box;
-    padding: 0.4rem;
     border-radius: 10px;
 }
 

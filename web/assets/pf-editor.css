@@ -1,7 +1,6 @@
 :host {
     display: block;
     position: relative;
-    border-radius: 10px;
     overflow: visible;
 }
 
@@ -11,10 +10,6 @@
     height: 300px;
     box-sizing: border-box;
     overflow: hidden;
-
-    border: 1px solid var(--code-border);
-    border-radius: 10px;
-
     resize: vertical;
     min-height: 1.4em;
 }
@@ -127,7 +122,7 @@ pf-reader {
     box-sizing: border-box;
     height: 1.75rem;
     padding: 0 .75rem;
-    border: none;
+    border: 1px solid var(--code-border);
     border-radius: 7px;
     background: var(--paper);
     color: var(--code-text);
