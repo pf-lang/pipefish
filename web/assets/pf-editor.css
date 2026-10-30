@@ -22,18 +22,6 @@ pf-reader {
     margin: 0;
 }
 
-.editor::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 16px;
-    height: 16px;
-    background: var(--paper);
-    z-index: 3;
-    pointer-events: none;
-}
-
 .project-name {
     font-weight: 500;
     color: var(--cyan);
