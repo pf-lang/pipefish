@@ -7,18 +7,17 @@
 .editor {
     position: relative;
     width: 100%;
-    height: 300px;
+    height: auto;
     box-sizing: border-box;
-    overflow: hidden;
-    resize: vertical;
-    min-height: 1.4em;
+    overflow: visible;
+    min-height: 0;
 }
 
 pf-reader {
-    position: absolute;
-    inset: 0;
+    position: relative;
+    display: block;
     width: 100%;
-    height: 100%;
+    height: auto;
     margin: 0;
 }
 
@@ -120,3 +119,5 @@ pf-reader {
     align-items: center;
     pointer-events: auto;
 }
+
+

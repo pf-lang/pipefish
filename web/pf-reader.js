@@ -1,5 +1,9 @@
 import "./pf-text.js";
 import { loadWasm } from "./assets/pf-wasm.js";
+import {
+    classifyFile,
+    decodeFileText
+} from "./assets/file-viewer.js";
 
 class PipefishReader extends HTMLElement {
     constructor() {
@@ -25,15 +29,29 @@ class PipefishReader extends HTMLElement {
 
         const emptyState = document.createElement("div");
         emptyState.className = "empty-state";
-        emptyState.innerHTML = `
-            <img src="./assets/rene.png" alt="">
-        `;
 
-        shadow.append(style, tabs, this.text, emptyState);
+        const mascot = document.createElement("img");
+        mascot.src = new URL("./assets/rene.png", import.meta.url);
+        mascot.alt = "";
+
+        const emptyMessage = document.createElement("p");
+
+        emptyState.append(mascot, emptyMessage);
+
+        const image = document.createElement("img");
+        image.className = "file-image";
+        image.alt = "";
+
+        shadow.append(style, tabs, this.text, image, emptyState);
+
+        this.image = image;
+        this.emptyState = emptyState;
+        this.emptyMessage = emptyMessage;
+        this.imageURL = null;
+        this.displayInfo = classifyFile(null, null);
 
         this.tabs = tabs;
-        this.emptyState = emptyState;
-
+        
         this.fileExtractor = async (path, filename) => {
             const url = new URL(
                 filename,
@@ -208,16 +226,27 @@ class PipefishReader extends HTMLElement {
         this.text.value = "";
         this.text.scrollTop = 0;
         this.text.scrollLeft = 0;
+
+        this.text.style.display = "";
+        this.image.style.display = "none";
+
+        if (this.imageURL) {
+            URL.revokeObjectURL(this.imageURL);
+            this.imageURL = null;
+        }
     }
 
     updateEmptyState() {
         const empty = this.files.length === 0;
+
+        this.classList.toggle("empty-view", empty);
 
         this.emptyState.style.display = empty ? "flex" : "none";
         this.text.style.opacity = empty ? "0.4" : "";
         this.tabs.style.opacity = empty ? "0.4" : "";
 
         if (empty) {
+            this.style.height = "";
             this.readerClear();
             this.currentFile = null;
         }
@@ -238,34 +267,115 @@ class PipefishReader extends HTMLElement {
         });
 
         await this.display(file.data);
+    }
 
-        this.dispatchEvent(new CustomEvent("filechange", {
-            detail: {
-                path: file.path,
-                data: file.data
+    async closeTab(path) {
+        const index = this.files.findIndex(file => file.path === path);
+
+        if (index === -1) {
+            return;
+        }
+
+        const wasCurrent = this.currentFile === path;
+
+        this.files.splice(index, 1);
+
+        if (wasCurrent) {
+            const file = this.files[index] ?? this.files[index - 1] ?? null;
+            this.currentFile = file?.path ?? null;
+
+            this.makeTabs();
+
+            if (file) {
+                await this.display(file.data);
+            } else {
+                this.readerClear();
             }
-        }));
+        } else {
+            this.makeTabs();
+        }
     }
 
     async display(data) {
         await this.ready;
 
-        if (!this.currentFile) {
+        if (this.imageURL) {
+            URL.revokeObjectURL(this.imageURL);
+            this.imageURL = null;
+        }
+
+        this.displayInfo = classifyFile(this.currentFile, data);
+        const info = this.displayInfo;
+        this.classList.toggle("image-view", info.type === "image");
+        this.classList.toggle("empty-view", info.type === "empty");
+        this.style.height = "";
+        this.text.style.display = "none";
+        this.image.style.display = "none";
+        this.emptyState.style.display = "none";
+
+        if (info.type === "empty" || info.type === "too-large") {
             this.readerClear();
+
+            this.emptyMessage.textContent =
+                info.type === "empty"
+                    ? "No file open."
+                    : "File too large to display.";
+
+            this.emptyState.style.display = "flex";
+        } else if (info.type === "image") {
+            const blob = new Blob(
+                [data],
+                { type: info.mimeType }
+            );
+
+            this.imageURL = URL.createObjectURL(blob);
+            this.image.src = this.imageURL;
+            this.image.style.display = "block";
+        } else {
+            const source = decodeFileText(data);
+
+            this.text.highlighter =
+                info.highlighting === "pipefish"
+                    ? source => window.pipefishHighlight(source)
+                    : info.highlighting === "markdown" &&
+                    window.pipefishMarkdownHighlight
+                        ? source => window.pipefishMarkdownHighlight(source)
+                        : source => source;
+
+            this.text.style.display = "block";
+            this.text.value = source;
+            this.setInitialHeight();
+        }
+
+        this.dispatchEvent(new CustomEvent("displaychange", {
+            detail: info
+        }));
+    }
+
+    setInitialHeight() {
+        const input = this.text?.input;
+
+        if (!input) {
             return;
         }
 
-        const extension = this.currentFile
-            .slice(this.currentFile.lastIndexOf("."))
-            .toLowerCase();
+        const lines = Math.max(1, input.value.split("\n").length);
+        const visibleLines = Math.min(lines, 20);
 
-        const source = new TextDecoder("utf-8").decode(data);
+        const inputStyle = getComputedStyle(input);
+        const lineHeight = parseFloat(inputStyle.lineHeight);
+        const padding =
+            parseFloat(inputStyle.paddingTop) +
+            parseFloat(inputStyle.paddingBottom);
 
-        this.text.highlighter = extension === ".pf"
-            ? source => window.pipefishHighlight(source)
-            : source => source;
+        const tabsHeight = this.tabs.getBoundingClientRect().height;
 
-        this.text.value = source;
+        const borders =
+            parseFloat(getComputedStyle(this).borderTopWidth) +
+            parseFloat(getComputedStyle(this).borderBottomWidth);
+
+        this.style.height =
+            `${tabsHeight + visibleLines * lineHeight + padding + borders}px`;
     }
 
     get scrollTop() {
@@ -316,13 +426,6 @@ class PipefishReader extends HTMLElement {
         this.currentFile = this.files[0].path;
         this.makeTabs();
         await this.display(this.files[0].data);
-
-        this.dispatchEvent(new CustomEvent("filechange", {
-            detail: {
-                path: this.files[0].path,
-                data: this.files[0].data,
-            },
-        }));
     }
 
 
@@ -345,13 +448,6 @@ class PipefishReader extends HTMLElement {
             } else {
                 this.readerClear();
             }
-
-            this.dispatchEvent(new CustomEvent("filechange", {
-                detail: {
-                    path: file?.path ?? null,
-                    data: file?.data ?? "",
-                },
-            }));
         } else {
             this.makeTabs();
         }

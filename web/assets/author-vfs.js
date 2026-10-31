@@ -10,6 +10,7 @@ const SAMPLE_BOOK_FILES = [
     "Initializing-components-from-files.md",
     "Introduction.md",
     "Markdown.md",
+    "Pipefish-components.md",
     "The-Books-menu.md",
     "The-Files-menu.md",
     "The-structure-of-a-book.md",

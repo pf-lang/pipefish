@@ -14,5 +14,6 @@
 ## Components
 
 - Components overview
+- Pipefish components
 - Initializing components from code
 - Initializing components from files

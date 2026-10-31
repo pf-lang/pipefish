@@ -191,9 +191,16 @@ class PipefishEditor extends HTMLElement {
             this.updateScrollbar();
         });
 
-        reader.addEventListener("filechange", () => {
-            this.setInitialHeight();
+        this.reader.addEventListener("displaychange", event => {
+            const info = event.detail;
+
+            this.reader.text.editable = info.editable;
+            this.reader.text.wrap = info.wrap ? "soft" : "off";
+
+            this.classList.toggle("image-view", info.type === "image");
+
         });
+        
     }
 
     connectedCallback() {
@@ -213,7 +220,6 @@ class PipefishEditor extends HTMLElement {
 
     set value(value) {
         this.reader.text.value = String(value ?? "");
-        this.setInitialHeight();
     }
 
     async initialize(source) {
@@ -249,8 +255,6 @@ class PipefishEditor extends HTMLElement {
             await window.pipefishCompile(this.reader.files);
         }
 
-        this.setInitialHeight();
-
         return bytes;
     }
 
@@ -260,35 +264,6 @@ class PipefishEditor extends HTMLElement {
         await this.reader.display(
             new TextEncoder().encode(source)
         );
-
-        this.setInitialHeight();
-    }
-
-    setInitialHeight() {
-        if (!this.reader.text?.input) {
-            return;
-        }
-
-        const input = this.reader.text.input;
-        const lines = Math.max(1, input.value.split("\n").length);
-        const visibleLines = Math.min(lines, 20);
-
-        const inputStyle = getComputedStyle(input);
-        const lineHeight = parseFloat(inputStyle.lineHeight);
-        const padding =
-            parseFloat(inputStyle.paddingTop) +
-            parseFloat(inputStyle.paddingBottom);
-
-        const editorStyle = getComputedStyle(this.editor);
-        const borders =
-            parseFloat(editorStyle.borderTopWidth) +
-            parseFloat(editorStyle.borderBottomWidth);
-
-        const tabsStyle = getComputedStyle(this.reader.tabs);
-        const tabsHeight = parseFloat(tabsStyle.height) || 0;
-
-        this.editor.style.height =
-            `${tabsHeight + visibleLines * lineHeight + padding + borders}px`;
     }
 }
 
