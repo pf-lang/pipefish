@@ -119,6 +119,7 @@
 }
 
 .empty-state p {
+    font-family: "Google Sans Code", monospace;
     margin: 0;
     opacity: 0.55;
 }
@@ -134,4 +135,3 @@
     display: flex;
     padding: 3.2rem 0 1rem;
 }
-

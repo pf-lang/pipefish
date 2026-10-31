@@ -250,6 +250,8 @@ class PipefishReader extends HTMLElement {
             this.readerClear();
             this.currentFile = null;
         }
+
+        this.emptyMessage.textContent = "No file open";
     }
 
     async selectFile(path) {
@@ -318,8 +320,8 @@ class PipefishReader extends HTMLElement {
 
             this.emptyMessage.textContent =
                 info.type === "empty"
-                    ? "No file open."
-                    : "File too large to display.";
+                    ? "No file open"
+                    : "File too large to display";
 
             this.emptyState.style.display = "flex";
         } else if (info.type === "image") {
