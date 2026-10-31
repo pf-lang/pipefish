@@ -4,6 +4,7 @@ import {
     classifyFile,
     decodeFileText
 } from "./assets/file-viewer.js";
+import { highlightMarkdown } from "./assets/markdown-highlighter.js";
 
 class PipefishReader extends HTMLElement {
     constructor() {
@@ -339,10 +340,9 @@ class PipefishReader extends HTMLElement {
             this.text.highlighter =
                 info.highlighting === "pipefish"
                     ? source => window.pipefishHighlight(source)
-                    : info.highlighting === "markdown" &&
-                    window.pipefishMarkdownHighlight
-                        ? source => window.pipefishMarkdownHighlight(source)
-                        : source => source;
+                    : info.highlighting === "markdown"
+                        ? highlightMarkdown
+                        : source => source; 
 
             this.text.style.display = "block";
             this.text.value = source;

@@ -42,6 +42,16 @@
     --syntax-font: "Google Sans Code", monospace;
     --syntax-font-size: 15px;
 
+    /* Highlighting for raw markdown */
+
+    --md-body: #333333;
+    --md-heading: #aa3731;
+    --md-bold: #448c27;
+    --md-italic: #448c27;
+    --md-quote: #7a3e9d;
+    --md-list: #4b69c6;
+    --md-inline-code: #9c5d27;
+    --md-link: #4b69c6;
 }
 
 @font-face {
@@ -100,6 +110,17 @@
     --cyan: #00dddd;
     --blue: #0000ee;
     --purple: #dd00ff;
+
+    /* Highlighting for raw markdown */
+
+    --md-body: #cccccc;
+    --md-heading: #569cd6;
+    --md-bold: #569cd6;
+    --md-italic: #cccccc;
+    --md-quote: #6a9955;
+    --md-list: #d7ba7d;
+    --md-inline-code: #ce9178;
+    --md-link: #9cdcfe;
 }
 
 .reserved {
@@ -182,3 +203,40 @@
 .vertical-break {
     height: 1.5rem;
 }
+
+/* Markdown token classes */
+
+.md-body {
+    color: var(--md-body);
+}
+
+.md-heading {
+    color: var(--md-heading);
+}
+
+.md-bold {
+    color: var(--md-bold);
+    font-weight: bold;
+}
+
+.md-italic {
+    color: var(--md-italic);
+    font-style: italic;
+}
+
+.md-quote {
+    color: var(--md-quote);
+}
+
+.md-list {
+    color: var(--md-list);
+}
+
+.md-inline-code {
+    color: var(--md-inline-code);
+}
+
+.md-link {
+    color: var(--md-link);
+}
+
