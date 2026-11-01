@@ -1,3 +1,5 @@
+import { highlightMarkdown } from "./markdown-highlighter.js";
+
 export const MAX_TEXT_FILE_SIZE = 512 * 1024;
 
 const IMAGE_TYPES = {
@@ -26,7 +28,6 @@ const TEXT_TYPES = {
     }
 };
 
-
 function getExtension(path) {
     const filename = path.split("/").pop();
     const index = filename.lastIndexOf(".");
@@ -35,7 +36,6 @@ function getExtension(path) {
         ? ""
         : filename.slice(index).toLowerCase();
 }
-
 
 function getSize(data) {
     if (data == null) {
@@ -48,7 +48,6 @@ function getSize(data) {
 
     return data.byteLength;
 }
-
 
 export function classifyFile(path, data) {
     if (!path) {
@@ -102,11 +101,88 @@ export function classifyFile(path, data) {
     };
 }
 
-
 export function decodeFileText(data) {
     if (typeof data === "string") {
         return data;
     }
 
     return new TextDecoder("utf-8").decode(data);
+}
+
+export function getFileHighlighter(info) {
+    switch (info.highlighting) {
+        case "pipefish":
+            return source => window.pipefishHighlight(source);
+
+        case "markdown":
+            return highlightMarkdown;
+
+        default:
+            return source => source;
+    }
+}
+
+/*
+ * Displays a file using the supplied presentation elements.
+ *
+ * The caller remains responsible for revoking the returned imageURL
+ * when the displayed file changes or the display is cleared.
+ */
+export function displayFile({
+    path,
+    data,
+    text,
+    image,
+    emptyState,
+    emptyMessage
+}) {
+    const info = classifyFile(path, data);
+
+    text.style.display = "none";
+    image.style.display = "none";
+    emptyState.style.display = "none";
+
+    if (info.type === "empty" || info.type === "too-large") {
+        text.value = "";
+
+        emptyMessage.textContent =
+            info.type === "empty"
+                ? "No file open"
+                : "File too large to display";
+
+        emptyState.style.display = "flex";
+
+        return {
+            info,
+            imageURL: null
+        };
+    }
+
+    if (info.type === "image") {
+        const blob = new Blob(
+            [data],
+            { type: info.mimeType }
+        );
+
+        const imageURL = URL.createObjectURL(blob);
+
+        image.src = imageURL;
+        image.style.display = "block";
+
+        return {
+            info,
+            imageURL
+        };
+    }
+
+    const source = decodeFileText(data);
+
+    text.highlighter = getFileHighlighter(info);
+    text.value = source;
+    text.style.display = "block";
+
+    return {
+        info,
+        imageURL: null
+    };
 }

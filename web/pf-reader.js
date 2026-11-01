@@ -1,10 +1,10 @@
 import "./pf-text.js";
 import { loadWasm } from "./assets/pf-wasm.js";
+
 import {
     classifyFile,
-    decodeFileText
+    displayFile
 } from "./assets/file-viewer.js";
-import { highlightMarkdown } from "./assets/markdown-highlighter.js";
 
 class PipefishReader extends HTMLElement {
     constructor() {
@@ -307,50 +307,36 @@ class PipefishReader extends HTMLElement {
             this.imageURL = null;
         }
 
-        this.displayInfo = classifyFile(this.currentFile, data);
-        const info = this.displayInfo;
-        this.classList.toggle("image-view", info.type === "image");
-        this.classList.toggle("empty-view", info.type === "empty");
         this.style.height = "";
-        this.text.style.display = "none";
-        this.image.style.display = "none";
-        this.emptyState.style.display = "none";
 
-        if (info.type === "empty" || info.type === "too-large") {
-            this.readerClear();
+        const result = displayFile({
+            path: this.currentFile,
+            data,
+            text: this.text,
+            image: this.image,
+            emptyState: this.emptyState,
+            emptyMessage: this.emptyMessage
+        });
 
-            this.emptyMessage.textContent =
-                info.type === "empty"
-                    ? "No file open"
-                    : "File too large to display";
+        this.displayInfo = result.info;
+        this.imageURL = result.imageURL;
 
-            this.emptyState.style.display = "flex";
-        } else if (info.type === "image") {
-            const blob = new Blob(
-                [data],
-                { type: info.mimeType }
-            );
+        this.classList.toggle(
+            "image-view",
+            result.info.type === "image"
+        );
 
-            this.imageURL = URL.createObjectURL(blob);
-            this.image.src = this.imageURL;
-            this.image.style.display = "block";
-        } else {
-            const source = decodeFileText(data);
+        this.classList.toggle(
+            "empty-view",
+            result.info.type === "empty"
+        );
 
-            this.text.highlighter =
-                info.highlighting === "pipefish"
-                    ? source => window.pipefishHighlight(source)
-                    : info.highlighting === "markdown"
-                        ? highlightMarkdown
-                        : source => source; 
-
-            this.text.style.display = "block";
-            this.text.value = source;
+        if (result.info.type === "text") {
             this.setInitialHeight();
         }
 
         this.dispatchEvent(new CustomEvent("displaychange", {
-            detail: info
+            detail: result.info
         }));
     }
 
