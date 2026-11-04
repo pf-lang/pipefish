@@ -72,7 +72,7 @@ class PfWriter extends PfPage {
 
     async load() {
         const loadId = ++this.loadId;
-
+        this.saveFile = null;
         await window.pipefishReady;
 
         const src = this.getAttribute("src");
@@ -166,7 +166,14 @@ class PfWriter extends PfPage {
                 const markdown = editor.value;
                 const src = this.getAttribute("src");
 
-                if (src?.startsWith("bookfs:")) {
+                if (this.saveFile) {
+                    try {
+                        await this.saveFile(markdown);
+                    } catch (error) {
+                        console.error("Failed to save Markdown:", error);
+                        return;
+                    }
+                } else if (src?.startsWith("bookfs:")) {
                     const result = window.pipefishWriteBookFile(
                         src.slice("bookfs:".length),
                         markdown
@@ -223,6 +230,17 @@ class PfWriter extends PfPage {
                 await element.build(fileExtractor);
             }
         }
+    }
+
+    async setContent(markdown, saveFile) {
+        ++this.loadId; // Invalidate any pending load.
+
+        this.markdown = markdown;
+        this.saveFile = saveFile;
+        this.editing = false;
+
+        this.renderWriter();
+        await this.buildEmbeddedElements(this.fileExtractor);
     }
 
     disconnectedCallback() {

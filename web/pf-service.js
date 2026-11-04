@@ -69,7 +69,7 @@ class PipefishService extends HTMLElement {
         return result;
     }
 
-        async loadDirectory(lines) {
+    async loadDirectory(lines) {
         const base = lines[0].trim();
         const entries = this.parseDirectory(lines.slice(1));
         const files = [];

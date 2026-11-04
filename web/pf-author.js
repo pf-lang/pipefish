@@ -9,6 +9,12 @@ import {
     load,
     save
 } from "./assets/author-storage.js";
+import "./pf-text.js";
+import {
+    classifyFile,
+    decodeFileText,
+    displayFile
+} from "./assets/file-viewer.js";
 
 class PfAuthor extends PfBook {
     constructor() {
@@ -16,6 +22,10 @@ class PfAuthor extends PfBook {
 
         this.vfs = new AuthorVFS();
         this.fileManager = null;
+
+        this.addEventListener("file-open", event => {
+            this.openFile(event.detail.path, event.detail.data);
+        });
     }
 
     async connectedCallback() {
@@ -153,13 +163,127 @@ class PfAuthor extends PfBook {
 
     async showPage(hash) {
         const writer = this.querySelector("pf-writer");
+        const navigation = this.querySelector(".page-navigation");
+        const fileView = this.getFileView();
 
-        if (writer) {
-            writer.fileExtractor =
-                makeAuthorFileExtractor(this.bookRoot);
-        }
+        fileView.container.hidden = true;
+        navigation.hidden = false;
+        writer.hidden = false;
+
+        writer.fileExtractor =
+            makeAuthorFileExtractor(this.bookRoot);
 
         await super.showPage(hash);
+    }
+
+    async openFile(path, data) {
+        const info = classifyFile(path, data);
+
+        // Is this Markdown file one of the pages in the current book?
+        if (info.type === "text" && info.highlighting === "markdown") {
+            const page = this.contents
+                .flatMap(section => section.pages)
+                .find(page => page.filename === path);
+
+            if (page) {
+                await this.showPage(page.hash);
+                return;
+            }
+
+            // Otherwise, display it as standalone Markdown.
+            this.showStandaloneMarkdown(path, data);
+            return;
+        }
+
+        this.showOtherFile(path, data);
+    }
+
+    showStandaloneMarkdown(path, data) {
+        const writer = this.querySelector("pf-writer");
+        const navigation = this.querySelector(".page-navigation");
+        const fileView = this.getFileView();
+
+        fileView.container.hidden = true;
+        navigation.hidden = true;
+
+        writer.hidden = false;
+        writer.fileExtractor = makeAuthorFileExtractor(this.bookRoot);
+
+        writer.setContent(
+            decodeFileText(data),
+            async markdown => {
+                const result = this.vfs.writeFile(
+                    path,
+                    new TextEncoder().encode(markdown)
+                );
+
+                if (!result?.ok) {
+                    throw new Error(result?.error ?? "Failed to save file");
+                }
+            }
+        );
+    }
+
+    showOtherFile(path, data) {
+        const writer = this.querySelector("pf-writer");
+        const navigation = this.querySelector(".page-navigation");
+        const fileView = this.getFileView();
+
+        writer.hidden = true;
+        navigation.hidden = true;
+        fileView.container.hidden = false;
+
+        if (this.fileViewImageURL) {
+            URL.revokeObjectURL(this.fileViewImageURL);
+            this.fileViewImageURL = null;
+        }
+
+        const result = displayFile({
+            path,
+            data,
+            text: fileView.text,
+            image: fileView.image,
+            emptyState: fileView.emptyState,
+            emptyMessage: fileView.emptyMessage
+        });
+
+        this.fileViewImageURL = result.imageURL;
+    }
+
+    getFileView() {
+        if (this.fileView) {
+            return this.fileView;
+        }
+
+        const main = this.querySelector(".book-main");
+
+        const container = document.createElement("div");
+        container.className = "author-file-view";
+        container.hidden = true;
+
+        const text = document.createElement("pf-text");
+        const image = document.createElement("img");
+
+        image.alt = "";
+
+        const emptyState = document.createElement("div");
+        emptyState.className = "author-file-empty";
+
+        const emptyMessage = document.createElement("p");
+
+        emptyState.append(emptyMessage);
+        container.append(text, image, emptyState);
+        main.append(container);
+
+        this.fileView = {
+            container,
+            text,
+            image,
+            emptyState,
+            emptyMessage
+        };
+
+        return this.fileView;
     }
 
     renderHeaderExtras(controls, themeToggle) {

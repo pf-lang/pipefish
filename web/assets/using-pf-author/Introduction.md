@@ -8,7 +8,7 @@ In the next section of the book we will explain how to use the extra controls to
 
 ## Temporary editor test
 
-```pf-ide
+```pf-editor
 ./project/
     main.pf
     other.pf

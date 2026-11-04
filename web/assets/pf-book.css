@@ -990,3 +990,34 @@ pf-page tbody tr:hover {
     }
 }
 
+/* ----------------------------------------
+   File display for pf-author
+   ---------------------------------------- */
+
+.author-file-view {
+    width: 100%;
+    min-width: 0;
+}
+
+.author-file-view[hidden] {
+    display: none;
+}
+
+.author-file-view pf-text {
+    display: block;
+    width: 100%;
+}
+
+.author-file-view img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.author-file-empty {
+    display: none;
+    min-height: 20rem;
+    align-items: center;
+    justify-content: center;
+}
+
