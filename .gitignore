@@ -9,3 +9,4 @@ buglist.txt
 temp.pf
 hub/test-files/default
 website-build/*
+web/assets/pipefish.wasm
