@@ -31,7 +31,7 @@ class PipefishIde extends HTMLElement {
             document.createElement("link");
         style.rel = "stylesheet";
         style.href =
-            new URL("../assets/pf-ide.css", import.meta.url);
+            new URL("./assets/pf-ide.css", import.meta.url);
 
         const wrapper =
             document.createElement("div");

@@ -25,7 +25,7 @@ class PipefishTui extends HTMLElement {
             document.createElement("link");
         style.rel = "stylesheet";
         style.href =
-            new URL("../assets/pf-tui.css", import.meta.url);
+            new URL("./assets/pf-tui.css", import.meta.url);
 
         const repl =
             document.createElement("div");

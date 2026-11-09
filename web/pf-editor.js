@@ -1,6 +1,6 @@
 import "./pf-reader.js";
-import { FileManager } from "../assets/file-manager.js";
-import "../assets/file-menu.js";
+import { FileManager } from "./assets/file-manager.js";
+import "./assets/file-menu.js";
 
 class PipefishEditor extends HTMLElement {
     constructor() {
@@ -10,14 +10,14 @@ class PipefishEditor extends HTMLElement {
 
         const style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = new URL("../assets/pf-editor.css", import.meta.url);
+        style.href = new URL("./assets/pf-editor.css", import.meta.url);
 
         const editor = document.createElement("div");
         editor.classList.add("editor");
 
         const logo = document.createElement("img");
         logo.classList.add("logo");
-        logo.src = new URL("../assets/icon.ico", import.meta.url);
+        logo.src = new URL("./assets/icon.ico", import.meta.url);
         logo.alt = "";
 
         const projectMenu = document.createElement("pf-file-menu");
