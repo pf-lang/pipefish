@@ -30,6 +30,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Build WASM
+        run: |
+          GOOS=js GOARCH=wasm go build \
+            -o web/assets/pipefish.wasm \
+            ./cmd/buildwebcomponent
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
