@@ -36,10 +36,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Build WASM
-        run: |
-          GOOS=js GOARCH=wasm go build \
-            -o web/assets/pipefish.wasm \
-            ./cmd/buildwebcomponent
+        run: go run ./cmd/buildwebcomponent
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
