@@ -27,10 +27,7 @@ export class AuthorVFS {
         return Promise.all(
             SAMPLE_BOOK_FILES.map(async name => {
                 const path = `using-pf-author/${name}`;
-                const url = new URL(
-                    `using-pf-author/${name}`,
-                    import.meta.url
-                );
+                const url = new URL(path, document.baseURI);
 
                 const response = await fetch(url, {
                     cache: "no-store"

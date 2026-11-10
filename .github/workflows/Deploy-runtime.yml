@@ -1,12 +1,10 @@
-name: Deploy Pipefish runtime to GitHub Pages
+name: Deploy Pipefish to GitHub Pages
 
 on:
   push:
     branches:
       - main
-    paths:
-      - 'web/**'
-      - '.github/workflows/Deploy-runtime.yml'
+
   workflow_dispatch:
 
 permissions:
@@ -35,8 +33,14 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Build WASM
+      - name: Build Pipefish WASM
         run: go run ./cmd/buildwebcomponent
+
+      - name: Assemble website
+        run: |
+          mkdir -p _site/author
+          cp -R web/. _site/
+          cp -R author/. _site/author/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -44,7 +48,7 @@ jobs:
       - name: Upload website
         uses: actions/upload-pages-artifact@v4
         with:
-          path: web
+          path: _site
 
       - name: Deploy
         id: deployment
