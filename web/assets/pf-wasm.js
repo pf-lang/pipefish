@@ -8,7 +8,9 @@ return ready;
 ready = new Promise(async (resolve, reject) => {
     try {
         if (!window.Go) {
-            await loadScript("assets/wasm_exec.js");
+            await loadScript(
+                new URL("./wasm_exec.js", import.meta.url).href
+            );
         }
 
         const go = new window.Go();

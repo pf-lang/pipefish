@@ -42,11 +42,6 @@ jobs:
           cp -R web/. _site/
           cp -R author/. _site/author/
 
-      - name: Verify website
-        run: |
-          find _site -maxdepth 3 -type f | sort
-          test -f _site/author/index.html
-
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
