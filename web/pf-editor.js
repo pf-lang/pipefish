@@ -17,7 +17,7 @@ class PipefishEditor extends HTMLElement {
 
         const logo = document.createElement("img");
         logo.classList.add("logo");
-        logo.src = new URL("./assets/icon.ico", import.meta.url);
+        logo.src = new URL("./assets/icon.ico", import.meta.url).href;
         logo.alt = "";
 
         const projectMenu = document.createElement("pf-file-menu");

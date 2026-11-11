@@ -1,8 +1,8 @@
 import "./pf-page.js";
 import { loadWasm } from "./assets/pf-wasm.js";
 
-const DEFAULT_LOGO = "./assets/rene.png";
-const DEFAULT_ICON = "./assets/icon.ico";
+const DEFAULT_LOGO = new URL("./assets/rene.png", import.meta.url).href;
+const DEFAULT_ICON = new URL("./assets/icon.ico", import.meta.url).href;
 
 function parseContents(text) {
     const sections = [];
