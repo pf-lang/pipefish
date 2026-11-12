@@ -409,11 +409,11 @@ class PfAuthor extends PfBook {
             }
         });
 
+        controls.append(filesMenu, booksMenu, themeToggle);
+
         const publisher = document.createElement("pf-publish");
         this.appendChild(publisher);
         this.publisher = publisher;
-
-        controls.append(filesMenu, booksMenu, themeToggle);
     }
 }
 
