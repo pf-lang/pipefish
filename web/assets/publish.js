@@ -26,9 +26,7 @@ class PfPublish extends HTMLElement {
         stylesheet.rel = "stylesheet";
         stylesheet.href = new URL("./publish.css", import.meta.url).href;
 
-        this.shadowRoot.append(stylesheet);
-
-        this.shadowRoot.insertAdjacentHTML("beforeend", `
+        this.shadowRoot.innerHTML = `
             <div class="backdrop" hidden>
                 <section class="dialog" role="dialog"
                          aria-modal="true"
@@ -105,7 +103,8 @@ class PfPublish extends HTMLElement {
                     </footer>
                 </section>
             </div>
-        `);
+        `;
+        this.shadowRoot.prepend(stylesheet);
 
         this.backdrop = this.shadowRoot.querySelector(".backdrop");
         this.rows = this.shadowRoot.querySelector(".destination-rows");
