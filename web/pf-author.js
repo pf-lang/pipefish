@@ -334,9 +334,6 @@ class PfAuthor extends PfBook {
         const files = document.createElement("pf-files");
         this.appendChild(files);
 
-        this.publisher = document.createElement("pf-publish");
-        this.shadowRoot.append(this.publisher);
-
         this.fileManager = new FileManager(
             files,
             {
@@ -411,6 +408,10 @@ class PfAuthor extends PfBook {
                 alert(error.message);
             }
         });
+
+        const publisher = document.createElement("pf-publish");
+        this.appendChild(publisher);
+        this.publisher = publisher;
 
         controls.append(filesMenu, booksMenu, themeToggle);
     }
