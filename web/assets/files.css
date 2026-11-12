@@ -199,7 +199,7 @@ color: inherit;
 }
 
 @media (max-width: 34rem) {
-.tree {
-max-height: 12rem;
-}
+    .tree {
+    max-height: 12rem;
+    }
 }

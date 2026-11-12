@@ -15,6 +15,7 @@ import {
     decodeFileText,
     displayFile
 } from "./assets/file-viewer.js";
+import "./publish.js";
 
 class PfAuthor extends PfBook {
     constructor() {
@@ -333,6 +334,9 @@ class PfAuthor extends PfBook {
         const files = document.createElement("pf-files");
         this.appendChild(files);
 
+        this.publisher = document.createElement("pf-publish");
+        this.shadowRoot.append(this.publisher);
+
         this.fileManager = new FileManager(
             files,
             {
@@ -394,6 +398,9 @@ class PfAuthor extends PfBook {
                     }
 
                     case "Publish book":
+                        this.publisher.open({
+                            bookTitle: this.bookTitle || this.bookRoot
+                        });
                         break;
 
                     case "Download book":
