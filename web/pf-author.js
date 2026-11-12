@@ -15,7 +15,7 @@ import {
     decodeFileText,
     displayFile
 } from "./assets/file-viewer.js";
-import "./publish.js";
+import "./assets/publish.js";
 
 class PfAuthor extends PfBook {
     constructor() {
