@@ -380,7 +380,6 @@ class PfAuthor extends PfBook {
                     case "Open folder as book":
                         this.fileManager.open("open-book");
                         break;
-
                     case "Revert sample book": {
                         const refresh =
                             this.bookRoot === "using-pf-author";
@@ -393,13 +392,12 @@ class PfAuthor extends PfBook {
 
                         break;
                     }
-
                     case "Publish book":
-                        this.publisher.open({
-                            bookTitle: this.bookTitle || this.bookRoot
+                        await this.publisher.open({
+                            bookRoot: this.bookRoot,
+                            bookTitle: this.bookTitle
                         });
                         break;
-
                     case "Download book":
                         break;
                 }
