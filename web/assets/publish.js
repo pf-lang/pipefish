@@ -27,7 +27,7 @@ class PfPublish extends HTMLElement {
         stylesheet.href = new URL("./publish.css", import.meta.url).href;
 
         this.shadowRoot.innerHTML = `
-            <div class="backdrop" hidden>
+            <div class="backdrop setup-backdrop" hidden>
                 <section class="dialog" role="dialog"
                          aria-modal="true"
                          aria-labelledby="dialog-title">
@@ -80,7 +80,9 @@ class PfPublish extends HTMLElement {
                                     <td></td>
                                     <td colspan="4">
                                         <div class="field">
-                                            <label for="publish-directory">Publish to directory</label>
+                                            <label for="publish-directory">
+                                                Publish to directory
+                                            </label>
                                             <input id="publish-directory"
                                                 class="directory-input"
                                                 readonly>
@@ -90,16 +92,9 @@ class PfPublish extends HTMLElement {
                             </tbody>
                         </table>
 
-                        <div class="status" role="status" aria-live="polite"></div>
-
-                        <div class="success" hidden>
-                            <p>Book published successfully.</p>
-                            <a class="published-url" target="_blank" rel="noopener"></a>
-                            <div class="success-actions">
-                                <button data-action="copy-url">Copy URL</button>
-                                <button data-action="visit-url">Visit book</button>
-                            </div>
-                        </div>
+                        <div class="status"
+                             role="status"
+                             aria-live="polite"></div>
                     </div>
 
                     <footer class="dialog-footer">
@@ -114,17 +109,54 @@ class PfPublish extends HTMLElement {
                     </footer>
                 </section>
             </div>
+
+            <div class="backdrop success-backdrop" hidden>
+                <section class="dialog success-dialog"
+                         role="dialog"
+                         aria-modal="true"
+                         aria-labelledby="success-dialog-title">
+
+                    <header class="dialog-header">
+                        <h2 id="success-dialog-title">
+                            Book published successfully
+                        </h2>
+                    </header>
+
+                    <div class="dialog-body success-body">
+                        <a class="published-url"
+                           target="_blank"
+                           rel="noopener"></a>
+                    </div>
+
+                    <footer class="dialog-footer">
+                        <button data-action="success-ok">OK</button>
+                        <button data-action="copy-url">Copy link</button>
+                        <button data-action="visit-url">Visit book</button>
+                    </footer>
+                </section>
+            </div>
         `;
 
         this.shadowRoot.prepend(stylesheet);
 
-        this.backdrop = this.shadowRoot.querySelector(".backdrop");
-        this.rows = this.shadowRoot.querySelector(".destination-rows");
+        this.backdrop =
+            this.shadowRoot.querySelector(".setup-backdrop");
+
+        this.successBackdrop =
+            this.shadowRoot.querySelector(".success-backdrop");
+
+        this.rows =
+            this.shadowRoot.querySelector(".destination-rows");
+
         this.directoryInput =
             this.shadowRoot.querySelector(".directory-input");
-        this.status = this.shadowRoot.querySelector(".status");
-        this.success = this.shadowRoot.querySelector(".success");
-        this.publishedURL = this.shadowRoot.querySelector(".published-url");
+
+        this.status =
+            this.shadowRoot.querySelector(".status");
+
+        this.publishedURL =
+            this.shadowRoot.querySelector(".published-url");
+
         this.publishButton =
             this.shadowRoot.querySelector(".publish-button");
 
@@ -136,20 +168,33 @@ class PfPublish extends HTMLElement {
                 case "close":
                     this.close();
                     break;
+
                 case "add":
                     this.addDestination();
                     break;
+
                 case "delete":
                     this.deleteDestination(button.dataset.id);
                     break;
+
                 case "publish":
                     this.publish();
                     break;
+
+                case "success-ok":
+                    this.closeSuccess();
+                    break;
+
                 case "copy-url":
                     this.copyPublishedURL();
                     break;
+
                 case "visit-url":
-                    window.open(this.publishedURL.href, "_blank", "noopener");
+                    window.open(
+                        this.publishedURL.href,
+                        "_blank",
+                        "noopener"
+                    );
                     break;
             }
         });
@@ -199,7 +244,9 @@ class PfPublish extends HTMLElement {
         this.bookTitle = bookTitle || "Book";
 
         this.clearStatus();
-        this.success.hidden = true;
+        this.backdrop.hidden = true;
+        this.successBackdrop.hidden = true;
+
         this.publishedURL.textContent = "";
         this.publishedURL.removeAttribute("href");
 
@@ -223,7 +270,7 @@ class PfPublish extends HTMLElement {
                 item => item.bookRoot === this.bookRoot
             );
 
-            // Republishing an already-associated book needs no dialog.
+            // Automatically republish an already-associated book.
             if (publication) {
                 const destination = this.destinations.find(
                     item => item.id === publication.destinationId
@@ -262,8 +309,6 @@ class PfPublish extends HTMLElement {
                 this.destinations[0]?.id ??
                 null;
 
-            // Keep the existing directory when this book has been published
-            // before. Otherwise derive it from the title.
             this.directory = publication?.directory ??
                 this.slugify(this.bookTitle);
 
@@ -282,6 +327,10 @@ class PfPublish extends HTMLElement {
 
     close() {
         this.backdrop.hidden = true;
+    }
+
+    closeSuccess() {
+        this.successBackdrop.hidden = true;
     }
 
     slugify(value) {
@@ -369,10 +418,14 @@ class PfPublish extends HTMLElement {
     }
 
     async addDestination() {
-        const ownerInput = this.shadowRoot.querySelector(".add-owner");
+        const ownerInput =
+            this.shadowRoot.querySelector(".add-owner");
+
         const repositoryInput =
             this.shadowRoot.querySelector(".add-repository");
-        const tokenInput = this.shadowRoot.querySelector(".add-token");
+
+        const tokenInput =
+            this.shadowRoot.querySelector(".add-token");
 
         const owner = ownerInput.value.trim();
         const repository = repositoryInput.value.trim();
@@ -400,13 +453,12 @@ class PfPublish extends HTMLElement {
 
             await save(KEYS.destinations, this.destinations);
 
-            // Clear the add row only after validation and persistence succeed.
             ownerInput.value = "";
             repositoryInput.value = "";
             tokenInput.value = "";
 
             this.renderRows();
-            this.showStatus("Destination added.");
+            this.clearStatus();
             this.updatePublishButton();
 
         } catch (error) {
@@ -511,7 +563,6 @@ class PfPublish extends HTMLElement {
             item => item.id !== id
         );
 
-        // Remove publication associations which refer to this destination.
         this.publications = this.publications.filter(
             item => item.destinationId !== id
         );
@@ -538,7 +589,6 @@ class PfPublish extends HTMLElement {
         if (!destination) return;
 
         this.setBusy(true);
-        this.success.hidden = true;
         this.showStatus("Checking destination…");
 
         try {
@@ -547,8 +597,6 @@ class PfPublish extends HTMLElement {
 
             this.showStatus("Publishing book…");
 
-            // This promise resolves only when pf-author has completed the
-            // GitHub operation.
             const result = await this.dispatchPublish(
                 destination,
                 this.directory
@@ -609,16 +657,35 @@ class PfPublish extends HTMLElement {
     }
 
     showSuccess(url) {
-        this.success.hidden = false;
+        this.backdrop.hidden = true;
+
         this.publishedURL.href = url;
         this.publishedURL.textContent = url;
-        this.showStatus("Publication complete.");
+
+        this.successBackdrop.hidden = false;
+
+        this.shadowRoot
+            .querySelector('[data-action="success-ok"]')
+            .focus();
+    }
+
+    async copyPublishedURL() {
+        try {
+            await navigator.clipboard.writeText(this.publishedURL.href);
+        } catch (error) {
+            alert(
+                "Could not copy the link automatically. " +
+                "Please select and copy the URL."
+            );
+        }
     }
 
     setBusy(busy) {
-        this.shadowRoot.querySelectorAll("button, input").forEach(element => {
-            element.disabled = busy;
-        });
+        this.shadowRoot
+            .querySelectorAll(".setup-backdrop button, .setup-backdrop input")
+            .forEach(element => {
+                element.disabled = busy;
+            });
 
         if (!busy) {
             this.updatePublishButton();
@@ -634,19 +701,6 @@ class PfPublish extends HTMLElement {
         this.status.textContent = "";
         this.status.classList.remove("error");
     }
-
-    async copyPublishedURL() {
-        try {
-            await navigator.clipboard.writeText(this.publishedURL.href);
-            this.showStatus("URL copied.");
-        } catch (error) {
-            this.showStatus(
-                "Could not copy automatically. Select and copy the URL above.",
-                true
-            );
-        }
-    }
-
 }
 
 if (!customElements.get("pf-publish")) {

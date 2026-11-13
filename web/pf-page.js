@@ -11,11 +11,7 @@ class PfPage extends HTMLElement {
         }
     }
 
-    attributeChangedCallback(
-        name,
-        oldValue,
-        newValue
-    ) {
+    attributeChangedCallback(name, oldValue, newValue) {
         if (
             name === "src" &&
             oldValue !== newValue &&
@@ -31,11 +27,23 @@ class PfPage extends HTMLElement {
         const src = this.getAttribute("src");
         const title = this.getAttribute("title");
 
-        const response = await fetch(src);
+        const url = new URL(src, document.baseURI);
+        url.searchParams.set("_", Date.now());
+
+        const response = await fetch(url, {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                `Could not load page "${src}" (${response.status}).`
+            );
+        }
+
         const markdown = await response.text();
 
         this.innerHTML = window.pipefishRenderMdAsHtml(markdown);
-        await this.buildEmbeddedElements()
+        await this.buildEmbeddedElements();
 
         const h1 = document.createElement("h1");
         h1.textContent = title;

@@ -73,7 +73,8 @@ input {
     font-size: .95rem;
 }
 
-#dialog-title {
+#dialog-title,
+#success-dialog-title {
     margin: 0;
     padding: 0;
 
@@ -123,8 +124,6 @@ td {
     padding: .45rem;
     text-align: left;
     vertical-align: middle;
-
-    border-bottom: 1px solid var(--border);
 }
 
 th {
@@ -309,24 +308,40 @@ input[type="radio"] {
    Success dialog
 --------------------------------------------------------------- */
 
-.success {
-    margin-top: 1rem;
+/* ------------------------------------------------------------
+   Success dialog
+   ------------------------------------------------------------ */
+
+.success-dialog {
+    width: min(520px, 100%);
 }
 
-.success[hidden] {
-    display: none;
+.success-body {
+    overflow-wrap: anywhere;
 }
 
 .published-url {
     display: block;
+    padding: .65rem .75rem;
+
+    border: 1px solid var(--border);
+    border-radius: 4px;
+
+    background: var(--background);
+    color: var(--link);
+
+    font-size: .85rem;
+    line-height: 1.5;
     overflow-wrap: anywhere;
-    margin: 0.5rem 0;
 }
 
-.success-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
+.success-dialog .dialog-footer button {
+    background: transparent;
+    color: var(--text);
+}
+
+.success-dialog .dialog-footer button:hover {
+    background: var(--paper);
 }
 
 /* ------------------------------------------------------------
