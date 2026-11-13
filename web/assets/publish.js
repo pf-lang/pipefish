@@ -43,7 +43,7 @@ class PfPublish extends HTMLElement {
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th>Destination</th>
+                                    <th>Owner</th>
                                     <th>Repository</th>
                                     <th>Authentication token</th>
                                     <th></th>
@@ -54,13 +54,13 @@ class PfPublish extends HTMLElement {
                                 <tr class="add-row">
                                     <td></td>
                                     <td>
-                                        <input class="add-name"
-                                            placeholder="Site name"
+                                        <input class="add-owner"
+                                            placeholder="Owner"
                                             autocomplete="off">
                                     </td>
                                     <td>
                                         <input class="add-repository"
-                                            placeholder="Owner/repository"
+                                            placeholder="Repository"
                                             autocomplete="off">
                                     </td>
                                     <td>
@@ -90,7 +90,6 @@ class PfPublish extends HTMLElement {
                             </tbody>
                         </table>
 
-
                         <div class="status" role="status" aria-live="polite"></div>
                     </div>
 
@@ -107,6 +106,7 @@ class PfPublish extends HTMLElement {
                 </section>
             </div>
         `;
+
         this.shadowRoot.prepend(stylesheet);
 
         this.backdrop = this.shadowRoot.querySelector(".backdrop");
@@ -168,6 +168,7 @@ class PfPublish extends HTMLElement {
             if (!row) return;
 
             const radio = row.querySelector('input[type="radio"]');
+
             if (radio && !radio.checked) {
                 radio.checked = true;
                 this.selectedDestinationId = radio.value;
@@ -268,8 +269,8 @@ class PfPublish extends HTMLElement {
                            aria-label="Select destination">
                 </td>
                 <td>
-                    <input data-field="name"
-                           aria-label="Destination name">
+                    <input data-field="owner"
+                           aria-label="Owner">
                 </td>
                 <td>
                     <input data-field="repository"
@@ -292,8 +293,8 @@ class PfPublish extends HTMLElement {
             row.querySelector('[type="radio"]').checked =
                 destination.id === this.selectedDestinationId;
 
-            row.querySelector('[data-field="name"]').value =
-                destination.name || "";
+            row.querySelector('[data-field="owner"]').value =
+                destination.owner || "";
 
             row.querySelector('[data-field="repository"]').value =
                 destination.repository || "";
@@ -322,7 +323,7 @@ class PfPublish extends HTMLElement {
 
         this.publishButton.disabled = !(
             destination &&
-            destination.name?.trim() &&
+            destination.owner?.trim() &&
             destination.repository?.trim() &&
             destination.token?.trim() &&
             this.directory
@@ -330,16 +331,16 @@ class PfPublish extends HTMLElement {
     }
 
     async addDestination() {
-        const nameInput = this.shadowRoot.querySelector(".add-name");
+        const ownerInput = this.shadowRoot.querySelector(".add-owner");
         const repositoryInput =
             this.shadowRoot.querySelector(".add-repository");
         const tokenInput = this.shadowRoot.querySelector(".add-token");
 
-        const name = nameInput.value.trim();
+        const owner = ownerInput.value.trim();
         const repository = repositoryInput.value.trim();
         const token = tokenInput.value.trim();
 
-        if (!name || !repository || !token) {
+        if (!owner || !repository || !token) {
             this.showStatus("Please fill in all three fields.", true);
             return;
         }
@@ -349,7 +350,7 @@ class PfPublish extends HTMLElement {
 
         try {
             const destination = await this.checkDestination({
-                name,
+                owner,
                 repository,
                 token
             });
@@ -362,7 +363,7 @@ class PfPublish extends HTMLElement {
             await save(KEYS.destinations, this.destinations);
 
             // Clear the add row only after validation and persistence succeed.
-            nameInput.value = "";
+            ownerInput.value = "";
             repositoryInput.value = "";
             tokenInput.value = "";
 
@@ -378,16 +379,14 @@ class PfPublish extends HTMLElement {
         }
     }
 
-    async checkDestination({ name, repository, token }) {
-        const match = repository.match(/^([^/\s]+)\/([^/\s]+)$/);
-
-        if (!match) {
-            throw new Error(
-                "Repository must be in the form owner/repository."
-            );
+    async checkDestination({ owner, repository, token }) {
+        if (owner.includes("/") || /\s/.test(owner)) {
+            throw new Error("Please enter a valid GitHub owner.");
         }
 
-        const [, owner, repo] = match;
+        if (repository.includes("/") || /\s/.test(repository)) {
+            throw new Error("Please enter a valid repository name.");
+        }
 
         const headers = {
             "Accept": "application/vnd.github+json",
@@ -395,10 +394,10 @@ class PfPublish extends HTMLElement {
             "X-GitHub-Api-Version": "2022-11-28"
         };
 
-        const repoResponse = await fetch(
-            `${GITHUB_API}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`,
-            { headers }
-        );
+        const repoPath =
+            `${GITHUB_API}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}`;
+
+        const repoResponse = await fetch(repoPath, { headers });
 
         if (repoResponse.status === 401) {
             throw new Error("GitHub rejected the authentication token.");
@@ -423,7 +422,7 @@ class PfPublish extends HTMLElement {
         }
 
         const pagesResponse = await fetch(
-            `${GITHUB_API}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/pages`,
+            `${repoPath}/pages`,
             { headers }
         );
 
@@ -448,7 +447,7 @@ class PfPublish extends HTMLElement {
         const pages = await pagesResponse.json();
 
         return {
-            name,
+            owner,
             repository,
             token,
             pagesUrl: pages.html_url,
@@ -462,7 +461,7 @@ class PfPublish extends HTMLElement {
         if (!destination) return;
 
         if (!window.confirm(
-            `Delete the destination "${destination.name}"?`
+            `Delete the destination "${destination.owner}/${destination.repository}"?`
         )) {
             return;
         }
