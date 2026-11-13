@@ -32,7 +32,7 @@ class PfPublish extends HTMLElement {
                          aria-modal="true"
                          aria-labelledby="dialog-title">
 
-                    <header>
+                    <header class="dialog-header">
                         <h2 id="dialog-title">Publish book</h2>
                         <button class="close" data-action="close"
                                 aria-label="Close">&times;</button>
@@ -89,7 +89,7 @@ class PfPublish extends HTMLElement {
                         <div class="status" role="status" aria-live="polite"></div>
                     </div>
 
-                    <footer>
+                    <footer class="dialog-footer">
                         <button class="publish-button"
                                 data-action="publish"
                                 disabled>
