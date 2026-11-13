@@ -17,58 +17,38 @@ input {
     display: none !important;
 }
 
-/* ------------------------------------------------------------
-   Backdrop and dialog
-   ------------------------------------------------------------ */
-
 .backdrop {
     position: fixed;
     inset: 0;
     z-index: 10000;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 1rem;
-
     background: rgba(0, 0, 0, .35);
 }
 
 .dialog {
     display: flex;
     flex-direction: column;
-
     width: min(900px, 100%);
     max-height: min(85vh, 800px);
-
     overflow: hidden;
-
     background: var(--paper);
     color: var(--text);
-
     border: 1px solid var(--border);
     border-radius: var(--radius, 10px);
-
     box-shadow: var(--shadow-large);
 }
-
-/* ------------------------------------------------------------
-   Header
-   ------------------------------------------------------------ */
 
 .dialog-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     flex: 0 0 auto;
-
     padding: .8rem 1rem;
-
     background: var(--background);
     color: var(--text);
-
     font-family: var(--font-ui);
     font-size: .95rem;
 }
@@ -77,7 +57,6 @@ input {
 #success-dialog-title {
     margin: 0;
     padding: 0;
-
     font: inherit;
     font-weight: 400;
 }
@@ -85,13 +64,10 @@ input {
 .close {
     border: 0;
     padding: 0 .25rem;
-
     background: transparent;
     color: inherit;
-
     font-size: 1.4rem;
     line-height: 1;
-
     cursor: pointer;
 }
 
@@ -99,15 +75,10 @@ input {
     color: var(--link);
 }
 
-/* ------------------------------------------------------------
-   Body
-   ------------------------------------------------------------ */
-
 .dialog-body {
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
-
     padding: 1rem;
 }
 
@@ -115,7 +86,6 @@ table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
-
     font-size: .85rem;
 }
 
@@ -128,7 +98,6 @@ td {
 
 th {
     padding-bottom: .35rem;
-
     font-weight: 400;
     white-space: nowrap;
 }
@@ -148,15 +117,11 @@ td:last-child {
 input:not([type="radio"]) {
     width: 100%;
     min-width: 0;
-
     padding: .4rem .5rem;
-
     border: 1px solid var(--border);
     border-radius: 4px;
-
     background: var(--paper);
     color: var(--text);
-
     font-size: .85rem;
 }
 
@@ -168,10 +133,6 @@ input:focus {
 input[type="radio"] {
     accent-color: var(--link);
 }
-
-/* ------------------------------------------------------------
-   Directory field
-   ------------------------------------------------------------ */
 
 .field {
     display: flex;
@@ -201,25 +162,17 @@ input[type="radio"] {
     opacity: .8;
 }
 
-/* ------------------------------------------------------------
-   Row buttons
-   ------------------------------------------------------------ */
-
 .add-button,
 .delete-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     width: 1.8rem;
     height: 1.8rem;
-
     border: 1px solid var(--border);
     border-radius: 4px;
-
     background: var(--background);
     color: var(--text);
-
     cursor: pointer;
 }
 
@@ -240,7 +193,6 @@ input[type="radio"] {
 .status {
     min-height: 1.4rem;
     margin-top: .75rem;
-
     font-size: .8rem;
 }
 
@@ -252,69 +204,30 @@ input[type="radio"] {
     color: #c0392b;
 }
 
-/* ------------------------------------------------------------
-   Footer
-   ------------------------------------------------------------ */
-
 .dialog-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: .5rem;
-
     flex: 0 0 auto;
-
     padding: .75rem 1rem;
-
     background: var(--background);
     color: var(--text);
 }
 
 .dialog-footer button {
-    padding: .45rem .9rem;
-
-    border: 1px solid var(--border);
-    border-radius: 4px;
-
-    font-size: .85rem;
+    padding: .45rem .8rem;
+    border: 1px solid var(--code-border);
+    border-radius: 5px;
+    background: var(--paper);
+    font: inherit;
     cursor: pointer;
-}
-
-.publish-button {
-    background: var(--paper);
     color: var(--text);
-}
-
-.publish-button:hover:not(:disabled) {
-    background: var(--paper);
-    filter: brightness(.95);
-}
-
-.cancel {
-    background: transparent;
-    color: var(--text);
-}
-
-.cancel:hover {
-    background: var(--paper);
 }
 
 .dialog-footer button:disabled {
-    opacity: .45;
-    cursor: default;
-}
-
-/* ------------------------------------------------------------
-   Success dialog
---------------------------------------------------------------- */
-
-.success-dialog .dialog-footer button {
-    background: var(--paper);
-    color: var(--text);
-}
-
-.success-dialog .dialog-footer button:hover {
-    filter: brightness(.95);
+    opacity: .4;
+    cursor: not-allowed;
 }
 
 .success-body {
@@ -324,30 +237,14 @@ input[type="radio"] {
 .published-url {
     display: block;
     padding: .65rem .75rem;
-
     border: 1px solid var(--border);
     border-radius: 4px;
-
     background: var(--background);
     color: var(--link);
-
     font-size: .85rem;
     line-height: 1.5;
     overflow-wrap: anywhere;
 }
-
-.success-dialog .dialog-footer button {
-    background: transparent;
-    color: var(--text);
-}
-
-.success-dialog .dialog-footer button:hover {
-    background: var(--paper);
-}
-
-/* ------------------------------------------------------------
-   Narrow screens
-   ------------------------------------------------------------ */
 
 @media (max-width: 650px) {
     .dialog-body {
@@ -367,6 +264,4 @@ input[type="radio"] {
         padding: .3rem;
         font-size: .75rem;
     }
-
 }
-
