@@ -281,13 +281,13 @@ input[type="radio"] {
 }
 
 .publish-button {
-    background: var(--link);
-    color: white;
-    border-color: var(--link) !important;
+    background: var(--paper);
+    color: var(--text);
 }
 
 .publish-button:hover:not(:disabled) {
-    background: var(--link-hover);
+    background: var(--paper);
+    filter: brightness(.95);
 }
 
 .cancel {
@@ -308,12 +308,13 @@ input[type="radio"] {
    Success dialog
 --------------------------------------------------------------- */
 
-/* ------------------------------------------------------------
-   Success dialog
-   ------------------------------------------------------------ */
+.success-dialog .dialog-footer button {
+    background: var(--paper);
+    color: var(--text);
+}
 
-.success-dialog {
-    width: min(520px, 100%);
+.success-dialog .dialog-footer button:hover {
+    filter: brightness(.95);
 }
 
 .success-body {
