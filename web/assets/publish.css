@@ -1,243 +1,31 @@
 :host {
+    font-family: "Google Sans Code", monospace;
+    color: var(--text);
+}
+
+.dialog,
+.dialog * {
     font-family: inherit;
+}
+
+.dialog-header,
+.dialog-footer {
+    background-color: var(--background);
     color: var(--text);
+    font: inherit;
+    font-size: 1rem;
 }
 
-[hidden] {
-    display: none !important;
+#dialog-title {
+    font: inherit;
 }
 
-.backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    background: rgb(0 0 0 / 45%);
+.field label {
+    display: block;
+    font: inherit;
+    margin-bottom: 0.35rem;
 }
 
-.dialog {
-    width: min(900px, 100%);
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    background: var(--paper);
-    color: var(--text);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    box-shadow: 0 8px 32px rgb(0 0 0 / 25%);
-}
-
-.dialog header,
-.dialog footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.9rem 1.2rem;
-}
-
-.dialog header {
-    border-bottom: 1px solid var(--line);
-}
-
-.dialog header h2 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.dialog footer {
+.dialog-footer {
     justify-content: flex-end;
-    border-top: 1px solid var(--line);
-}
-
-.dialog-body {
-    padding: 1.2rem;
-    overflow: auto;
-}
-
-button {
-    font: inherit;
-    cursor: pointer;
-}
-
-button:disabled {
-    cursor: default;
-    opacity: 0.45;
-}
-
-.close {
-    border: none;
-    background: transparent;
-    color: var(--text);
-    font-size: 1.6rem;
-    line-height: 1;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-th {
-    padding: 0.5rem;
-    text-align: left;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-td {
-    padding: 0.35rem;
-    vertical-align: middle;
-}
-
-th:first-child,
-td:first-child {
-    width: 2rem;
-    text-align: center;
-}
-
-th:last-child,
-td:last-child {
-    width: 2.5rem;
-    text-align: center;
-}
-
-th:nth-child(2) {
-    width: 20%;
-}
-
-th:nth-child(3) {
-    width: 28%;
-}
-
-th:nth-child(4) {
-    width: auto;
-}
-
-td input:not([type="radio"]) {
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 0;
-    padding: 0.5rem;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    background: var(--background);
-    color: var(--text);
-    font: inherit;
-}
-
-td input:focus,
-.directory-input:focus {
-    outline: 2px solid var(--link);
-    outline-offset: 1px;
-}
-
-input[type="radio"] {
-    accent-color: var(--link);
-}
-
-.add-row {
-    border-top: 1px solid var(--line);
-}
-
-.add-button,
-.delete-button {
-    width: 2rem;
-    height: 2rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    background: var(--background);
-    color: var(--text);
-    font-size: 1.2rem;
-}
-
-.add-button:hover,
-.delete-button:hover {
-    border-color: var(--link);
-    color: var(--link);
-}
-
-.directory {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.directory label {
-    white-space: nowrap;
-    font-weight: 600;
-}
-
-.directory-input {
-    box-sizing: border-box;
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    background: var(--background);
-    color: var(--text);
-    font: inherit;
-}
-
-.status {
-    min-height: 1.4em;
-    margin-top: 0.8rem;
-    font-size: 0.9rem;
-}
-
-.status.error {
-    color: #c33;
-}
-
-.cancel,
-.publish-button {
-    padding: 0.55rem 1.1rem;
-    border: 1px solid var(--line);
-    border-radius: 5px;
-    background: var(--background);
-    color: var(--text);
-}
-
-.publish-button {
-    border-color: var(--link);
-    background: var(--link);
-    color: white;
-}
-
-@media (max-width: 650px) {
-    .dialog-body {
-        padding: 0.6rem;
-    }
-
-    table {
-        table-layout: auto;
-    }
-
-    th {
-        font-size: 0.75rem;
-    }
-
-    td {
-        padding: 0.2rem;
-    }
-
-    td input:not([type="radio"]) {
-        padding: 0.35rem;
-        font-size: 0.8rem;
-    }
-
-    .directory {
-        align-items: stretch;
-        flex-direction: column;
-        gap: 0.4rem;
-    }
 }

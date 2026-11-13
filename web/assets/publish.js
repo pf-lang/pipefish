@@ -60,7 +60,7 @@ class PfPublish extends HTMLElement {
                                     </td>
                                     <td>
                                         <input class="add-repository"
-                                               placeholder="owner/repository"
+                                               placeholder="Owner/repository"
                                                autocomplete="off">
                                     </td>
                                     <td>
@@ -79,26 +79,24 @@ class PfPublish extends HTMLElement {
                             </tbody>
                         </table>
 
-                        <div class="directory">
-                            <label for="publish-directory">
-                                Publish to directory
-                            </label>
+                        <div class="field">
+                            <label for="publish-directory">Publish to directory</label>
                             <input id="publish-directory"
-                                   class="directory-input"
-                                   readonly>
+                                class="directory-input"
+                                readonly>
                         </div>
 
                         <div class="status" role="status" aria-live="polite"></div>
                     </div>
 
                     <footer>
-                        <button class="cancel" data-action="close">
-                            Cancel
-                        </button>
                         <button class="publish-button"
                                 data-action="publish"
                                 disabled>
                             Publish
+                        </button>
+                        <button class="cancel" data-action="close">
+                            Cancel
                         </button>
                     </footer>
                 </section>
