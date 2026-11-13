@@ -91,6 +91,15 @@ class PfPublish extends HTMLElement {
                         </table>
 
                         <div class="status" role="status" aria-live="polite"></div>
+
+                        <div class="success" hidden>
+                            <p>Book published successfully.</p>
+                            <a class="published-url" target="_blank" rel="noopener"></a>
+                            <div class="success-actions">
+                                <button data-action="copy-url">Copy URL</button>
+                                <button data-action="visit-url">Visit book</button>
+                            </div>
+                        </div>
                     </div>
 
                     <footer class="dialog-footer">
@@ -114,6 +123,8 @@ class PfPublish extends HTMLElement {
         this.directoryInput =
             this.shadowRoot.querySelector(".directory-input");
         this.status = this.shadowRoot.querySelector(".status");
+        this.success = this.shadowRoot.querySelector(".success");
+        this.publishedURL = this.shadowRoot.querySelector(".published-url");
         this.publishButton =
             this.shadowRoot.querySelector(".publish-button");
 
@@ -133,6 +144,12 @@ class PfPublish extends HTMLElement {
                     break;
                 case "publish":
                     this.publish();
+                    break;
+                case "copy-url":
+                    this.copyPublishedURL();
+                    break;
+                case "visit-url":
+                    window.open(this.publishedURL.href, "_blank", "noopener");
                     break;
             }
         });
@@ -182,6 +199,9 @@ class PfPublish extends HTMLElement {
         this.bookTitle = bookTitle || "Book";
 
         this.clearStatus();
+        this.success.hidden = true;
+        this.publishedURL.textContent = "";
+        this.publishedURL.removeAttribute("href");
 
         try {
             const [destinations, publications, lastDestination] =
@@ -210,10 +230,28 @@ class PfPublish extends HTMLElement {
                 );
 
                 if (destination?.token) {
-                    this.dispatchPublish(
-                        destination,
-                        publication.directory
-                    );
+                    this.selectedDestinationId = destination.id;
+                    this.directory = publication.directory;
+                    this.directoryInput.value = this.directory;
+
+                    this.renderRows();
+                    this.backdrop.hidden = false;
+                    this.setBusy(true);
+                    this.showStatus("Publishing book…");
+
+                    try {
+                        const result = await this.dispatchPublish(
+                            destination,
+                            publication.directory
+                        );
+
+                        this.showSuccess(result.url);
+                    } catch (error) {
+                        this.showStatus(error.message, true);
+                    } finally {
+                        this.setBusy(false);
+                    }
+
                     return;
                 }
             }
@@ -421,6 +459,8 @@ class PfPublish extends HTMLElement {
             );
         }
 
+        const repo = await repoResponse.json();
+
         const pagesResponse = await fetch(
             `${repoPath}/pages`,
             { headers }
@@ -452,7 +492,8 @@ class PfPublish extends HTMLElement {
             token,
             pagesUrl: pages.html_url,
             sourceBranch: pages.source?.branch ?? null,
-            sourcePath: pages.source?.path ?? "/"
+            sourcePath: pages.source?.path ?? "/",
+            defaultBranch: repo.default_branch
         };
     }
 
@@ -497,13 +538,21 @@ class PfPublish extends HTMLElement {
         if (!destination) return;
 
         this.setBusy(true);
+        this.success.hidden = true;
         this.showStatus("Checking destination…");
 
         try {
-            // Recheck editable destination fields before publishing.
             const checked = await this.checkDestination(destination);
-
             Object.assign(destination, checked);
+
+            this.showStatus("Publishing book…");
+
+            // This promise resolves only when pf-author has completed the
+            // GitHub operation.
+            const result = await this.dispatchPublish(
+                destination,
+                this.directory
+            );
 
             const publication = {
                 bookRoot: this.bookRoot,
@@ -527,8 +576,7 @@ class PfPublish extends HTMLElement {
                 save(KEYS.lastDestination, destination.id)
             ]);
 
-            this.close();
-            this.dispatchPublish(destination, this.directory);
+            this.showSuccess(result.url);
 
         } catch (error) {
             this.showStatus(error.message, true);
@@ -538,15 +586,33 @@ class PfPublish extends HTMLElement {
     }
 
     dispatchPublish(destination, directory) {
+        const detail = {
+            bookRoot: this.bookRoot,
+            destination: { ...destination },
+            directory,
+            promise: null
+        };
+
         this.dispatchEvent(new CustomEvent("publish-action", {
             bubbles: true,
             composed: true,
-            detail: {
-                bookRoot: this.bookRoot,
-                destination: { ...destination },
-                directory
-            }
+            detail
         }));
+
+        if (!detail.promise) {
+            return Promise.reject(
+                new Error("No publication handler is available.")
+            );
+        }
+
+        return detail.promise;
+    }
+
+    showSuccess(url) {
+        this.success.hidden = false;
+        this.publishedURL.href = url;
+        this.publishedURL.textContent = url;
+        this.showStatus("Publication complete.");
     }
 
     setBusy(busy) {
@@ -568,6 +634,19 @@ class PfPublish extends HTMLElement {
         this.status.textContent = "";
         this.status.classList.remove("error");
     }
+
+    async copyPublishedURL() {
+        try {
+            await navigator.clipboard.writeText(this.publishedURL.href);
+            this.showStatus("URL copied.");
+        } catch (error) {
+            this.showStatus(
+                "Could not copy automatically. Select and copy the URL above.",
+                true
+            );
+        }
+    }
+
 }
 
 if (!customElements.get("pf-publish")) {

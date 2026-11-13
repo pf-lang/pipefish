@@ -306,6 +306,30 @@ input[type="radio"] {
 }
 
 /* ------------------------------------------------------------
+   Success dialog
+--------------------------------------------------------------- */
+
+.success {
+    margin-top: 1rem;
+}
+
+.success[hidden] {
+    display: none;
+}
+
+.published-url {
+    display: block;
+    overflow-wrap: anywhere;
+    margin: 0.5rem 0;
+}
+
+.success-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+/* ------------------------------------------------------------
    Narrow screens
    ------------------------------------------------------------ */
 
@@ -329,3 +353,4 @@ input[type="radio"] {
     }
 
 }
+

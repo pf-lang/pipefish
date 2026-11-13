@@ -16,6 +16,11 @@ import {
     displayFile
 } from "./assets/file-viewer.js";
 import "./assets/publish.js";
+import {
+    makeBookExport,
+    downloadBookExport
+} from "./assets/book-export.js";
+import { publishBookToGitHub } from "./assets/github-publisher.js";
 
 class PfAuthor extends PfBook {
     constructor() {
@@ -26,6 +31,10 @@ class PfAuthor extends PfBook {
 
         this.addEventListener("file-open", event => {
             this.openFile(event.detail.path, event.detail.data);
+        });
+
+        this.addEventListener("publish-action", event => {
+            event.detail.promise = this.publishBook(event.detail);
         });
     }
 
@@ -399,6 +408,7 @@ class PfAuthor extends PfBook {
                         });
                         break;
                     case "Download book":
+                        await this.downloadBook();
                         break;
                 }
             } catch (error) {
@@ -412,6 +422,31 @@ class PfAuthor extends PfBook {
         const publisher = document.createElement("pf-publish");
         this.appendChild(publisher);
         this.publisher = publisher;
+    }
+    
+    async publishBook({ destination, directory }) {
+        const files = await makeBookExport(this.bookTitle);
+
+        return publishBookToGitHub({
+            destination,
+            directory,
+            files
+        });
+    }
+
+    async downloadBook() {
+        const directory = this.slugifyBookDirectory(this.bookTitle);
+        const files = await makeBookExport(this.bookTitle);
+
+        await downloadBookExport(files, directory);
+    }
+
+    slugifyBookDirectory(value) {
+        return value
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "book";
     }
 }
 
