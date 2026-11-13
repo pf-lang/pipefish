@@ -23,6 +23,8 @@ jobs:
       contents: write
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Go
       uses: actions/setup-go@v5
@@ -41,10 +43,14 @@ jobs:
         curl -s "https://img.shields.io/badge/Coverage-${COVERAGE}%25-%2333cb56" > badge.svg
         
     - name: Commit badge
+      if: github.event_name == 'push'
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add badge.svg
-        git diff --staged --quiet || git commit -m "Update coverage badge"
-        git push
+        git diff --staged --quiet && exit 0
+        git commit -m "Update coverage badge"
+        git fetch origin main
+        git rebase origin/main
+        git push origin HEAD:main
 

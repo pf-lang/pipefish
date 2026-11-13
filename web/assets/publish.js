@@ -76,15 +76,31 @@ class PfPublish extends HTMLElement {
                                                 aria-label="Add destination">+</button>
                                     </td>
                                 </tr>
+
+                            <tr class="directory-row">
+                                <td></td>
+                                <td colspan="4">
+                                    <div class="field">
+                                        <label for="publish-directory">Publish to directory</label>
+                                        <input id="publish-directory"
+                                            class="directory-input"
+                                            readonly>
+                                    </div>
+                                </td>
+                                </tr>                                
+                                    <td></td>
+                                    <td colspan="4">
+                                        <div class="field">
+                                            <label for="publish-directory">Publish to directory</label>
+                                            <input id="publish-directory"
+                                                class="directory-input"
+                                                readonly>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
 
-                        <div class="field">
-                            <label for="publish-directory">Publish to directory</label>
-                            <input id="publish-directory"
-                                class="directory-input"
-                                readonly>
-                        </div>
 
                         <div class="status" role="status" aria-live="polite"></div>
                     </div>

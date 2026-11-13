@@ -178,13 +178,17 @@ input[type="radio"] {
     display: flex;
     flex-direction: column;
     gap: .35rem;
-
-    margin: 1.25rem .3rem 0 2.95rem;
+    margin: 0;
 }
 
 .field label {
     font-size: .85rem;
     font-weight: 400;
+}
+
+.directory-row td {
+    padding-top: 1.25rem;
+    border-bottom: 0;
 }
 
 .directory-input {
@@ -318,7 +322,4 @@ input[type="radio"] {
         font-size: .75rem;
     }
 
-    .field {
-        margin: 1.25rem .3rem 0 2.8rem;
-    }
 }
