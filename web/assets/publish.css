@@ -197,6 +197,8 @@ input[type="radio"] {
     width: 100%;
     text-align: left;
     align-self: stretch;
+    padding-left: 47px;
+    box-sizing: border-box;
 }
 
 .status:empty {
