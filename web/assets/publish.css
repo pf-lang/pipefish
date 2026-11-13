@@ -194,6 +194,9 @@ input[type="radio"] {
     min-height: 1.4rem;
     margin-top: .75rem;
     font-size: .8rem;
+    width: 100%;
+    text-align: left;
+    align-self: stretch;
 }
 
 .status:empty {
@@ -244,6 +247,10 @@ input[type="radio"] {
     font-size: .85rem;
     line-height: 1.5;
     overflow-wrap: anywhere;
+}
+
+.dialog-footer button {
+    font-size: 1rem;
 }
 
 @media (max-width: 650px) {
