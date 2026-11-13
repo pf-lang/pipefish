@@ -179,7 +179,7 @@ input[type="radio"] {
     flex-direction: column;
     gap: .35rem;
 
-    margin: 1.25rem 0 0 3.4rem;
+    margin: 1.25rem .9rem 0 2.95rem;
 }
 
 .field label {
@@ -319,6 +319,7 @@ input[type="radio"] {
     }
 
     .field {
-        margin-left: 2.4rem;
+        margin-left: 2.8rem;
+        margin-right: .9rem;
     }
 }
