@@ -55,19 +55,19 @@ class PfPublish extends HTMLElement {
                                     <td></td>
                                     <td>
                                         <input class="add-name"
-                                               placeholder="Site name"
-                                               autocomplete="off">
+                                            placeholder="Site name"
+                                            autocomplete="off">
                                     </td>
                                     <td>
                                         <input class="add-repository"
-                                               placeholder="Owner/repository"
-                                               autocomplete="off">
+                                            placeholder="Owner/repository"
+                                            autocomplete="off">
                                     </td>
                                     <td>
                                         <input class="add-token"
-                                               type="password"
-                                               placeholder="GitHub token"
-                                               autocomplete="off">
+                                            type="password"
+                                            placeholder="GitHub token"
+                                            autocomplete="off">
                                     </td>
                                     <td>
                                         <button class="add-button"
@@ -76,18 +76,7 @@ class PfPublish extends HTMLElement {
                                                 aria-label="Add destination">+</button>
                                     </td>
                                 </tr>
-
-                            <tr class="directory-row">
-                                <td></td>
-                                <td colspan="4">
-                                    <div class="field">
-                                        <label for="publish-directory">Publish to directory</label>
-                                        <input id="publish-directory"
-                                            class="directory-input"
-                                            readonly>
-                                    </div>
-                                </td>
-                                </tr>                                
+                                <tr class="directory-row">
                                     <td></td>
                                     <td colspan="4">
                                         <div class="field">
