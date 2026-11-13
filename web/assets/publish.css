@@ -128,6 +128,8 @@ td {
 }
 
 th {
+    padding-bottom: .35rem;
+
     font-weight: 400;
     white-space: nowrap;
 }
@@ -168,14 +170,16 @@ input[type="radio"] {
     accent-color: var(--link);
 }
 
-.directory {
-    margin-top: 1.25rem;
-}
+/* ------------------------------------------------------------
+   Directory field
+   ------------------------------------------------------------ */
 
 .field {
     display: flex;
     flex-direction: column;
     gap: .35rem;
+
+    margin: 1.25rem 0 0 3.4rem;
 }
 
 .field label {
@@ -204,7 +208,7 @@ input[type="radio"] {
     border: 1px solid var(--border);
     border-radius: 4px;
 
-    background: transparent;
+    background: var(--background);
     color: var(--text);
 
     cursor: pointer;
@@ -216,10 +220,11 @@ input[type="radio"] {
 
 .add-button:hover,
 .delete-button:hover {
-    background: var(--background);
+    filter: brightness(.95);
 }
 
 .add-row td {
+    padding-top: 0;
     border-bottom: 0;
 }
 
@@ -228,6 +233,10 @@ input[type="radio"] {
     margin-top: .75rem;
 
     font-size: .8rem;
+}
+
+.status:empty {
+    display: none;
 }
 
 .status.error {
@@ -307,5 +316,9 @@ input[type="radio"] {
     input:not([type="radio"]) {
         padding: .3rem;
         font-size: .75rem;
+    }
+
+    .field {
+        margin-left: 2.4rem;
     }
 }
