@@ -17,6 +17,8 @@ const SAMPLE_BOOK_FILES = [
     "project/main.pf",
     "project/other.pf",
     "project/README.md",
+    "project/image.png",
+    "project/text.txt",
     "project/text/text.txt",
     "other-book/Contents.md",
     "other-book/Jabberwocky.md",
