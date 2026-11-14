@@ -4,14 +4,13 @@ WHITESPACE = set(' ', '\t')
 SYMBOLS = set('+', '-', '*', '/', '^', '~', '!', '(', ')')
 NUMERALS = set('0', '1', '2', '3', '4', '5', '6', '7', '8', '9') 
 
-// We wrap our recursive function with two parameters inside a non-recursive function
-// with just one, so we can conveniently call it.
 def
 
 lex(code string) :
     first lexHead [], code
 
-// And now the recursive function.
+private
+
 lexHead(tokens list, code string) -> list, string :
     code == "" :
         tokens, ""

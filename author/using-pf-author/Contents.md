@@ -14,6 +14,7 @@
 ## Components
 
 - Components overview
+- The virtual file system
 - Pipefish components
 - Initializing components from code
 - Initializing components from files

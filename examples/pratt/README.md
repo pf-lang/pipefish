@@ -30,9 +30,9 @@ Let's define some terms.
 
  By contrast, a **tree-walking interpreter** (or just **tree-walker**) evaluates the code by executing a recursive evaluation function on the AST which you can probably invent for yourself right now if you look at the diagram above for thirty seconds. (If you can't, it will be explained later.)
 
-An **interpreter** generally is something that executes code *other than* machine code. However, some people use that term to mean only a treewalker, and would call something that executes bytecode a **virtual machine** or **VM**.
+An **interpreter** generally is something that executes code *other than* machine code. However, some people use the term "interpreter" to mean only a treewalker, and would call something that executes bytecode a **virtual machine** or **VM**.
 
-If I had to explain what makes it a "virtual machine", I would say the distinction is that since the treewalker is just a collection of recursive functions calling one another, it never explicitly has to represent *state*, because the intermediate calculations are automatically pushed onto the stack as stack frames at each function call. By contrast, the virtual machine must model its execution as the operations it executes modifying the state of the machine until it contains our final result.
+If I had to explain what makes it a "virtual machine", I would say the distinction between this and a treewalker is that since the treewalker is just a collection of recursive functions calling one another, it never explicitly has to represent *state*, because the intermediate calculations are automatically pushed onto the stack as stack frames at each function call. By contrast, the in the virtual machine model the state of the machine is explicitly represented and is modified by the successive operations until its state represents our final result.
 
 ## Note on the code
 
