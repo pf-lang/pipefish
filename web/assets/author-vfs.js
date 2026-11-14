@@ -14,6 +14,7 @@ const SAMPLE_BOOK_FILES = [
     "The-Books-menu.md",
     "The-Files-menu.md",
     "The-structure-of-a-book.md",
+    "The-virtual-file-system.md",
     "project/main.pf",
     "project/other.pf",
     "project/README.md",
