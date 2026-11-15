@@ -4,6 +4,7 @@ export const MAX_TEXT_FILE_SIZE = 512 * 1024;
 
 const IMAGE_TYPES = {
     ".bmp": "image/bmp",
+    ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",
     ".png": "image/png"
 };
