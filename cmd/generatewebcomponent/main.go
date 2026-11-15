@@ -298,8 +298,8 @@ func readAuthorFile(this js.Value, args []js.Value) any {
     }
 
     if len(data) >= 8 {
-        println("readAuthorFile %s: %v\n", args[0].String(), data[:8])
-    }
+        println("readAuthorFile ", args[0].String() + ":", data[:8])
+}
 
     result := js.Global().Get("Object").New()
     result.Set("ok", true)
