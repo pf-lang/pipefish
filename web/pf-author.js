@@ -361,17 +361,16 @@ class PfAuthor extends PfBook {
             {
                 openPaths: paths => {
                     for (const path of paths) {
-                        const result = this.vfs.readFile(path);
+                        try {
+                            const data = this.vfs.readFile(path);
 
-                        if (result.ok) {
                             this.dispatchEvent(new CustomEvent("file-open", {
-                                detail: {
-                                    path,
-                                    data: result.data
-                                },
+                                detail: { path, data },
                                 bubbles: true,
                                 composed: true
                             }));
+                        } catch (error) {
+                            console.error(`Failed to open ${path}:`, error);
                         }
                     }
                 },
