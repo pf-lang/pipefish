@@ -44,8 +44,8 @@ export class AuthorVFS {
 
                 return {
                     path,
-                    data: new TextEncoder().encode(
-                        await response.text()
+                    data: new Uint8Array(
+                        await response.arrayBuffer()
                     )
                 };
             })
