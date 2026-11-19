@@ -222,14 +222,10 @@ class PfAuthor extends PfBook {
         writer.setContent(
             decodeFileText(data),
             async markdown => {
-                const result = this.vfs.writeFile(
+                await this.vfs.writeFile(
                     path,
                     new TextEncoder().encode(markdown)
                 );
-
-                if (!result?.ok) {
-                    throw new Error(result?.error ?? "Failed to save file");
-                }
             }
         );
     }
