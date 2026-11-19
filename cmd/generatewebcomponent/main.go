@@ -4,7 +4,6 @@ package main
 
 import (
 	"bytes"
-    "fmt"
 	"path/filepath"
 	pathpkg "path"
 	"sort"
