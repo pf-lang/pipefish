@@ -302,38 +302,24 @@ pf-writer[hidden],
     display: none;
 }
 
+/* ------------------------------------------------------------
+   Author file display
+   ------------------------------------------------------------ */
+
 .author-file-view {
+    box-sizing: border-box;
     grid-column: 1;
     position: relative;
     display: block;
     align-self: start;
     width: 100%;
     min-width: 0;
+
     background: var(--paper);
     padding: 3.5rem;
     border-radius: var(--radius);
     box-shadow: var(--shadow-small);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 1.2rem;
-    line-height: 1.5rem;
-}
 
-.author-file-view[hidden] {
-    display: none;
-}
-
-.author-file-view {
-    grid-column: 1;
-    position: relative;
-    display: block;
-    align-self: start;
-    width: 100%;
-    min-width: 0;
-    background: var(--paper);
-    padding: 3.5rem;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-small);
     color: var(--text);
     font-family: var(--font-body);
     font-size: 1.2rem;
@@ -360,18 +346,6 @@ pf-writer[hidden],
     min-height: 20rem;
     align-items: center;
     justify-content: center;
-}
-
-@media (max-width: 650px) {
-    .author-file-view {
-        padding: 2rem 1.5rem;
-    }
-}
-
-@media (max-width: 420px) {
-    .author-file-view {
-        padding: 1.75rem 1rem;
-    }
 }
 
 pf-page::after, pf-writer::after {
@@ -1028,6 +1002,10 @@ pf-page tbody tr:hover {
     .page-navigation .next {
         text-align: left;
     }
+
+    .author-file-view {
+        padding: 2rem 1.5rem;
+    }
 }
 
 
@@ -1065,36 +1043,8 @@ pf-page tbody tr:hover {
         padding-left: 1rem;
         padding-right: 1rem;
     }
+
+    .author-file-view {
+        padding: 1.75rem 1rem;
+    }
 }
-
-/* ----------------------------------------
-   File display for pf-author
-   ---------------------------------------- */
-
-.author-file-view {
-    width: 100%;
-    min-width: 0;
-}
-
-.author-file-view[hidden] {
-    display: none;
-}
-
-.author-file-view pf-text {
-    display: block;
-    width: 100%;
-}
-
-.author-file-view img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-}
-
-.author-file-empty {
-    display: none;
-    min-height: 20rem;
-    align-items: center;
-    justify-content: center;
-}
-
