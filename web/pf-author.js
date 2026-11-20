@@ -189,18 +189,20 @@ class PfAuthor extends PfBook {
     async openFile(path, data) {
         const info = classifyFile(path, data);
 
-        // Is this Markdown file one of the pages in the current book?
         if (info.type === "text" && info.highlighting === "markdown") {
+            const filename = path.replace(/^\.\//, "");
+
             const page = this.contents
                 .flatMap(section => section.pages)
-                .find(page => page.filename === path);
+                .find(page =>
+                    page.filename.replace(/^\.\//, "") === filename
+                );
 
             if (page) {
                 await this.showPage(page.hash);
                 return;
             }
 
-            // Otherwise, display it as standalone Markdown.
             this.showStandaloneMarkdown(path, data);
             return;
         }
@@ -218,7 +220,7 @@ class PfAuthor extends PfBook {
 
         writer.hidden = false;
         writer.fileExtractor = makeAuthorFileExtractor(this.bookRoot);
-
+        writer.removeAttribute("title");
         writer.setContent(
             decodeFileText(data),
             async markdown => {

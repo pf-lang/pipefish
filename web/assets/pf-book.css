@@ -316,7 +316,7 @@ pf-writer[hidden],
     min-width: 0;
 
     background: var(--paper);
-    padding: 3.5rem;
+    padding: 1.5rem;
     border-radius: var(--radius);
     box-shadow: var(--shadow-small);
 

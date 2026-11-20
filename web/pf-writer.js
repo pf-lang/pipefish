@@ -124,8 +124,6 @@ class PfWriter extends PfPage {
             this.detachToggle = null;
         }
 
-        this.replaceChildren();
-
         const title = document.createElement("h1");
 
         title.textContent =
@@ -214,12 +212,13 @@ class PfWriter extends PfPage {
 
         this.rendered = rendered
 
-        this.append(
-            title,
-            rendered,
-            editor,
-            toggle
-        );
+        this.replaceChildren();
+
+        if (title) {
+            this.appendChild(title);
+        }
+
+        this.append(rendered, editor, toggle);
 
         edgeToggle.setMode(false);
     }
