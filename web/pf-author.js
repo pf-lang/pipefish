@@ -262,6 +262,20 @@ class PfAuthor extends PfBook {
         });
 
         this.fileViewImageURL = result.imageURL;
+
+        const text = fileView.text;
+        text.oninput = null;
+
+        if (result.info.type === "text" && result.info.editable) {
+            text.oninput = async () => {
+                await this.vfs.writeFile(
+                    path,
+                    new TextEncoder().encode(text.value)
+                );
+            };
+        }
+
+        this.fileViewImageURL = result.imageURL;
     }
 
     getFileView() {
