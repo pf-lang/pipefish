@@ -7,7 +7,7 @@
     box-sizing: border-box;
     border: 1px solid var(--code-border);
     border-radius: 10px;
-    overflow: auto;
+    overflow: hidden;
     resize: vertical;
 }
 
@@ -92,6 +92,16 @@
     font-size: 1rem;
     line-height: 1;
     cursor: pointer;
+}
+
+pf-text {
+    position: absolute;
+    inset: 2.2rem 0 0;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+    resize: none;
 }
 
 .tab-close:hover {
