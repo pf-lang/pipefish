@@ -52,6 +52,9 @@
     --md-list: #4b69c6;
     --md-inline-code: #9c5d27;
     --md-link: #4b69c6;
+
+    /* Prevents the browser from using its own judgment. */
+    scrollbar-color: #888 var(--background);
 }
 
 @font-face {
