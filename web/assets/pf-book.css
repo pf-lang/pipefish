@@ -373,6 +373,10 @@ pf-writer pf-ide {
     display: block;
 }
 
+pf-writer.standalone-markdown {
+    padding-top: 1.5rem;
+}
+
 /* ------------------------------------------------------------
    Sidebar
    ------------------------------------------------------------ */

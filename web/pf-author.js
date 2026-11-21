@@ -190,13 +190,15 @@ class PfAuthor extends PfBook {
         const info = classifyFile(path, data);
 
         if (info.type === "text" && info.highlighting === "markdown") {
-            const filename = path.replace(/^\.\//, "");
+            const bookPrefix = `${this.bookRoot.replace(/\/+$/, "")}/`;
+
+            const filename = path.startsWith(bookPrefix)
+                ? path.slice(bookPrefix.length)
+                : path.replace(/^\.\//, "");
 
             const page = this.contents
                 .flatMap(section => section.pages)
-                .find(page =>
-                    page.filename.replace(/^\.\//, "") === filename
-                );
+                .find(page => page.filename === filename);
 
             if (page) {
                 await this.showPage(page.hash);
@@ -220,6 +222,7 @@ class PfAuthor extends PfBook {
 
         writer.hidden = false;
         writer.fileExtractor = makeAuthorFileExtractor(this.bookRoot);
+        writer.classList.add("standalone-markdown");
         writer.removeAttribute("title");
         writer.setContent(
             decodeFileText(data),
