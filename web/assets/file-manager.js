@@ -5,6 +5,7 @@ export class FileManager {
         this.dialog = dialog;
         this.vfs = vfs;
         this.host = host;
+        this.pendingUploads = [];
 
         dialog.addEventListener("files-action", event => {
             this.handleAction(event).catch(error => {
@@ -14,8 +15,41 @@ export class FileManager {
     }
 
     open(operation = "open") {
+        if (operation === "upload files" || operation === "upload") {
+            this.selectUploadFiles();
+            return;
+        }
+
         this.refresh();
         this.dialog.open(operation);
+    }
+
+    selectUploadFiles() {
+        const input = document.createElement("input");
+
+        input.type = "file";
+        input.multiple = true;
+        input.hidden = true;
+
+        input.addEventListener("change", () => {
+            const files = Array.from(input.files);
+            input.remove();
+
+            if (!files.length) {
+                return;
+            }
+
+            this.pendingUploads = files;
+            this.refresh();
+            this.dialog.open("upload");
+        }, { once: true });
+
+        input.addEventListener("cancel", () => {
+            input.remove();
+        }, { once: true });
+
+        document.body.append(input);
+        input.click();
     }
 
     refresh() {
@@ -38,6 +72,31 @@ export class FileManager {
         const type = selection?.type ?? selection?.node?.type;
 
         switch (operation) {
+            case "upload": {
+                if (type !== "folder") {
+                    break;
+                }
+
+                const destination = path === "."
+                    ? ""
+                    : path;
+
+                for (const file of this.pendingUploads) {
+                    const filepath = destination
+                        ? `${destination}/${file.name}`
+                        : file.name;
+
+                    const data = new Uint8Array(
+                        await file.arrayBuffer()
+                    );
+
+                    await this.vfs.writeFile(filepath, data);
+                }
+
+                this.pendingUploads = [];
+                break;
+            }
+
             case "open-book": {
                 if (type !== "folder") {
                     break;
@@ -45,6 +104,7 @@ export class FileManager {
                 await this.host.openBook?.(path);
                 break;
             }
+
             case "open": {
                 if (type === "file") {
                     await this.host.openPaths?.([path]);

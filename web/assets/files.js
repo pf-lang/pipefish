@@ -2,6 +2,7 @@ const TITLES = {
 open: "Open",
 "open-book": "Open",
 download: "Download",
+upload: "Upload",
 new: "New",
 rename: "Rename",
 delete: "Delete",
@@ -154,13 +155,17 @@ class PFFiles extends HTMLElement {
             rename: "Rename",
             delete: "Delete",
             revert: "Revert",
+            upload: "Upload",
         }[this.operation] || "OK";
     }
     renderNodes(nodes, container, parentPath) {
         for (const node of nodes) {
-            const path = parentPath
-                ? `${parentPath}/${node.name}`
-                : node.name || ".";
+            if (this.operation === "upload" && node.type !== "folder") {
+                continue;
+            }
+            const path = !parentPath || parentPath === "."
+                ? (parentPath === "." ? node.name : node.name || ".")
+                : `${parentPath}/${node.name}`;
 
             const item = document.createElement("div");
             item.className = "tree-item";
@@ -260,10 +265,14 @@ class PFFiles extends HTMLElement {
                 return;
             }
         } else if (
-            ["open", "download", "rename", "delete", "revert"]
+            ["open", "download", "rename", "delete", "revert", "upload"]
                 .includes(this.operation)
             && !this.selected
         ) {
+            return;
+        }
+
+        if (this.operation === "upload" && this.selected.type !== "folder") {
             return;
         }
 
@@ -298,7 +307,7 @@ class PFFiles extends HTMLElement {
 
         let enabled = true;
 
-        if (["open", "download", "rename", "delete", "revert"].includes(this.operation)) {
+        if (["open", "download", "upload", "rename", "delete", "revert"].includes(this.operation)) {
             enabled = !!this.selected;
         }
 

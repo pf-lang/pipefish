@@ -40,7 +40,8 @@ class PipefishFileMenu extends HTMLElement {
                 "Rename",
                 "Delete",
                 "Revert",
-                "Download"
+                "Download",
+                "Upload"
             ],
             size: Number(this.getAttribute("size")) || 28
         });
