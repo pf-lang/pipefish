@@ -159,6 +159,10 @@ export class PfBook extends HTMLElement {
             return;
         }
 
+        if (location.hash !== `#${hash}`) {
+            history.replaceState(null, "", `#${hash}`);
+        }
+
         this.updatePageNavigation(hash);
 
         this.querySelectorAll("nav a").forEach(item => {
