@@ -178,6 +178,7 @@ class PfAuthor extends PfBook {
 
         fileView.container.hidden = true;
         navigation.hidden = false;
+        writer.classList.remove("standalone-markdown");
         writer.hidden = false;
 
         writer.fileExtractor =

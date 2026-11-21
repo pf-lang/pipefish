@@ -189,10 +189,8 @@ export class PfBook extends HTMLElement {
             this.pageSrc(page)
         );
 
-        writer.classList.remove("standalone-markdown");
-
         await loaded;
-showPage
+
         pageElement.scrollIntoView({
             behavior: "auto",
             block: "start"
