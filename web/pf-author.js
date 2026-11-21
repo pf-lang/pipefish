@@ -190,43 +190,27 @@ class PfAuthor extends PfBook {
     async openFile(path, data) {
         const info = classifyFile(path, data);
 
-        const pages = this.contents
-            .flatMap(section => section.pages);
-
-        const bookPrefix = `${this.bookRoot.replace(/\/+$/, "")}/`;
-
-        const filename = path.startsWith(bookPrefix)
-            ? path.slice(bookPrefix.length)
-            : path.replace(/^\.\//, "");
-
-        const page = pages.find(page => page.filename === filename);
-
-        console.group("pf-author.openFile");
-        console.log("Received path:", path);
-        console.log("Book root:", this.bookRoot);
-        console.log("Classified as:", info);
-        console.log("Normalized filename:", filename);
-        console.log("Book page filenames:", pages.map(page => page.filename));
-        console.log("Matched page:", page ?? "(no match)");
-
         if (info.type === "text" && info.highlighting === "markdown") {
-            if (page) {
-                console.log("Opening book page:", page.hash);
-                console.groupEnd();
+            const bookPrefix = `${this.bookRoot.replace(/\/+$/, "")}/`;
 
+            const normalizedPath = path.replace(/^\.\//, "");
+
+            const filename = normalizedPath.startsWith(bookPrefix)
+                ? normalizedPath.slice(bookPrefix.length)
+                : normalizedPath;
+
+            const page = this.contents
+                .flatMap(section => section.pages)
+                .find(page => page.filename === filename);
+
+            if (page) {
                 await this.showPage(page.hash);
                 return;
             }
 
-            console.log("Opening as standalone Markdown");
-            console.groupEnd();
-
             this.showStandaloneMarkdown(path, data);
             return;
         }
-
-        console.log("Opening as other file");
-        console.groupEnd();
 
         this.showOtherFile(path, data);
     }
