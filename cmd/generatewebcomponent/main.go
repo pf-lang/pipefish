@@ -105,7 +105,17 @@ func getService(index js.Value) (*pf.Service, error) {
 }
 
 func getFilepath(this js.Value, args []js.Value) any {
-	return mainFilepath
+    if len(args) == 0 {
+        return ""
+    }
+
+    index := args[0].Int()
+
+    if index < 0 || index >= len(mainFilepaths) {
+        return ""
+    }
+
+    return mainFilepaths[index]
 }
 
 func updateFile(this js.Value, args []js.Value) any {

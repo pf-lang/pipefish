@@ -48,6 +48,16 @@ class PipefishService extends HTMLElement {
         return await this.compile(this.source);
     }
 
+    async getFilepath() {
+        await this.ready;
+
+        if (this.serviceIndex === null) {
+            return "";
+        }
+
+        return window.pipefishGetFilepath(this.serviceIndex);
+    }
+
     async compile(source) {
         await this.ready;
 
