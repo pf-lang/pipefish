@@ -9,19 +9,13 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: github-pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,14 +36,24 @@ jobs:
           cp -R web/. _site/
           cp -R author/. _site/author/
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
       - name: Upload website
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
