@@ -175,7 +175,7 @@ class PfAuthor extends PfBook {
         const writer = this.querySelector("pf-writer");
         const navigation = this.querySelector(".page-navigation");
         const fileView = this.getFileView();
-
+        fileView.label.hidden = true;
         fileView.container.hidden = true;
         navigation.hidden = false;
         writer.classList.remove("standalone-markdown");
@@ -219,6 +219,8 @@ class PfAuthor extends PfBook {
         const writer = this.querySelector("pf-writer");
         const navigation = this.querySelector(".page-navigation");
         const fileView = this.getFileView();
+        fileView.label.textContent = path.split("/").pop();
+        fileView.label.hidden = false;
 
         fileView.container.hidden = true;
         navigation.hidden = true;
@@ -242,6 +244,8 @@ class PfAuthor extends PfBook {
         const writer = this.querySelector("pf-writer");
         const navigation = this.querySelector(".page-navigation");
         const fileView = this.getFileView();
+        fileView.label.textContent = path.split("/").pop();
+        fileView.label.hidden = false;
 
         writer.hidden = true;
         navigation.hidden = true;
@@ -285,6 +289,10 @@ class PfAuthor extends PfBook {
 
         const main = this.querySelector(".book-main");
 
+        const label = document.createElement("div");
+        label.className = "file-view-label";
+        label.hidden = true;
+
         const container = document.createElement("div");
         container.className = "author-file-view";
         container.hidden = true;
@@ -301,10 +309,11 @@ class PfAuthor extends PfBook {
 
         emptyState.append(emptyMessage);
         container.append(text, image, emptyState);
-        main.append(container);
+        main.append(label, container);
 
         this.fileView = {
             container,
+            label,
             text,
             image,
             emptyState,

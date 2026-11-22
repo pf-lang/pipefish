@@ -306,6 +306,24 @@ pf-writer[hidden],
    Author file display
    ------------------------------------------------------------ */
 
+.file-view-label {
+    position: absolute;
+    z-index: 3;
+    top: -1.3rem;
+    left: 1rem;
+    height: 1.75rem;
+    padding: 0 .75rem;
+    border: 1px solid var(--code-border);
+    border-radius: 7px;
+    background: var(--paper);
+    color: var(--code-text);
+    font-family: "Google Sans Code", monospace;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
 .author-file-view {
     box-sizing: border-box;
     grid-column: 1;
@@ -848,6 +866,7 @@ pf-page tbody tr:hover {
     grid-column: 1;
     grid-row: 1;
     min-width: 0;
+    position: relative;
 }
 
 .book-sidebar {
