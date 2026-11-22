@@ -4,6 +4,7 @@ package main
 
 import (
 	"bytes"
+    "fmt"
 	"path/filepath"
 	pathpkg "path"
 	"sort"
@@ -16,13 +17,13 @@ import (
 	"github.com/tim-hardcastle/pipefish/source/initializer"
 	"github.com/tim-hardcastle/pipefish/source/pf"
 	"github.com/tim-hardcastle/pipefish/source/text"
-	"github.com/tim-hardcastle/pipefish/source/values"
 	"github.com/tim-hardcastle/pipefish/source/vm"
 	"github.com/tim-hardcastle/pipefish/web-component/generated-go/registry"
 )
 
 var (
-    service       *pf.Service
+    services      []*pf.Service
+    mainFilepaths []string
     mainFilepath  string
     fs            *filesystem.VFS
     authorFS      *filesystem.VFS
@@ -33,48 +34,74 @@ var (
 )
 
 func compile(this js.Value, args []js.Value) any {
-	files := args[0]
-	fs = filesystem.NewVFS()
-	originalFiles = make(map[string][]byte)
-	mainFilepath = ""
+    files := args[0]
 
-	for i := 0; i < files.Length(); i++ {
-		item := files.Index(i)
-		path := item.Get("path").String()
-		dataValue := item.Get("data")
-		data := make([]byte, dataValue.Get("byteLength").Int())
-		js.CopyBytesToGo(data, dataValue)
+    if fs == nil {
+        fs = filesystem.NewVFS()
+        originalFiles = make(map[string][]byte)
+    }
 
-		if err := fs.WriteFile(path, data); err != nil {
-			return err.Error()
-		}
+    mainFilepath := ""
 
-		originalFiles[path] = data
+    for i := 0; i < files.Length(); i++ {
+        item := files.Index(i)
+        path := item.Get("path").String()
+        dataValue := item.Get("data")
+        data := make([]byte, dataValue.Get("byteLength").Int())
+        js.CopyBytesToGo(data, dataValue)
 
-		if mainFilepath == "" && strings.HasSuffix(path, ".pf") {
-			mainFilepath = path
-		}
-	}
+        if !fs.FileExists(path) {
+            if err := fs.WriteFile(path, data); err != nil {
+                return err.Error()
+            }
 
-	var (
-		main []byte 
-		err error
-	)
-	if mainFilepath != "" {
-		main, err = fs.ReadFile(mainFilepath)
-		if err != nil {
-			return err.Error()
-		}
-	}
+            originalFiles[path] = data
+        }
 
-	service = pf.NewService().Update(pf.Dependencies{FileSystem: fs})
+        if mainFilepath == "" && strings.HasSuffix(path, ".pf") {
+            mainFilepath = path
+        }
+    }
 
-	if err := service.InitializeFromCode(string(main)); err != nil {
-		errorReport, _ := service.GetErrorReport()
-		return errorReport
-	}
-	service.Update(pf.Dependencies{OutHandler: service.MakeCapturingOutHandler()})
-	return nil
+    var main []byte
+    var err error
+
+    if mainFilepath != "" {
+        main, err = fs.ReadFile(mainFilepath)
+        if err != nil {
+            return err.Error()
+        }
+    }
+
+    service := pf.NewService().Update(
+        pf.Dependencies{FileSystem: fs},
+    )
+
+    if err := service.InitializeFromCode(string(main)); err != nil {
+        errorReport, _ := service.GetErrorReport()
+        return errorReport
+    }
+
+    service.Update(
+        pf.Dependencies{
+            OutHandler: service.MakeCapturingOutHandler(),
+        },
+    )
+
+    services = append(services, service)
+    mainFilepaths = append(mainFilepaths, mainFilepath)
+
+    return len(services) - 1
+}
+
+func getService(index js.Value) (*pf.Service, error) {
+    i := index.Int()
+
+    if i < 0 || i >= len(services) {
+        return nil, fmt.Errorf("invalid service index: %d", i)
+    }
+
+    return services[i], nil
 }
 
 func getFilepath(this js.Value, args []js.Value) any {
@@ -93,43 +120,74 @@ func updateFile(this js.Value, args []js.Value) any {
 }
 
 func compileMain(this js.Value, args []js.Value) any {
-	main, err := fs.ReadFile(mainFilepath)
-	if err != nil {
-		return err.Error()
-	}
-	if err := service.InitializeFromCode(string(main)); err != nil {
-		return err.Error()
-	}
-	service.Update(pf.Dependencies{OutHandler: service.MakeCapturingOutHandler()})
-	return nil
+    service, err := getService(args[0])
+    if err != nil {
+        return err.Error()
+    }
+
+    mainFilepath := mainFilepaths[args[0].Int()]
+
+    main, err := fs.ReadFile(mainFilepath)
+    if err != nil {
+        return err.Error()
+    }
+
+    if err := service.InitializeFromCode(string(main)); err != nil {
+        return err.Error()
+    }
+
+    service.Update(
+        pf.Dependencies{
+            OutHandler: service.MakeCapturingOutHandler(),
+        },
+    )
+
+    return nil
 }
 
 func do(this js.Value, args []js.Value) any {
-	var result values.Value
-	if args[0].String() == "" {
-		compileMain(this, []js.Value{})
-	} else {
-		result, _ = service.Do(args[0].String())
-	}
-	if errorsExist, _ := service.ErrorsExist(); errorsExist {
-		errors, _ := service.GetErrorReport()
-		return text.GetTuiRenderer(-1)(errors)
-	}
-	if args[0].String() == "" {
-		return ""
-	}
-	if result.T == pf.ERROR {
-		e := result.V.(*pf.Error)
-		if e.Message == "" {
-			e = err.CreateErr(e.ErrorId, e.Token, e.Args...)
-		}
-		return text.GetTuiRenderer(-1)("[0] " + text.ERROR + e.Message + err.DescribePos(e.Token) + ".")
-	}
-	if service.PostHappened() {
-		dump, _ := service.Dump()
-		return dump
-	}
-	return service.ToString(result)
+    service, e := getService(args[0])
+    if e != nil {
+        return e.Error()
+    }
+
+    code := args[1].String()
+
+    if code == "" {
+        compileMain(this, []js.Value{args[0]})
+    } else {
+        result, _ := service.Do(code)
+
+        if errorsExist, _ := service.ErrorsExist(); errorsExist {
+            errors, _ := service.GetErrorReport()
+            return text.GetTuiRenderer(-1)(errors)
+        }
+
+        if result.T == pf.ERROR {
+            e := result.V.(*pf.Error)
+            if e.Message == "" {
+                e = err.CreateErr(e.ErrorId, e.Token, e.Args...)
+            }
+            return text.GetTuiRenderer(-1)(
+                "[0] " + text.ERROR + e.Message +
+                    err.DescribePos(e.Token) + ".",
+            )
+        }
+
+        if service.PostHappened() {
+            dump, _ := service.Dump()
+            return dump
+        }
+
+        return service.ToString(result)
+    }
+
+    if errorsExist, _ := service.ErrorsExist(); errorsExist {
+        errors, _ := service.GetErrorReport()
+        return text.GetTuiRenderer(-1)(errors)
+    }
+
+    return ""
 }
 
 func getFileTree(this js.Value, args []js.Value) any {

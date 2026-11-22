@@ -6,6 +6,8 @@ class PipefishService extends HTMLElement {
 
         this.ready = loadWasm();
         this.source = null;
+        this.serviceIndex = null;
+
         this.fileExtractor = async (path, filename) => {
             const url = new URL(
                 filename,
@@ -37,17 +39,19 @@ class PipefishService extends HTMLElement {
     }
 
     async build(fileExtractor) {
-        await this.initialization
+        await this.initialization;
+
         if (fileExtractor) {
-            this.fileExtractor = fileExtractor
+            this.fileExtractor = fileExtractor;
         }
-        await this.compile(this.source)
+
+        return await this.compile(this.source);
     }
 
     async compile(source) {
         await this.ready;
 
-        let files = null;
+        let files;
 
         const lines = source.replace(/\r\n/g, "\n").split("\n");
 
@@ -61,11 +65,14 @@ class PipefishService extends HTMLElement {
                 }
             ];
         }
-        const result =
-            await window.pipefishCompile(files);
+
+        const result = await window.pipefishCompile(files);
+
+        if (Number.isInteger(result)) {
+            this.serviceIndex = result;
+        }
 
         this.source = source;
-        const fp = await this.getFilepath()
         return result;
     }
 
@@ -88,7 +95,12 @@ class PipefishService extends HTMLElement {
 
     async compileMain() {
         await this.ready;
-        return window.pipefishCompileMain();
+
+        if (this.serviceIndex === null) {
+            throw new Error("Service has not been compiled");
+        }
+
+        return window.pipefishCompileMain(this.serviceIndex);
     }
 
     parseDirectory(lines) {
@@ -132,17 +144,15 @@ class PipefishService extends HTMLElement {
     async do(line) {
         await this.ready;
 
-        return window.pipefishDo(line);
-    }
+        if (this.serviceIndex === null) {
+            throw new Error("Service has not been compiled");
+        }
 
-    async getFilepath() {
-        return window.pipefishGetFilepath();
+        return window.pipefishDo(this.serviceIndex, line);
     }
-
 }
 
 customElements.define(
     "pf-service",
     PipefishService
 );
-
