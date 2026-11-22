@@ -7,7 +7,6 @@
 :root {
 
     --border: #d8dee8;
-    --sidebar-border: #d0d8e4;
 
     --shadow-small:
         0 2px 8px rgba(0, 0, 0, .05);
@@ -40,7 +39,6 @@
 
 [data-theme="dark"] {
     --border: #454b58;
-    --sidebar-border: #444a57;
 
     --shadow-small: none;
     --shadow-large: none;
@@ -268,6 +266,7 @@ pf-page, pf-writer {
     padding: 3.5rem;
 
     border-radius: var(--radius);
+    border: 1px solid var(--code-border);
 
     box-shadow: var(--shadow-small);
 
@@ -410,6 +409,7 @@ pf-writer.standalone-markdown {
 
     padding: 1.5rem;
 
+    border: 1px solid var(--code-border);
     border-radius: var(--radius);
 
     box-shadow: var(--shadow-small);
@@ -445,7 +445,7 @@ pf-writer.standalone-markdown {
 
     border-left: 2px solid transparent;
 
-    color: var(--text);
+    color: var(--code-text);
 
     text-decoration: underline;
     text-decoration-thickness: 1px;
