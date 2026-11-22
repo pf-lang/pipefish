@@ -310,7 +310,7 @@ pf-writer[hidden],
     position: absolute;
     z-index: 3;
     top: -1.3rem;
-    left: 1rem;
+    right: 1rem;
     height: 1.75rem;
     padding: 0 .75rem;
     border: 1px solid var(--code-border);
@@ -322,6 +322,10 @@ pf-writer[hidden],
     display: flex;
     align-items: center;
     box-sizing: border-box;
+}
+
+.file-view-label[hidden] {
+    display: none;
 }
 
 .author-file-view {
