@@ -268,6 +268,8 @@ class PfAuthor extends PfBook {
         this.fileViewImageURL = result.imageURL;
 
         const text = fileView.text;
+        text.lineNumbersEnabled = result.info.lineNumbers ?? false;
+        text.wrap = result.info.wrap ? "soft" : "off";
         text.oninput = null;
 
         if (result.info.type === "text" && result.info.editable) {
