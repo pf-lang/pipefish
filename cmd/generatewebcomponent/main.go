@@ -96,7 +96,7 @@ func compile(this js.Value, args []js.Value) any {
 
 func getService(index js.Value) (*pf.Service, error) {
     i := index.Int()
-
+    println("Called getService with index", i)
     if i < 0 || i >= len(services) {
         return nil, fmt.Errorf("invalid service index: %d", i)
     }
