@@ -13,19 +13,22 @@ const TEXT_TYPES = {
     ".md": {
         highlighting: "markdown",
         editable: true,
-        wrap: true
+        wrap: true,
+        lineNumbers: false
     },
 
     ".pf": {
         highlighting: "pipefish",
         editable: true,
-        wrap: false
+        wrap: false,
+        lineNumbers: true
     },
 
     ".txt": {
         highlighting: null,
         editable: true,
-        wrap: true
+        wrap: true,
+        lineNumbers: false
     }
 };
 
@@ -78,6 +81,7 @@ export function classifyFile(path, data) {
             extension,
             editable: knownTextType.editable,
             wrap: knownTextType.wrap,
+            lineNumbers: knownTextType.lineNumbers,
             highlighting: knownTextType.highlighting,
             size
         };
@@ -97,6 +101,7 @@ export function classifyFile(path, data) {
         extension,
         editable: true,
         wrap: false,
+        lineNumbers: false,
         highlighting: null,
         size
     };

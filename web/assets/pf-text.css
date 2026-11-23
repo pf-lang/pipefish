@@ -72,3 +72,53 @@
     cursor: default;
     caret-color: transparent;
 }
+
+.input.no-wrap,
+.highlighted.no-wrap {
+    white-space: pre;
+    overflow-wrap: normal;
+}
+
+.line-numbers {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: calc(var(--line-number-digits, 1) * 1ch + 1.5rem);
+    overflow: hidden;
+    box-sizing: border-box;
+    background: var(--paper);
+    border-right: 1px solid var(--code-border);
+    color: var(--code-border);
+    pointer-events: none;
+}
+
+:host([line-numbers]) .line-numbers {
+    display: block;
+}
+
+:host([line-numbers]) .highlighted,
+:host([line-numbers]) .input {
+    padding-left: calc(
+        var(--line-number-digits, 1) * 1ch + 2.5rem
+    );
+}
+
+.line-numbers-content {
+    padding-top: 1.3rem;
+    padding-bottom: 1rem;
+    text-align: right;
+    transform: translateY(0);
+    will-change: transform;
+}
+
+.line-number {
+    height: 1.4em;
+    line-height: 1.4em;
+    padding: 0 .5rem;
+    box-sizing: border-box;
+    white-space: nowrap;
+    user-select: none;
+}

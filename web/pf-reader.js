@@ -319,6 +319,9 @@ class PipefishReader extends HTMLElement {
         });
 
         this.displayInfo = result.info;
+        this.text.lineNumbersEnabled =
+        result.info.lineNumbers ?? false;
+        this.text.wrap = result.info.wrap ? "soft" : "off";
         this.imageURL = result.imageURL;
 
         this.classList.toggle(

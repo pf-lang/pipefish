@@ -28,28 +28,37 @@ class PfText extends HTMLElement {
         input.autocapitalize = "off";
         input.setAttribute("aria-label", "File contents");
 
-        surface.append(highlighted, input);
+        const lineNumbers = document.createElement("div");
+        lineNumbers.className = "line-numbers";
+        lineNumbers.setAttribute("aria-hidden", "true");
+
+        const lineNumbersContent = document.createElement("div");
+        lineNumbersContent.className = "line-numbers-content";
+
+        lineNumbers.append(lineNumbersContent);
+        surface.append(highlighted, input, lineNumbers);
         shadow.append(style, syntax, surface);
 
         this.surface = surface;
         this.highlighted = highlighted;
         this.input = input;
+        this.lineNumbers = lineNumbers;
+        this.lineNumbersContent = lineNumbersContent;
 
         this._value = "";
         this._highlighter = null;
         this._renderVersion = 0;
+        this._lineNumbers = false;
+        this._wrap = "soft";
 
         input.addEventListener("input", () => {
             this._value = input.value;
+            this.updateLineNumbers();
             this.renderHighlight();
-
-            // The native input event bubbles through the shadow boundary.
-            // Consumers can listen for "input" on <pf-text>.
         });
 
         input.addEventListener("scroll", () => {
-            highlighted.style.transform =
-                `translate(${-input.scrollLeft}px, ${-input.scrollTop}px)`;
+            this.syncHighlightScroll();
         });
 
         input.addEventListener("keydown", event => {
@@ -114,6 +123,7 @@ class PfText extends HTMLElement {
             this.input.value = this._value;
         }
 
+        this.updateLineNumbers();
         this.renderHighlight();
     }
 
@@ -132,6 +142,47 @@ class PfText extends HTMLElement {
         this.toggleAttribute("editable", value);
     }
 
+    get lineNumbersEnabled() {
+        return this._lineNumbers;
+    }
+
+    set lineNumbersEnabled(value) {
+        this._lineNumbers = Boolean(value);
+        this.toggleAttribute("line-numbers", this._lineNumbers);
+
+        this.updateLineNumbers();
+        this.syncHighlightScroll();
+    }
+
+    // Shorter public property name.
+    get showLineNumbers() {
+        return this.lineNumbersEnabled;
+    }
+
+    set showLineNumbers(value) {
+        this.lineNumbersEnabled = value;
+    }
+
+    get wrap() {
+        return this._wrap;
+    }
+
+    set wrap(value) {
+        this._wrap = value === "off" ? "off" : "soft";
+
+        this.input.wrap = this._wrap;
+
+        this.input.classList.toggle(
+            "no-wrap",
+            this._wrap === "off"
+        );
+
+        this.highlighted.classList.toggle(
+            "no-wrap",
+            this._wrap === "off"
+        );
+    }
+
     get highlighter() {
         return this._highlighter;
     }
@@ -142,6 +193,31 @@ class PfText extends HTMLElement {
             : null;
 
         this.renderHighlight();
+    }
+
+    updateLineNumbers() {
+        if (!this._lineNumbers) {
+            return;
+        }
+
+        const lines = this.input.value.split("\n");
+        const digits = String(lines.length).length;
+
+        this.style.setProperty(
+            "--line-number-digits",
+            digits
+        );
+
+        const fragment = document.createDocumentFragment();
+
+        for (let i = 0; i < lines.length; i++) {
+            const number = document.createElement("div");
+            number.className = "line-number";
+            number.textContent = String(i + 1);
+            fragment.append(number);
+        }
+
+        this.lineNumbersContent.replaceChildren(fragment);
     }
 
     async renderHighlight() {
@@ -161,7 +237,6 @@ class PfText extends HTMLElement {
             html = escapeHTML(source);
         }
 
-        // A newer edit may have happened while highlighting was running.
         if (version !== this._renderVersion) {
             return;
         }
@@ -169,8 +244,7 @@ class PfText extends HTMLElement {
         this.highlighted.innerHTML =
             html + (source.endsWith("\n") ? "\u00a0" : "");
 
-        this.highlighted.style.transform =
-            `translate(${-this.input.scrollLeft}px, ${-this.input.scrollTop}px)`;
+        this.syncHighlightScroll();
     }
 
     focus() {
@@ -218,6 +292,9 @@ class PfText extends HTMLElement {
     syncHighlightScroll() {
         this.highlighted.style.transform =
             `translate(${-this.input.scrollLeft}px, ${-this.input.scrollTop}px)`;
+
+        this.lineNumbersContent.style.transform =
+            `translateY(${-this.input.scrollTop}px)`;
     }
 
     isEscaped(text, pos) {
