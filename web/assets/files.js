@@ -1,6 +1,6 @@
 const TITLES = {
 open: "Open",
-"open-book": "Open",
+"open-book": "Open folder as book",
 download: "Download",
 upload: "Upload",
 new: "New",
@@ -25,12 +25,27 @@ class PFFiles extends HTMLElement {
         this.render();
     }
 
-    open(operation = "open", selectedPath = null) {
+    async open(operation = "open", selectedPath = null) {
         this.operation = TITLES[operation] ? operation : "open";
         this.selectedPath = selectedPath;
         this.selected = null;
 
         this.render();
+
+        const link = this.shadowRoot.querySelector(
+            'link[rel="stylesheet"]'
+        );
+
+        if (!link.sheet) {
+            await new Promise(resolve => {
+                link.addEventListener("load", resolve, { once: true });
+
+                link.addEventListener("error", () => {
+                    console.error("Failed to load files.css:", link.href);
+                    resolve();
+                }, { once: true });
+            });
+        }
 
         this.shadowRoot.querySelector(".backdrop").hidden = false;
     }
