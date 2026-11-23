@@ -8,7 +8,6 @@
     overflow: auto;
     resize: vertical;
     pointer-events: auto;
-    border: 1px solid var(--code-border);
 
     color: var(--code-text);
     font-family: "Google Sans Code", monospace;
