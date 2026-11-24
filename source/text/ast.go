@@ -13,6 +13,7 @@ type mdNode interface {
 // A code block.
 type mdCodeBlock struct {
 	tag   string
+	flags string
 	lines []string
 }
 

@@ -82,7 +82,7 @@ func Parse(raw string) mdDocument {
 	docNodes := []mdNode{}
 	accumulator := []string{}
 	mode := mdUnassigned
-	var codeTag string
+	var metadata string
 mainloop:
 	for i := range len(lines) + 1 {
 		line := ""
@@ -108,7 +108,7 @@ mainloop:
 			if mode == mdGettingCodeBlock || mode == mdGettingCliBlock {
 				newMode = mdUnassigned
 			} else {
-				codeTag = line[3:]
+				metadata = line[3:]
 				newMode = mdGettingCodeBlock
 			}
 		}
@@ -125,8 +125,15 @@ mainloop:
 			case mdGettingParagraph:
 				docNodes = append(docNodes, makeParagraph(accumulator))
 			case mdGettingCodeBlock:
-				docNodes = append(docNodes, makeCodeBlock(codeTag, accumulator))
-				codeTag = ""
+				tag := metadata
+				flags := ""
+				ix := strings.Index(metadata, " ")
+				if ix != -1 {
+					tag = metadata[:ix]
+					flags = metadata[ix+1:]
+				}
+				docNodes = append(docNodes, makeCodeBlock(tag, flags, accumulator))
+				metadata = ""
 			case mdGettingCliBlock:
 				docNodes = append(docNodes, makeCliBlock(accumulator))
 			case mdGettingQuote:
@@ -169,8 +176,8 @@ func makeHeading(lines []string) mdHeading {
 	return mdHeading{level, ip.parseAll()}
 }
 
-func makeCodeBlock(codeTag string, lines []string) mdCodeBlock {
-	return mdCodeBlock{codeTag, lines}
+func makeCodeBlock(codeTag string, flags string, lines []string) mdCodeBlock {
+	return mdCodeBlock{codeTag, flags, lines}
 }
 
 func makeCliBlock(lines []string) mdCliBlock {
