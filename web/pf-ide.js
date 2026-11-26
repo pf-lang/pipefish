@@ -1,5 +1,6 @@
 import "./pf-coder.js";
 import "./pf-tui.js";
+import { setFlags } from "./assets/flags.js";
 
 class PipefishIde extends HTMLElement {
     constructor() {
