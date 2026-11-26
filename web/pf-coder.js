@@ -1,5 +1,6 @@
 import "./pf-editor.js";
 import "./pf-service.js";
+import { setFlags } from "./assets/flags.js";
 
 class PipefishCoder extends HTMLElement {
     constructor() {
@@ -36,14 +37,16 @@ class PipefishCoder extends HTMLElement {
         ]);
     }
 
-    initialize(source) {
+    initialize(source, flags) {
         this.initialization = (async () => {
+            setFlags(this, flags);
+
             await this.ready;
 
             this.source = source;
 
-            await this.service.initialize(source);
-            await this.editor.initialize(source);
+            await this.service.initialize(source, this.flags);
+            await this.editor.initialize(source, this.flags);
 
             this.dirty = false;
         })();

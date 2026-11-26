@@ -1,5 +1,6 @@
 import "./pf-text.js";
 import { loadWasm } from "./assets/pf-wasm.js";
+import { setFlags } from "./assets/flags.js";
 
 import {
     classifyFile,
@@ -111,10 +112,12 @@ class PipefishReader extends HTMLElement {
         this.initialize(this.textContent);
     }
 
-    initialize(source) {
+    initialize(source, flags) {
         this.initialization = (async () => {
+            setFlags(this, flags);
             this.source = source;
         })();
+
         return this.initialization;
     }
 

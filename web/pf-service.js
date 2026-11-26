@@ -1,4 +1,5 @@
 import { loadWasm } from "./assets/pf-wasm.js";
+import { setFlags } from "./assets/flags.js";
 
 class PipefishService extends HTMLElement {
     constructor() {
@@ -32,10 +33,13 @@ class PipefishService extends HTMLElement {
         };
     }
 
-    async initialize(source) {
+    async initialize(source, flags) {
         this.initialization = (async () => {
+            setFlags(this, flags);
             this.source = source;
         })();
+
+        return this.initialization;
     }
 
     async build(fileExtractor) {

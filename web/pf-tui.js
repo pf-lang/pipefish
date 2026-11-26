@@ -1,5 +1,6 @@
 import "./pf-service.js";
 import "./pf-highlighter.js";
+import { setFlags } from "./assets/flags.js";
 
 class PipefishTui extends HTMLElement {
     constructor() {
@@ -299,14 +300,15 @@ class PipefishTui extends HTMLElement {
         this.arrow.textContent = this.promptLabel.textContent == "" ? "→ " : " → ";
     }
 
-    async initialize(source) {
+    async initialize(source, flags) {
+        setFlags(this, flags);
         this.initialized = this._initialize(source);
         return this.initialized;
     }
 
     async _initialize(source) {
         await this.ready;
-        await this.service.initialize(source);
+        await this.service.initialize(source, this.flags);
     }
 
     isEscaped(text, pos) {

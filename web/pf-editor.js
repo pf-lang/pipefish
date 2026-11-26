@@ -1,6 +1,7 @@
 import "./pf-reader.js";
 import { FileManager } from "./assets/file-manager.js";
 import "./assets/file-menu.js";
+import { setFlags } from "./assets/flags.js";
 
 class PipefishEditor extends HTMLElement {
     constructor() {
@@ -222,8 +223,10 @@ class PipefishEditor extends HTMLElement {
         this.reader.text.value = String(value ?? "");
     }
 
-    async initialize(source) {
+    async initialize(source, flags) {
         this.initialization = (async () => {
+            setFlags(this, flags);
+
             await this.ready;
 
             const firstLine = source.trim().split(/\r?\n/, 1)[0].trim();
@@ -232,7 +235,7 @@ class PipefishEditor extends HTMLElement {
                 ? firstLine.replace(/\/+$/, "").split("/").pop()
                 : "⋮";
 
-            await this.reader.initialize(source);
+            await this.reader.initialize(source, this.flags);
         })();
 
         return this.initialization;
