@@ -144,24 +144,8 @@ class PipefishEditor extends HTMLElement {
         this.initialization = null;
 
         minimize.addEventListener("click", () => {
-            const minimized =
-                this.editor.classList.toggle("minimized");
-
-            this.classList.toggle("minimized", minimized);
-
-            this.minimizeButton.setAttribute(
-                "aria-label",
-                minimized ? "Maximize" : "Minimize"
-            );
-
-            this.dispatchEvent(
-                new CustomEvent(
-                    minimized ? "minimize" : "maximize",
-                    {
-                        bubbles: true,
-                        composed: true
-                    }
-                )
+            this.setMinimized(
+                !this.editor.classList.contains("minimized")
             );
         });
 
@@ -204,6 +188,26 @@ class PipefishEditor extends HTMLElement {
         
     }
 
+    setMinimized(minimized) {
+        this.editor.classList.toggle("minimized", minimized);
+        this.classList.toggle("minimized", minimized);
+
+        this.minimizeButton.setAttribute(
+            "aria-label",
+            minimized ? "Maximize" : "Minimize"
+        );
+
+        this.dispatchEvent(
+            new CustomEvent(
+                minimized ? "minimize" : "maximize",
+                {
+                    bubbles: true,
+                    composed: true
+                }
+            )
+        );
+    }
+
     connectedCallback() {
         this.updateScrollbar();
     }
@@ -226,6 +230,7 @@ class PipefishEditor extends HTMLElement {
     async initialize(source, flags) {
         this.initialization = (async () => {
             setFlags(this, flags);
+            this.setMinimized(!!this.flags.minimized);
 
             await this.ready;
 
