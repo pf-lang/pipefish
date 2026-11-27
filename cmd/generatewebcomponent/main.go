@@ -77,7 +77,7 @@ func compile(this js.Value, args []js.Value) any {
         pf.Dependencies{FileSystem: fs},
     )
 
-    if err := service.InitializeFromCode(string(main)); err != nil {
+    if err := service.InitializeFromCode(mainFilepath, string(main)); err != nil {
         errorReport, _ := service.GetErrorReport()
         return errorReport
     }
@@ -143,7 +143,7 @@ func compileMain(this js.Value, args []js.Value) any {
         return err.Error()
     }
 
-    if err := service.InitializeFromCode(string(main)); err != nil {
+    if err := service.InitializeFromCode(mainFilepath, string(main)); err != nil {
         return err.Error()
     }
 
