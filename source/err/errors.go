@@ -136,11 +136,14 @@ func MergeErrors(a, b Errors) Errors {
 var oppositeOf = map[string]string{"<-|": "indent", "|->": "outdent", ")": "(", "(": ")", "]": "[", "[": "]", "}": "{", "{": "}"}
 
 func DescribePos(token *token.Token) string {
+	println("Called DescribePos")
 	if token == nil {
+		println("Token is nil.")
 		return ""
 	}
 	prettySource := token.Source
 	if prettySource == "" {
+		println("Source is empty string.")
 		return ""
 	}
 	if prettySource != "REPL input" {
