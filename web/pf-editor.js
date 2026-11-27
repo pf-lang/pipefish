@@ -230,7 +230,8 @@ class PipefishEditor extends HTMLElement {
     async initialize(source, flags) {
         this.initialization = (async () => {
             setFlags(this, flags);
-            this.setMinimized(!!this.flags.minimized);
+            this.setMinimized(!!this.flags.minimized)
+            console.log(!!this.flags.minimized)
 
             await this.ready;
 
