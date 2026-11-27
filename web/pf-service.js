@@ -85,11 +85,16 @@ class PipefishService extends HTMLElement {
         if (Number.isInteger(result)) {
             this.serviceIndex = result;
         } else {
-            console.log(result)
+            this.compileTimeErrors = result
         }
 
         this.source = source;
         return result;
+    }
+
+    async getCompileTimeErrors() {
+        await this.ready;
+        return this.compileTimeErrors;
     }
 
     async loadDirectory(lines) {

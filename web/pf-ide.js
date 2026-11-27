@@ -73,6 +73,11 @@ class PipefishIde extends HTMLElement {
         await this.initialization;
         await this.tui.build(fileExtractor);
     }
+
+    async do(line) {
+        await this.ready;
+        return this.tui.do(line);
+    }
 }
 
 customElements.define(

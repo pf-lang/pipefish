@@ -309,6 +309,15 @@ class PipefishTui extends HTMLElement {
     async _initialize(source) {
         await this.ready;
         await this.service.initialize(source, this.flags);
+        errorReport = this.service.getCompileTimeErrors()
+        if (errorReport) {
+            console.log(errorReport)
+        }
+    }
+
+    async do(line) {
+        await this.ready;
+        return this.service.do(line);
     }
 
     isEscaped(text, pos) {
