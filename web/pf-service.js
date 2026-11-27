@@ -84,6 +84,8 @@ class PipefishService extends HTMLElement {
 
         if (Number.isInteger(result)) {
             this.serviceIndex = result;
+        } else {
+            console.log(result)
         }
 
         this.source = source;
@@ -164,6 +166,7 @@ class PipefishService extends HTMLElement {
 
         return window.pipefishDo(this.serviceIndex, line);
     }
+
 }
 
 customElements.define(
