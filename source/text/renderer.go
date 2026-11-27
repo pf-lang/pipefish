@@ -121,13 +121,12 @@ func MakeRenderFunction(textWrapper map[mdStyle]func(s string) string, codeHighl
 				}
 				sb.WriteString("<")
 				sb.WriteString(n.tag)
+				sb.WriteString(" data-flags='")
+				sb.WriteString(n.flags)
 				sb.WriteString(">")
 				sb.WriteString(result)
 				sb.WriteString("</")
 				sb.WriteString(n.tag)
-				sb.WriteString(" data-flags='")
-				println("Wrote flags", n.flags)
-				sb.WriteString(n.flags)
 				sb.WriteString("'>")
 				if n.tag != "pf-service" {
 					sb.WriteString("<div class=\"vertical-break\"></div>")
