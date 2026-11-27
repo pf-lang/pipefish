@@ -24,5 +24,7 @@ export function parseFlags(source) {
 }
 
 export function setFlags(component, flags) {
-    component.flags = { ...flags };
+    component.flags = flags
+        ? { ...flags }
+        : parseFlags(component.dataset.flags);
 }
