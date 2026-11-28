@@ -63,7 +63,7 @@ class PipefishService extends HTMLElement {
     }
 
     async compile(source) {
-        console.log("Called compile")
+        console.log("Called compile");
         await this.ready;
 
         let files;
@@ -121,7 +121,7 @@ class PipefishService extends HTMLElement {
     }
 
     async compileMain() {
-        console.log("Called compileMain.")
+        console.log("Called compileMain.");
         await this.ready;
         this.compileTimeErrors = "";
         await window.pipefishCompileMain(this.serviceIndex);
