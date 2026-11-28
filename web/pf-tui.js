@@ -37,6 +37,7 @@ class PipefishTui extends HTMLElement {
         transcript.classList.add("transcript");
 
         this.transcript = transcript;
+        this.showCompilerErrors();
         this.repl = repl;
 
         const inputLine =
@@ -309,6 +310,9 @@ class PipefishTui extends HTMLElement {
     async _initialize(source) {
         await this.ready;
         await this.service.initialize(source, this.flags);
+    }
+
+    async showCompilerErrors() {
         const errorReport = await this.service.getErrorReport()
         if (errorReport) {
             const errors = document.createElement("div");
