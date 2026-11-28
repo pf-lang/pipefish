@@ -89,7 +89,9 @@ class PipefishService extends HTMLElement {
         }
 
         const errorReport = await window.pipefishGetErrorReport(result)
-        this.compileTimeErrors = await window.pipefishRenderMdAsHtml(errorReport);
+        if (errorReport != "Current service has no recent errors.") {
+            this.compileTimeErrors = await window.pipefishRenderMdAsHtml(errorReport);
+        }
 
         this.source = source;
         return result;
@@ -118,10 +120,12 @@ class PipefishService extends HTMLElement {
     }
 
     async compileMain() {
+        console.log("Called compileMain.")
         await this.ready;
         await window.pipefishCompileMain(this.serviceIndex);
         const errorReport = await window.pipefishGetErrorReport(this.serviceIndex)
-        if (errorReport) {
+        if (errorReport != "Current service has no recent errors.") {
+            console.log("Created error report", errorReport)
             this.compileTimeErrors = await window.pipefishRenderMdAsHtml(errorReport);
         }
     }
