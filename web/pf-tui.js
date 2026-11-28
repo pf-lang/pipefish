@@ -313,7 +313,7 @@ class PipefishTui extends HTMLElement {
         if (errorReport) {
             const errors = document.createElement("div");
             errors.innerHTML = errorReport;
-            this.transcript.appendChild(errorReport);
+            this.transcript.appendChild(errors);
         }
     }
 
