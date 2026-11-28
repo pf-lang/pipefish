@@ -89,7 +89,7 @@ class PipefishCoder extends HTMLElement {
 
     async getErrorReport() {
         await this.ready;
-        return this.compileTimeErrors;
+        return this.service.getErrorReport();
     }
 
     async do(line) {
