@@ -85,7 +85,7 @@ class PipefishService extends HTMLElement {
         if (Number.isInteger(result)) {
             this.serviceIndex = result;
         } else {
-            this.compileTimeErrors = result
+            this.compileTimeErrors = window.pipefishRenderMdAsHtml(result);
         }
 
         this.source = source;

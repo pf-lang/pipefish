@@ -311,7 +311,9 @@ class PipefishTui extends HTMLElement {
         await this.service.initialize(source, this.flags);
         errorReport = this.service.getCompileTimeErrors()
         if (errorReport) {
-            console.log(errorReport)
+            const errors = document.createElement("div");
+            errors.innerHTML = errorReport;
+            this.transcript.appendChild(errorReport);
         }
     }
 
