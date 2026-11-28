@@ -87,7 +87,7 @@ class PipefishCoder extends HTMLElement {
         this.dirty = false;
     }
 
-    async getCompileTimeErrors() {
+    async getErrorReport() {
         await this.ready;
         return this.compileTimeErrors;
     }

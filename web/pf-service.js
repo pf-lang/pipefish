@@ -92,7 +92,7 @@ class PipefishService extends HTMLElement {
         return result;
     }
 
-    async getCompileTimeErrors() {
+    async getErrorReport() {
         await this.ready;
         return this.compileTimeErrors;
     }
