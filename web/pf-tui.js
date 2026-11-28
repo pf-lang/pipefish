@@ -319,7 +319,6 @@ class PipefishTui extends HTMLElement {
             errors.innerHTML = errorReport;
             this.transcript.appendChild(errors);
         }
-        console.log("ER", errorReport)
     }
 
     async do(line) {
@@ -539,7 +538,7 @@ class PipefishTui extends HTMLElement {
 
             const result =
                 await this.service.do(command);
-
+            this.showCompilerErrors()
             if (
                 result !== undefined &&
                 result !== ""

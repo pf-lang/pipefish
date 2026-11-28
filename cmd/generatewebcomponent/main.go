@@ -144,7 +144,8 @@ func compileMain(this js.Value, args []js.Value) any {
     }
 
     if err := service.InitializeFromCode(mainFilepath, string(main)); err != nil {
-        return err.Error()
+        errorReport, _ := service.GetErrorReport()
+        return errorReport
     }
 
     service.Update(

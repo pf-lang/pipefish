@@ -116,12 +116,10 @@ class PipefishService extends HTMLElement {
 
     async compileMain() {
         await this.ready;
-
-        if (this.serviceIndex === null) {
-            throw new Error("Service has not been compiled");
+        const errorReport = window.pipefishCompileMain(this.serviceIndex);
+        if (errorReport) {
+            this.compileTimeErrors = window.pipefishRenderMdAsHtml(result);
         }
-
-        return window.pipefishCompileMain(this.serviceIndex);
     }
 
     parseDirectory(lines) {
