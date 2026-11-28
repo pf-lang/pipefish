@@ -113,8 +113,11 @@ func getErrorReport(this js.Value, args []js.Value) any {
     if i < 0 || i >= len(services) {
         return fmt.Sprintf("invalid service index: %d", i)
     }
-    report, _ := services[i].GetErrorReport()
-    return report
+    if services[i].IsBroken() {
+        report, _ := services[i].GetErrorReport()
+        return report
+    }
+    return nil
 }
 
 func getFilepath(this js.Value, args []js.Value) any {

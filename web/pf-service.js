@@ -90,7 +90,8 @@ class PipefishService extends HTMLElement {
         }
 
         const errorReport = await window.pipefishGetErrorReport(result)
-        if (errorReport != "Current service has no recent errors.") {
+        if (errorReport) {
+            console.log("")
             this.compileTimeErrors = await window.pipefishRenderMdAsHtml(errorReport);
         }
 
@@ -126,7 +127,7 @@ class PipefishService extends HTMLElement {
         this.compileTimeErrors = "";
         await window.pipefishCompileMain(this.serviceIndex);
         const errorReport = await window.pipefishGetErrorReport(this.serviceIndex)
-        if (errorReport != "Current service has no recent errors.") {
+        if (errorReport) {
             console.log("Created error report", errorReport)
             this.compileTimeErrors = await window.pipefishRenderMdAsHtml(errorReport);
         }
