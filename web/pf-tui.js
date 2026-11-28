@@ -309,7 +309,7 @@ class PipefishTui extends HTMLElement {
     async _initialize(source) {
         await this.ready;
         await this.service.initialize(source, this.flags);
-        const errorReport = this.service.getErrorReport()
+        const errorReport = await this.service.getErrorReport()
         if (errorReport) {
             const errors = document.createElement("div");
             errors.innerHTML = errorReport;
