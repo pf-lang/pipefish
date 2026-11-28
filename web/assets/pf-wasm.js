@@ -52,6 +52,7 @@ const deadline = Date.now() + 10000;
     function check() {
         if (
             window.pipefishCompile &&
+            window.pipefishGetErrorReport &&
             window.pipefishCompileMain &&
             window.pipefishCreateAuthorDirectory &&
             window.pipefishCreateDirectory &&

@@ -85,8 +85,11 @@ class PipefishService extends HTMLElement {
         if (Number.isInteger(result)) {
             this.serviceIndex = result;
         } else {
-            this.compileTimeErrors = window.pipefishRenderMdAsHtml(result);
+            return "failed to compile service"
         }
+
+        const errorReport = await window.pipefishGetErrorReport(result)
+        this.compileTimeErrors = await window.pipefishRenderMdAsHtml(errorReport);
 
         this.source = source;
         return result;
@@ -116,9 +119,10 @@ class PipefishService extends HTMLElement {
 
     async compileMain() {
         await this.ready;
-        const errorReport = window.pipefishCompileMain(this.serviceIndex);
+        await window.pipefishCompileMain(this.serviceIndex);
+        errorReport = await window.pipefishGetErrorReport(this.serviceIndex)
         if (errorReport) {
-            this.compileTimeErrors = window.pipefishRenderMdAsHtml(result);
+            this.compileTimeErrors = await window.pipefishRenderMdAsHtml(result);
         }
     }
 

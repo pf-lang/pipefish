@@ -3,14 +3,14 @@
 package main
 
 import (
+	"archive/zip"
 	"bytes"
-    "fmt"
-	"path/filepath"
+	"fmt"
 	pathpkg "path"
+	"path/filepath"
 	"sort"
 	"strings"
 	"syscall/js"
-	"archive/zip"
 
 	"github.com/tim-hardcastle/pipefish/source/err"
 	"github.com/tim-hardcastle/pipefish/source/filesystem"
@@ -77,16 +77,17 @@ func compile(this js.Value, args []js.Value) any {
         pf.Dependencies{FileSystem: fs},
     )
 
-    if err := service.InitializeFromCode(mainFilepath, string(main)); err != nil {
-        errorReport, _ := service.GetErrorReport()
-        return errorReport
-    }
+    err = service.InitializeFromCode(mainFilepath, string(main));
 
     service.Update(
         pf.Dependencies{
             OutHandler: service.MakeCapturingOutHandler(),
         },
     )
+
+    if service == nil {
+        return err
+    }
 
     services = append(services, service)
     mainFilepaths = append(mainFilepaths, mainFilepath)
@@ -103,6 +104,17 @@ func getService(index js.Value) (*pf.Service, error) {
     }
 
     return services[i], nil
+}
+
+func getErrorReport(this js.Value, args []js.Value) any {
+
+    i := args[0].Int()
+
+    if i < 0 || i >= len(services) {
+        return fmt.Sprintf("invalid service index: %d", i)
+    }
+    report, _ := services[i].GetErrorReport()
+    return report
 }
 
 func getFilepath(this js.Value, args []js.Value) any {
@@ -785,6 +797,11 @@ func main() {
 	js.Global().Set(
 		"pipefishCompile",
 		js.FuncOf(compile),
+	)
+
+    js.Global().Set(
+		"pipefishGetErrorReport",
+		js.FuncOf(getErrorReport),
 	)
 
 	js.Global().Set(
