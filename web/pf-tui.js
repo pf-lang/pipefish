@@ -37,7 +37,6 @@ class PipefishTui extends HTMLElement {
         transcript.classList.add("transcript");
 
         this.transcript = transcript;
-        this.showCompilerErrors();
         this.repl = repl;
 
         const inputLine =
@@ -299,6 +298,7 @@ class PipefishTui extends HTMLElement {
         const fp = await this.service.getFilepath()
         this.promptLabel.textContent = getFilenameWithoutExtension(fp)
         this.arrow.textContent = this.promptLabel.textContent == "" ? "→ " : " → ";
+        this.showCompilerErrors();
     }
 
     async initialize(source, flags) {
@@ -313,7 +313,7 @@ class PipefishTui extends HTMLElement {
     }
 
     async showCompilerErrors() {
-        const errorReport = await this.service.getErrorReport()
+        const errorReport = await this.service.getErrorReport();
         if (errorReport) {
             const errors = document.createElement("div");
             errors.innerHTML = errorReport;
