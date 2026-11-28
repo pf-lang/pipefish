@@ -120,7 +120,7 @@ class PipefishService extends HTMLElement {
     async compileMain() {
         await this.ready;
         await window.pipefishCompileMain(this.serviceIndex);
-        errorReport = await window.pipefishGetErrorReport(this.serviceIndex)
+        const errorReport = await window.pipefishGetErrorReport(this.serviceIndex)
         if (errorReport) {
             this.compileTimeErrors = await window.pipefishRenderMdAsHtml(result);
         }
