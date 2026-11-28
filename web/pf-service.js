@@ -63,6 +63,7 @@ class PipefishService extends HTMLElement {
     }
 
     async compile(source) {
+        console.log("Called compile")
         await this.ready;
 
         let files;
@@ -122,6 +123,7 @@ class PipefishService extends HTMLElement {
     async compileMain() {
         console.log("Called compileMain.")
         await this.ready;
+        this.compileTimeErrors = "";
         await window.pipefishCompileMain(this.serviceIndex);
         const errorReport = await window.pipefishGetErrorReport(this.serviceIndex)
         if (errorReport != "Current service has no recent errors.") {
